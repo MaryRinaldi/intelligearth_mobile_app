@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'screens/home_screen.dart';
 
 void main() {
   runApp(const MyApp());
@@ -11,7 +12,7 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Flutter Demo',
+      title: 'IntelligEarth App',
       theme: ThemeData(
 
         // Notice that the counter didn't reset back to zero; the application
@@ -23,7 +24,7 @@ class MyApp extends StatelessWidget {
         colorScheme: ColorScheme.fromSeed(seedColor: const Color.fromARGB(255, 175, 76, 142)),
         useMaterial3: true,
       ),
-      home: const MyHomePage(title: 'IntelligEarth App'),
+      home: const HomeScreen(),
     );
   }
 }
