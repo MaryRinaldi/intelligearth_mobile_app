@@ -1,7 +1,44 @@
 import 'package:flutter/material.dart';
 
-class HomeScreen extends StatelessWidget {
+class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
+
+  @override
+  HomeScreenState createState() => HomeScreenState();
+}
+class HomeScreenState extends State<HomeScreen> {
+  // Indice della pagina selezionata
+  int _selectedIndex = 0;
+
+  // Lista di pagine che vuoi mostrare
+  static const List<Widget> _pages = <Widget>[
+    Center(
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: <Widget>[
+          Text(
+            'Bentornat*!',
+            style: TextStyle(fontSize: 24),
+            ),
+            SizedBox(height: 20),
+            Text(
+            'we are loading...',
+            style: TextStyle(fontSize: 18),
+          ),
+        ],
+      ),
+    ),
+    Center(child: Text('Mappa Page', style: TextStyle(fontSize: 24))),
+    Center(child: Text('Report Page', style: TextStyle(fontSize: 24))),
+    Center(child: Text('Account Page', style: TextStyle(fontSize: 24))),
+  ];
+
+  // Funzione per aggiornare la selezione dell'indice
+  void _onItemTapped(int index) {
+    setState(() {
+      _selectedIndex = index;
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -9,22 +46,7 @@ class HomeScreen extends StatelessWidget {
       appBar: AppBar(
         title: const Text('IntelligEarth'),
       ),
-      body: const Center(
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: <Widget>[
-             Text(
-              'Bentornat*!',
-              style: TextStyle(fontSize: 24),
-            ),
-            SizedBox(height: 20),
-            Text('we are loading...',
-            style: TextStyle(fontSize: 18),
-            ),
-            // Aggiungi qui ulteriori widget per le ultime attività
-          ],
-        ),
-      ),
+      body: _pages[_selectedIndex],      
       bottomNavigationBar: BottomNavigationBar(
         items: const <BottomNavigationBarItem>[
           BottomNavigationBarItem(
@@ -44,12 +66,12 @@ class HomeScreen extends StatelessWidget {
             label: 'Account',
           ),
         ],
-        currentIndex: 0,
-        selectedItemColor: Colors.blue,
-        onTap: (index) {
-          // Gestisci la navigazione qui
-        },
+        currentIndex: _selectedIndex,
+        selectedItemColor: Colors.green,
+        unselectedItemColor: Colors.blue,
+        onTap: _onItemTapped,
       ),
     );
   }
 }
+ 
