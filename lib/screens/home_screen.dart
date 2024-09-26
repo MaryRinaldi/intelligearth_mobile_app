@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
-// import 'package:intelligearth_mobile/models/account_model.dart';
+import 'package:intelligearth_mobile/screens/user_page.dart';
+import 'package:intelligearth_mobile/models/user_model.dart';
+//import 'package:intelligearth_mobile/models/account_model.dart';
 // import 'package:intelligearth_mobile/models/report_model.dart';
-// import 'package:intelligearth_mobile/models/user_model.dart';
 // import 'package:intelligearth_mobile/screens/map_page.dart';
 // import 'package:intelligearth_mobile/screens/report_screen.dart';
 
@@ -15,6 +16,14 @@ class HomeScreenState extends State<HomeScreen> {
   // Indice della pagina selezionata
   int _selectedIndex = 0;
 
+  // Creazione dell'oggetto User
+  User currentUser = User(
+    id: '1',
+    name: 'Mario Rossi',
+    email: 'mario.rossi@example.com',
+    avatarUrl: '',  // Aggiungi un URL dell'avatar
+    role: '',  // Aggiungi un ruolo utente o admin
+  );
   // Lista di pagine che vuoi mostrare
   static const List<Widget> _pages = <Widget>[
     Center(
@@ -43,7 +52,16 @@ class HomeScreenState extends State<HomeScreen> {
     setState(() {
       _selectedIndex = index;
     });
+    // Navigazione alla pagina dell'account
+  if (index == 3) { // Indice della pagina Account
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => UserPage(user: currentUser),
+      ),
+    );
   }
+}
 
   @override
   Widget build(BuildContext context) {
