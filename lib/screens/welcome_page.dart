@@ -9,13 +9,15 @@ class WelcomePage extends StatelessWidget {
     return Scaffold(
       body: Center(
         child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
+          mainAxisAlignment: MainAxisAlignment.spaceEvenly,
           children: <Widget>[
-            Image.asset('assets/images/intelligearth_logo.png', height: 100),
-            const SizedBox(height: 30),
+            Spacer(),
+            Image.asset('assets/images/intelligearth_logo.png', height: 200, fit: BoxFit.contain,),
+            Spacer(),
             const Text('Intelligearth App', style: TextStyle(fontSize: 32)),
-            const Text('Slogan breve qui', style: TextStyle(fontSize: 16)),
-            const SizedBox(height: 50),
+            const Text('Descrizione breve', style: TextStyle(fontSize: 16)),
+            Spacer(),
+            Spacer(),
             ElevatedButton(
               onPressed: () {
                 Navigator.pushReplacement(
@@ -23,8 +25,9 @@ class WelcomePage extends StatelessWidget {
                   MaterialPageRoute(builder: (context) => const SignInScreen()),
                 );
               },
-              child: const Text('Get Started'),
+              child: const Text('Get Started', style: TextStyle(fontSize: 30)),
             ),
+            Spacer(),
           ],
         ),
       ),

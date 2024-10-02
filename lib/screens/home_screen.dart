@@ -3,8 +3,8 @@ import 'package:intelligearth_mobile/screens/user_page.dart';
 import 'package:intelligearth_mobile/models/user_model.dart';
 //import 'package:intelligearth_mobile/models/account_model.dart';
 // import 'package:intelligearth_mobile/models/report_model.dart';
-// import 'package:intelligearth_mobile/screens/map_page.dart';
-// import 'package:intelligearth_mobile/screens/report_screen.dart';
+import 'package:intelligearth_mobile/screens/photo_page.dart';
+import 'package:intelligearth_mobile/screens/techsupport_screen.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -24,28 +24,32 @@ class HomeScreenState extends State<HomeScreen> {
     avatarUrl: '',  // Aggiungi un URL dell'avatar
     role: '',  // Aggiungi un ruolo utente o admin
   );
-  // Lista di pagine che vuoi mostrare
-  static const List<Widget> _pages = <Widget>[
+
+late final List<Widget> _pages;
+
+@override
+void initState() {
+  super.initState();
+  _pages = [
     Center(
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: <Widget>[
-          Text(
-            'Bentornat*!',
-            style: TextStyle(fontSize: 24),
-            ),
-            SizedBox(height: 20),
-            Text(
-            'we are loading...',
-            style: TextStyle(fontSize: 18),
-          ),
+        child: Padding(
+        padding: EdgeInsets.all(16.0),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: <Widget>[
+            Image.asset('assets/images/intelligearth_logo.png', height: 50),
+            Text('IntelligEarth App', style: TextStyle(fontSize: 24)),
+            Text('Bentornat*!', style: TextStyle(fontSize: 24)),
+            Text('we are loading...', style: TextStyle(fontSize: 18)),
         ],
       ),
     ),
-    Center(child: Text('Mappa Page', style: TextStyle(fontSize: 24))),
-    Center(child: Text('Report Page', style: TextStyle(fontSize: 24))),
-    Center(child: Text('Account Page', style: TextStyle(fontSize: 24))),
+    ),
+    PhotoPage(),    // Usa il widget della schermata mappa
+    TechsupportScreen(),    // Usa il widget della schermata report
+    UserPage(user: currentUser), 
   ];
+}
 
   // Funzione per aggiornare la selezione dell'indice
   void _onItemTapped(int index) {

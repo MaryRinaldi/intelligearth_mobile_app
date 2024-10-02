@@ -13,7 +13,7 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       title: 'IntelligEarth App',
       theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(seedColor: const Color(0xFFAF4C8E)),
+        colorScheme: ColorScheme.fromSeed(seedColor: const Color.fromARGB(255, 225, 225, 225)),
         useMaterial3: true,
       ),
       home: const WelcomePage(),
