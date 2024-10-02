@@ -32,7 +32,7 @@ class SignUpScreenState extends State<SignUpScreen> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: <Widget>[
-            Image.asset('assets/images/intelligearth_logo', height: 50),
+            Image.asset('assets/images/intelligearth_logo.png', height: 50),
             const SizedBox(height: 10),
             const Text('IntelligEarth App', style: TextStyle(fontSize: 24)),
             const SizedBox(height: 40),
