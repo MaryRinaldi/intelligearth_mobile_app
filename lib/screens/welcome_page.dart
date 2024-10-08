@@ -25,7 +25,7 @@ class WelcomePage extends StatelessWidget {
                   MaterialPageRoute(builder: (context) => const SignInScreen()),
                 );
               },
-              child: const Text('Get Started', style: TextStyle(fontSize: 30)),
+              child: const Text('Get Started', style: TextStyle(fontSize: 26)),
             ),
             Spacer(),
           ],
