@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
-import 'sign_up_screen.dart';
+import 'package:intelligearth_mobile/services/auth_service.dart';
 import 'package:intelligearth_mobile/screens/home_screen.dart';
+import 'sign_up_screen.dart';
 
 class SignInScreen extends StatefulWidget {
   const SignInScreen({super.key});
@@ -9,22 +10,32 @@ class SignInScreen extends StatefulWidget {
   SignInScreenState createState() => SignInScreenState();
 }
 class SignInScreenState extends State<SignInScreen> {
+  final AuthService _authService = AuthService();
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
+  String? errorMessage;
 
-    void _loginUser(BuildContext context) {
-    // Simulazione del login
-    if (_emailController.text.isNotEmpty && _passwordController.text.isNotEmpty) {
+    void _signIn() async {
+    final user = await _authService.signIn(
+      _emailController.text,
+      _passwordController.text,
+    );
+
+    if (user != null) {
       Navigator.pushReplacement(
         context,
-        MaterialPageRoute(builder: (context) => const HomeScreen()),
+        MaterialPageRoute(builder: (context) => HomeScreen()),
       );
+    } else {
+      setState(() {
+        errorMessage = 'Invalid email or password';
+      });
     }
   }
 
   @override
   Widget build(BuildContext context) {
-     final screenSize = MediaQuery.of(context).size;
+    final screenSize = MediaQuery.of(context).size;
      
     return Scaffold(
       body: Padding(
@@ -64,6 +75,11 @@ class SignInScreenState extends State<SignInScreen> {
               decoration: const InputDecoration(labelText: 'Password'),
               obscureText: true,
             ),
+            if (errorMessage != null)
+              Padding(
+                padding: const EdgeInsets.only(top: 8.0),
+                child: Text(errorMessage!, style: TextStyle(color: Colors.red)),
+              ),
             SizedBox(height: 16),
             Align(
               alignment: Alignment.centerRight,
@@ -81,12 +97,12 @@ class SignInScreenState extends State<SignInScreen> {
                           style: ElevatedButton.styleFrom(
                             backgroundColor: const Color.fromARGB(255, 225, 225, 225), // Colore di sfondo
                             shape: RoundedRectangleBorder( // Forma del pulsante
-                              borderRadius: BorderRadius.circular(12),
+                            borderRadius: BorderRadius.circular(12),
                             ),
                             padding: const EdgeInsets.symmetric(vertical: 16.0), // Altezza del pulsante
                           ),
-                          onPressed: () => _loginUser(context),
-                          child: const Text('Sign In'),
+                          onPressed: _signIn,
+                          child: Text('Sign In'),
                         ),
                       ),
             SizedBox(height: 56),

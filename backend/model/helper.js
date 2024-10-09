@@ -1,5 +1,5 @@
 require("dotenv").config();
-const mysql = require("mysql");
+const mysql = require("mysql2");
 const bcrypt = require("bcrypt");
 
 const saltRounds = 10;
@@ -25,7 +25,7 @@ module.exports = async function db(query, params = []) {
     host: process.env.DB_HOST || "0.0.0.0",
     user: process.env.DB_USER || "root",
     password: process.env.DB_PASS,
-    database: process.env.DB_NAME || "mobile_app",
+    database: process.env.DB_NAME || "intelligearth_db",
     multipleStatements: true,
   });
 

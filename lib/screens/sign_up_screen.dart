@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:intelligearth_mobile/screens/home_screen.dart';
+import 'package:intelligearth_mobile/services/auth_service.dart';
+
 
 class SignUpScreen extends StatefulWidget {
   const SignUpScreen({super.key});
@@ -9,18 +10,26 @@ class SignUpScreen extends StatefulWidget {
 }
 
 class SignUpScreenState extends State<SignUpScreen> {
+  final AuthService _authService = AuthService();
+  final TextEditingController _nameController = TextEditingController();
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
   final TextEditingController _confirmPasswordController = TextEditingController();
+  String? errorMessage;
 
-  void _registerUser(BuildContext context) {
-    // Simulazione della registrazione
-    if (_emailController.text.isNotEmpty &&
-        _passwordController.text == _confirmPasswordController.text) {
-      Navigator.pushReplacement(
-        context,
-        MaterialPageRoute(builder: (context) => const HomeScreen()),
-      );
+  void _signUp() async {
+    final user = await _authService.signUp(
+      _nameController.text,
+      _emailController.text,
+      _passwordController.text,
+    );
+
+    if (user != null) {
+      Navigator.pushReplacementNamed(context, '/home');
+    } else {
+      setState(() {
+        errorMessage = 'Registration failed';
+      });
     }
   }
 
@@ -73,6 +82,11 @@ class SignUpScreenState extends State<SignUpScreen> {
                         decoration: const InputDecoration(labelText: 'Confirm Password'),
                         obscureText: true,
                       ),
+                       if (errorMessage != null)
+              Padding(
+                padding: const EdgeInsets.only(top: 8.0),
+                child: Text(errorMessage!, style: TextStyle(color: Colors.red)),
+              ),
                       const SizedBox(height: 20),
                       // Pulsante di registrazione
                       SizedBox(
@@ -85,7 +99,7 @@ class SignUpScreenState extends State<SignUpScreen> {
                             ),
                             padding: const EdgeInsets.symmetric(vertical: 16.0), // Altezza del pulsante
                           ),
-                          onPressed: () => _registerUser(context),
+                          onPressed: () => _signUp,
                           child: const Text('Sign Up'),
                         ),
                       ),

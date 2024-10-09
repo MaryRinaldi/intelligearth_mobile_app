@@ -2,6 +2,10 @@ const jwt = require('jsonwebtoken');
 
 const secretKey = process.env.JWT_SECRET;
 
+if (!secretKey) {
+    throw new Error("Missing JWT_SECRET in environment variables");
+  }
+
 // Funzione per generare un token JWT
 const generateToken = (user) => {
   if (!user || !user.id || !user.email) {

@@ -1,5 +1,5 @@
 require("dotenv").config();
-const mysql = require("mysql");
+const mysql = require("mysql2");
 const fs = require("fs");
 
 const DB_HOST = process.env.DB_HOST;
@@ -16,15 +16,22 @@ const con = mysql.createConnection({
 });
 
 con.connect(function (err) {
-  if (err) throw err;
+  if (err) {
+    console.error("Connection error:", err);
+    return;
+  }
   console.log("Connected!");
+  
 
   // Inizializzazione del database
-  let sql = fs.readFileSync(__dirname + "/init_db.sql").toString();
+  const sql = fs.readFileSync(__dirname + "/init_db.sql").toString();
   con.query(sql, function (err, result) {
-    if (err) throw err;
+    if (err) {
+      console.error("Error executing SQL:", err);
+      return con.end(); 
+    }
     console.log("Table creation `users` was successful!");
-
+    
     console.log("Closing...");
     con.end();
   });

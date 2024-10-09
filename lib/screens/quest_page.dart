@@ -6,7 +6,7 @@ class QuestPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Center(
-      child: Text(' Page - Coming Soon!', style: TextStyle(fontSize: 24)),
+      child: Text(' Missioni', style: TextStyle(fontSize: 24)),
     );
   }
 }

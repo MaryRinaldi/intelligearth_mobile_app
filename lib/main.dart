@@ -35,7 +35,6 @@ class MyApp extends StatelessWidget {
           id: '',
           name: 'Mario Rossi',
           email: 'mario.rossi@example.com',
-          avatarUrl: '',
           role: 'admin',
         )),
         // '/impostazioni': (context) => const SettingsPage(),
