@@ -1,31 +1,38 @@
 const express = require("express");
+const router = express.Router();
 require("dotenv").config()
 const bodyParser = require("body-parser");
 const cors = require("cors");
 const db = require("../model/helper");
 const { hashPassword, comparePassword } = require("../model/helper");
-const { generateToken } = require("../model/tokens");
-const { verifyToken } = require("../model/tokens");
+const { generateToken, verifyToken } = require("../model/tokens");
+const cookieParser = require("cookie-parser");
+// variables needed for bcrypt to do the encryption
+const saltRounds = 10;
+const supersecret = process.env.SUPER_SECRET;
 
-const app = express();
-const port = 3000;
+/* GET home page. */
+router.get("/", function (req, res, next) {
+  res.send({ title: "Express" });
+});
+
 
 // Middleware
-app.use(cors());
-app.use(bodyParser.json());
+router.use(cookieParser());
+router.use(cors());
+router.use(bodyParser.json());
 
 // Rotta per la registrazione
-app.post("/signup", async (req, res) => {
-  const existingUser = await db(`SELECT * FROM users WHERE email = ?`, [email]);
-  if (existingUser.data.length > 0) {
-    return res.status(409).json({ message: 'Email already exists.' });
-  }
-  
+router.post("/signup", async (req, res) => {
   const { name, email, password } = req.body;
 
   // Controllo dei dati di input
   if (!name || !email || !password) {
     return res.status(400).json({ message: 'All fields are required.' });
+  }
+  const existingUser = await db(`SELECT * FROM users WHERE email = ?`, [email]);
+  if (existingUser.data.length > 0) {
+    return res.status(409).json({ message: 'Email already exists.' });
   }
 
   try {
@@ -44,7 +51,7 @@ app.post("/signup", async (req, res) => {
 });
 
 // Rotta per il login
-app.post("/signin", async (req, res) => {
+router.post("/signin", async (req, res) => {
   const { email, password } = req.body;
 
   // Controllo dei dati di input
@@ -76,7 +83,7 @@ app.post("/signin", async (req, res) => {
 });
 
 //verifica user
-app.get("/current_user", async (req, res) => {
+router.get("/current_user", async (req, res) => {
   const token = req.headers.authorization?.split(" ")[1];
 
   if (!token) {
@@ -84,8 +91,8 @@ app.get("/current_user", async (req, res) => {
   }
 
   try {
-    const decoded = verifyToken(token);
-    const results = await db(`SELECT id, name, email, role FROM users WHERE id = ${decoded.id}`);
+    const decoded = await verifyToken(token);
+    const results = await db(`SELECT id, name, email, role FROM users WHERE id = ?`, [decoded.id]);
     if (results.data.length > 0) {
       const user = results.data[0];
       res.status(200).json(user);
@@ -93,13 +100,10 @@ app.get("/current_user", async (req, res) => {
       res.status(404).json({ message: "User not found" });
     }
   } catch (error) {
+    console.error('Error verifying token:', error);v
     res.status(401).json({ message: "Invalid token" });
   }
 });
 
 
-
-// Avvio del server
-app.listen(port, () => {
-  console.log(`Server running at http://localhost:${port}`);
-});
+module.exports = router;
