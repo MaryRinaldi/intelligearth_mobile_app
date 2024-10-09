@@ -102,14 +102,38 @@ class HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateMi
             ),
             Expanded(
               flex: 1,
-              child: Center(
+              child: _selectedIndex == 0 ? Center(
                 child: Text(
                   'Homepage',
                   style: TextStyle(fontSize: 20),
                   textAlign: TextAlign.center,
                 ),
-              ),
-            ),
+            ): _selectedIndex == 1 ? Center(
+                child: Text(
+                  'Missioni',
+                  style: TextStyle(fontSize: 20),
+                  textAlign: TextAlign.center,
+                ),
+            ): _selectedIndex == 2 ? Center(
+                child: Text(
+                  'Premi',
+                  style: TextStyle(fontSize: 20),
+                  textAlign: TextAlign.center,
+                ),
+                ): _selectedIndex == 3 ? Center(
+                child: Text(
+                  'User',
+                  style: TextStyle(fontSize: 20),
+                  textAlign: TextAlign.center,
+                ),
+                ): Center(
+                  child: Text(
+                    '',
+                  style: TextStyle(fontSize: 20),
+                  textAlign: TextAlign.center,
+                  )
+                ),
+            ),                
             Expanded(
               flex: 1,
               child: Align(
@@ -170,28 +194,28 @@ class HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateMi
         items: [
           BottomNavigationBarItem(
             icon: Image.asset(
-              _selectedIndex == 0 ? 'assets/icons/home_selected.png' : 'assets/icons/home.png',
+              _selectedIndex == 0 ? 'assets/icons/home_com.png' : 'assets/icons/home_com.png',
               height: 24,
             ),
             label: '',
           ),
           BottomNavigationBarItem(
             icon: Image.asset(
-              _selectedIndex == 1 ? 'assets/icons/storico_luogo_selected.png' : 'assets/icons/storico_luogo.png',
+              _selectedIndex == 1 ? 'assets/icons/quest.png' : 'assets/icons/quest.png',
               height: 24,
             ),
             label: '',
           ),
           BottomNavigationBarItem(
             icon: Image.asset(
-              _selectedIndex == 2 ? 'assets/icons/supporto_tecnico_selected.png' : 'assets/icons/supporto_tecnico.png',
+              _selectedIndex == 2 ? 'assets/icons/premi.png' : 'assets/icons/premi.png',
               height: 24,
             ),
             label: '',
           ),
           BottomNavigationBarItem(
             icon: Image.asset(
-              _selectedIndex == 3 ? 'assets/icons/user_selected.png' : 'assets/icons/user.png',
+              _selectedIndex == 3 ? 'assets/icons/prof_ut.png' : 'assets/icons/prof_ut.png',
               height: 24,
             ),
             label: '',

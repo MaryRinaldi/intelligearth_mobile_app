@@ -86,7 +86,7 @@ class SignInScreenState extends State<SignInScreen> {
                             padding: const EdgeInsets.symmetric(vertical: 16.0), // Altezza del pulsante
                           ),
                           onPressed: () => _loginUser(context),
-                          child: const Text('Sign Up'),
+                          child: const Text('Sign In'),
                         ),
                       ),
             SizedBox(height: 56),
