@@ -195,28 +195,28 @@ class HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateMi
           BottomNavigationBarItem(
             icon: Image.asset(
               _selectedIndex == 0 ? 'assets/icons/home_com.png' : 'assets/icons/home_com.png',
-              height: 24,
+              height: 34,
             ),
             label: '',
           ),
           BottomNavigationBarItem(
             icon: Image.asset(
               _selectedIndex == 1 ? 'assets/icons/quest.png' : 'assets/icons/quest.png',
-              height: 24,
+              height: 34,
             ),
             label: '',
           ),
           BottomNavigationBarItem(
             icon: Image.asset(
               _selectedIndex == 2 ? 'assets/icons/premi.png' : 'assets/icons/premi.png',
-              height: 24,
+              height: 34,
             ),
             label: '',
           ),
           BottomNavigationBarItem(
             icon: Image.asset(
               _selectedIndex == 3 ? 'assets/icons/prof_ut.png' : 'assets/icons/prof_ut.png',
-              height: 24,
+              height: 34,
             ),
             label: '',
           ),
@@ -230,7 +230,24 @@ class HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateMi
   // Widget per ogni elemento del menu
   Widget _menuItem(String iconPath, String label, int index) {
     return GestureDetector(
-      onTap: () => _navigateToPage(index),
+      onTap: () {
+        switch (index) {
+        case 0:
+        Navigator.pushReplacementNamed(context, '/home');
+        break;
+        case 1:
+        Navigator.pushReplacementNamed(context, '/quests');
+        break;
+        case 2:
+        Navigator.pushReplacementNamed(context, '/rewards');
+        break;
+        case 3:
+        Navigator.pushReplacementNamed(context, '/user');
+        break;
+        default:
+        Navigator.pushReplacementNamed(context, '/');
+      }
+      },
       child: Padding(
         padding: const EdgeInsets.symmetric(vertical: 12.0),
         child: Row(

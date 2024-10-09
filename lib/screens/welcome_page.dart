@@ -20,10 +20,7 @@ class WelcomePage extends StatelessWidget {
             Spacer(),
             ElevatedButton(
               onPressed: () {
-                Navigator.pushReplacement(
-                  context,
-                  MaterialPageRoute(builder: (context) => const SignInScreen()),
-                );
+                Navigator.pushReplacementNamed(context, '/signin');
               },
               child: const Text('Get Started', style: TextStyle(fontSize: 26)),
             ),
