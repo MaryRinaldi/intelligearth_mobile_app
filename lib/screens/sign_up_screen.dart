@@ -78,6 +78,11 @@ class SignUpScreenState extends State<SignUpScreen> {
                   child: Column(
                     children: <Widget>[
                       TextField(
+                        controller: _nameController,
+                        decoration: const InputDecoration(labelText: 'Name'),
+                        ),
+                        const SizedBox(height: 20),
+                      TextField(
                         controller: _emailController,
                         decoration: const InputDecoration(labelText: 'Email'),
                       ),
