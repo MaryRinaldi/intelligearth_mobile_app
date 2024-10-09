@@ -19,6 +19,7 @@ body: json.encode({
 );
 
 if (response.statusCode == 200) {
+
       final data = json.decode(response.body);
       SharedPreferences prefs = await SharedPreferences.getInstance();
       await prefs.setString('jwt_token', data['token']);
@@ -31,7 +32,7 @@ if (response.statusCode == 200) {
       );
     } else {
       // Gestisci gli errori di login
-      print("Error during login: ${response.statusCode}");
+
       return null;
     }
   }
@@ -51,6 +52,7 @@ if (response.statusCode == 200) {
     );
 
     if (response.statusCode == 201) {
+
       final data = json.decode(response.body);
       return User(
         id: data['id'].toString(),
@@ -60,11 +62,11 @@ if (response.statusCode == 200) {
       );
     } else if (response.statusCode == 409) {
       // Gestisci il caso di conflitto (ad esempio, email già esistente)
-      print("Error: Email already exists.");
+
       return null; // Mostra un messaggio di errore personalizzato
     } else {
       // Gestione di eventuali altri errori
-      print("Error during sign up: ${response.statusCode}");
+
       return null;
     }
   }
@@ -93,12 +95,12 @@ if (response.statusCode == 200) {
           role: data['role'],
         );
       } else {
-        print("Error retrieving current user: ${response.statusCode}");
+
         return null;
       }
     } else {
       // Nessun token salvato, l'utente non è autenticato
-      print("No token found, user is not authenticated");
+
       return null;
     }
   }
@@ -107,6 +109,6 @@ if (response.statusCode == 200) {
   Future<void> signOut() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     await prefs.remove('jwt_token'); // Rimuove il token salvato per effettuare il logout
-    print("User signed out successfully");
+
   }
 }

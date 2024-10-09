@@ -41,18 +41,18 @@ class HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateMi
     ];
   }
 
-  Future<void> _checkIfLoggedIn() async { // Aggiunta di async qui
-    bool isLoggedIn = false; // Imposta a false per testare il comportamento non loggato
-    if (!isLoggedIn) {
+  Future<void> _checkIfLoggedIn() async {
+    final currentUser = await AuthService().getCurrentUser(); // Metodo che recupera l'utente
+    if (currentUser == null) {
+      if (!mounted) return;
       Navigator.pushReplacementNamed(context, '/signin'); 
       return; // Esci dal metodo
-    } 
-    final authService = AuthService();
-
-    currentUser = await AuthService.getCurrentUser(); // Metodo che recupera l'utente
+    }
+    if (!mounted) return;
     setState(() {
-      _pages[3] = UserPage(user: currentUser ?? User.empty());
+      _pages[3] = UserPage(user: currentUser);
     });
+    
   }
 
   void _onItemTapped(int index) {

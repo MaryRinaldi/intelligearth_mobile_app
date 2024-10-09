@@ -18,6 +18,15 @@ class SignUpScreenState extends State<SignUpScreen> {
   String? errorMessage;
 
   void _signUp() async {
+     if (!mounted) return;
+
+     if (_passwordController.text != _confirmPasswordController.text) {
+      setState(() {
+        errorMessage = 'Passwords do not match';
+      });
+      return; 
+    }
+
     final user = await _authService.signUp(
       _nameController.text,
       _emailController.text,
@@ -25,8 +34,10 @@ class SignUpScreenState extends State<SignUpScreen> {
     );
 
     if (user != null) {
+      if (!mounted) return;
       Navigator.pushReplacementNamed(context, '/home');
     } else {
+      if (!mounted) return;
       setState(() {
         errorMessage = 'Registration failed';
       });
@@ -99,7 +110,7 @@ class SignUpScreenState extends State<SignUpScreen> {
                             ),
                             padding: const EdgeInsets.symmetric(vertical: 16.0), // Altezza del pulsante
                           ),
-                          onPressed: () => _signUp,
+                          onPressed: _signUp,
                           child: const Text('Sign Up'),
                         ),
                       ),

@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:intelligearth_mobile/services/auth_service.dart';
-import 'package:intelligearth_mobile/screens/home_screen.dart';
 import 'sign_up_screen.dart';
 
 class SignInScreen extends StatefulWidget {
@@ -16,16 +15,15 @@ class SignInScreenState extends State<SignInScreen> {
   String? errorMessage;
 
     void _signIn() async {
+    if (!mounted) return;
     final user = await _authService.signIn(
       _emailController.text,
       _passwordController.text,
     );
 
     if (user != null) {
-      Navigator.pushReplacement(
-        context,
-        MaterialPageRoute(builder: (context) => HomeScreen()),
-      );
+    if (!mounted) return;
+      Navigator.pushReplacementNamed(context, 'home');
     } else {
       setState(() {
         errorMessage = 'Invalid email or password';
