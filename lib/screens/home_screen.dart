@@ -3,7 +3,7 @@ import 'package:intelligearth_mobile/screens/user_page.dart';
 import 'package:intelligearth_mobile/models/user_model.dart';
 import 'package:intelligearth_mobile/screens/quest_page.dart';
 import 'package:intelligearth_mobile/screens/reward_screen.dart';
-import 'package:intelligearth_mobile/services/auth_service.dart'; // Importazione del servizio di autenticazione
+import 'package:intelligearth_mobile/services/auth_service.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -14,8 +14,10 @@ class HomeScreen extends StatefulWidget {
 
 class HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateMixin {
   int _selectedIndex = 0;
-
-  User? currentUser; // Creazione dell'oggetto User
+  User? currentUser;
+  bool _isMenuVisible = false; // Variabile per la visibilità del menu
+  late AnimationController _controller;
+  late Animation<double> _animation;
 
   late final List<Widget> _pages;
 
@@ -23,6 +25,12 @@ class HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateMi
   void initState() {
     super.initState();
     _checkIfLoggedIn();
+    _controller = AnimationController(
+      duration: const Duration(milliseconds: 300),
+      vsync: this,
+    );
+    _animation = Tween<double>(begin: 0, end: 1).animate(_controller);
+
     _pages = [
       Center(
         child: Padding(
@@ -37,19 +45,20 @@ class HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateMi
       ),
       const QuestPage(),
       const RewardScreen(),
-      UserPage(user: currentUser ?? User.empty()), // Gestione dell'utente corrente
+      UserPage(user: currentUser ?? User.empty()),
     ];
   }
 
   Future<void> _checkIfLoggedIn() async {
-    final currentUser = await AuthService().getCurrentUser(); // Metodo che recupera l'utente
+    final currentUser = await AuthService().getCurrentUser();
     if (currentUser == null) {
       if (!mounted) return;
-      Navigator.pushReplacementNamed(context, '/signin'); 
-      return; // Esci dal metodo
+      Navigator.pushReplacementNamed(context, '/signin');
+      return;
     }
     if (!mounted) return;
     setState(() {
+      this.currentUser = currentUser;
       _pages[3] = UserPage(user: currentUser);
     });
   }
@@ -57,6 +66,19 @@ class HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateMi
   void _onItemTapped(int index) {
     setState(() {
       _selectedIndex = index;
+      _isMenuVisible = false; // Nascondi il menu quando si cambia pagina
+      _controller.reverse(); // Nascondi l'animazione del menu
+    });
+  }
+
+  void _toggleMenu() {
+    setState(() {
+      _isMenuVisible = !_isMenuVisible;
+      if (_isMenuVisible) {
+        _controller.forward(); // Mostra il menu
+      } else {
+        _controller.reverse(); // Nascondi il menu
+      }
     });
   }
 
@@ -64,7 +86,13 @@ class HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateMi
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Center(child: Text(_getAppBarTitle())),   
+        title: Center(child: Text(_getAppBarTitle())),
+        leading: _selectedIndex == 3 // Menu hamburger solo per UserPage
+            ? IconButton(
+                icon: const Icon(Icons.menu),
+                onPressed: _toggleMenu, // Toggle menu visibile
+              )
+            : null,
         actions: [
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 16.0),
@@ -79,8 +107,37 @@ class HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateMi
           ),
         ],
       ),
-      body: _pages[_selectedIndex],          
-
+      body: Stack(
+        children: [
+          _pages[_selectedIndex],
+          if (_isMenuVisible) // Mostra il menu solo se è visibile
+            FadeTransition(
+              opacity: _animation,
+              child: Container(
+                color: Colors.black.withOpacity(0.9),
+                child: Align(
+                  alignment: Alignment.topLeft,
+                  child: Padding(
+                    padding: const EdgeInsets.all(16.0),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        _menuItem('assets/icons/home_com.png', 'Homepage', 0),
+                        _menuItem('assets/icons/quest.png', 'Quests', 1),
+                        _menuItem('assets/icons/premi.png', 'Rewards', 2),
+                        const SizedBox(height: 20),
+                        const Divider(color: Colors.white),
+                        _menuItem('assets/icons/settings.png', 'Impostazioni', 3),
+                        _menuItem('assets/icons/404.png', 'Aiuto', 4),
+                      ],
+                    ),
+                  ),
+                ),
+              ),
+            ),
+        ],
+      ),
       bottomNavigationBar: BottomNavigationBar(
         type: BottomNavigationBarType.fixed,
         items: [
@@ -119,6 +176,28 @@ class HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateMi
     );
   }
 
+  // Widget per ogni elemento del menu
+  Widget _menuItem(String iconPath, String label, int index) {
+    return GestureDetector(
+      onTap: () {
+        Navigator.of(context).pushNamed('/someRoute'); // Cambia '/someRoute' con la tua route
+      },
+      child: Padding(
+        padding: const EdgeInsets.symmetric(vertical: 12.0),
+        child: Row(
+          children: [
+            Image.asset(iconPath, height: 24, color: Colors.white),
+            const SizedBox(width: 10),
+            Text(
+              label,
+              style: const TextStyle(color: Colors.white, fontSize: 18),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
   String _getAppBarTitle() {
     switch (_selectedIndex) {
       case 0:
@@ -128,9 +207,15 @@ class HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateMi
       case 2:
         return 'Rewards';
       case 3:
-        return 'User page';
+        return 'Userpage'; // Modificato in 'User Page'
       default:
         return '';
     }
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose(); // Pulisci l'AnimationController
+    super.dispose();
   }
 }
