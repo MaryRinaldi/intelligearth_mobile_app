@@ -52,7 +52,6 @@ class HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateMi
     setState(() {
       _pages[3] = UserPage(user: currentUser);
     });
-    
   }
 
   void _onItemTapped(int index) {
@@ -125,11 +124,11 @@ class HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateMi
       case 0:
         return 'Homepage';
       case 1:
-        return 'Missioni';
+        return 'Quests';
       case 2:
-        return 'Premi';
+        return 'Rewards';
       case 3:
-        return 'User';
+        return 'User page';
       default:
         return '';
     }

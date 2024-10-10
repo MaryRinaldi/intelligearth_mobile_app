@@ -23,7 +23,7 @@ class SignInScreenState extends State<SignInScreen> {
 
     if (user != null) {
     if (!mounted) return;
-      Navigator.pushReplacementNamed(context, 'home');
+      Navigator.pushReplacementNamed(context, '/home');
     } else {
       setState(() {
         errorMessage = 'Invalid email or password';

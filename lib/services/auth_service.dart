@@ -1,10 +1,28 @@
 import 'dart:convert';
+import 'dart:io';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:intelligearth_mobile/models/user_model.dart';
 
+// Imposta la variabile per distinguere l'ambiente
+const bool isProduction = false; // Cambia a true per l'app finale in produzione
+
+// Usa l'URL corretto in base all'ambiente e alla piattaforma
+String getApiUrl() {
+  if (isProduction) {
+    return 'https://myappserver.com/api'; // URL del server remoto in produzione
+  } else {
+    if (Platform.isAndroid) {
+      return 'http://10.0.2.2:3000/api'; // URL per sviluppo locale su Android Emulator
+    } else if (Platform.isIOS) {
+      return 'http://127.0.0.1:3000/api'; // URL per sviluppo locale su iOS Simulator
+    } else {
+      return 'http://localhost:3000/api'; // Fallback per altre piattaforme (web, desktop)
+    }
+  }
+}
 class AuthService {
-final String apiUrl = 'http://localhost:3000/api';
+final String apiUrl = getApiUrl();
 
 Future<User?> signIn(String email, String password) async {
 final response = await http.post(

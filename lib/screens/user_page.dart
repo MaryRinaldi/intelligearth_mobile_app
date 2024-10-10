@@ -110,24 +110,15 @@ class UserPageState extends State<UserPage> with SingleTickerProviderStateMixin 
         Navigator.of(context).pushNamed('/someRoute'); // Cambia '/someRoute' con la tua route
       },
       child: Padding(
-        padding: const EdgeInsets.symmetric(vertical: 12.0),
+        padding: const EdgeInsets.symmetric(vertical: 10.0),
         child: Row(
           children: [
-            Image.asset(iconPath, height: 24, color: Colors.white),
-            const SizedBox(width: 10),
-            Text(
-              label,
-              style: const TextStyle(color: Colors.white, fontSize: 18),
-            ),
+            Image.asset(iconPath, height: 24),
+            const SizedBox(width: 8),
+            Text(label, style: const TextStyle(color: Colors.white, fontSize: 18)),
           ],
         ),
       ),
     );
-  }
-
-  @override
-  void dispose() {
-    _controller.dispose(); // Pulisci l'AnimationController
-    super.dispose();
   }
 }

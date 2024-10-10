@@ -31,14 +31,10 @@ class MyApp extends StatelessWidget {
         '/home': (context) => const HomeScreen(),
         '/quests': (context) => const QuestPage(),
         '/rewards': (context) => const RewardScreen(),
-        '/user': (context) => UserPage(user: User(
-          id: '',
-          name: 'Mario Rossi',
-          email: 'mario.rossi@example.com',
-          role: 'admin',
-        )),
-        // '/impostazioni': (context) => const SettingsPage(),
-        // '/aiuto': (context) => const SupportPage(),
+        '/user': (context) {
+          final User user = ModalRoute.of(context)!.settings.arguments as User; // Recupera l'argomento
+          return UserPage(user: user); // Passa l'argomento a UserPage
+        },
       },
     );
   }

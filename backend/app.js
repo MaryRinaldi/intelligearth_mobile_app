@@ -18,7 +18,8 @@ app.use(cookieParser());
 app.use("/api", serverRouter);
 
 app.use((err, req, res, next) => {
-    res.status(500).json({ message: err.message, code: err.code });
+  console.error("Middleware error handler:", err.message);
+  res.status(500).json({ message: "Something went wrong", error: err.message });
   });
 
   app.listen(port, () => {
