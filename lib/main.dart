@@ -7,7 +7,7 @@ import 'screens/quest_page.dart';
 import 'screens/reward_screen.dart';
 import 'screens/user_page.dart';
 import 'models/user_model.dart';
-import 'screens/map_screen.dart'; 
+// import 'screens/map_screen.dart'; 
 import 'screens/settings_page.dart';
 import 'screens/help_page.dart'; 
 
