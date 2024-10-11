@@ -82,6 +82,12 @@ class HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateMi
     });
   }
 
+  Future<void> _logout() async {
+    await AuthService().signOut(); 
+    if (!mounted) return;
+    Navigator.pushReplacementNamed(context, '/signin'); // Reindirizza alla pagina di accesso
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -89,7 +95,7 @@ class HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateMi
         title: Center(child: Text(_getAppBarTitle())),
         leading: _selectedIndex == 3 // Menu hamburger solo per UserPage
             ? IconButton(
-                icon: const Icon(Icons.menu),
+                icon: Image.asset('assets/icons/ham-menu.png'),
                 onPressed: _toggleMenu, // Toggle menu visibile
               )
             : null,
@@ -129,8 +135,10 @@ class HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateMi
                         _menuItem('assets/icons/prof_ut.png', 'User', '/user'),
                         const SizedBox(height: 20),
                         const Divider(color: Colors.white),
-                        _menuItem('assets/icons/settings.png', 'Settings', '/settings'),
-                        _menuItem('assets/icons/404.png', 'Help', '/help'),
+                        _menuItem('assets/icons/service.png', 'Settings', '/settings'),
+                        _menuItem('assets/icons/info.png', 'Help', '/help'),
+                        const Spacer(),
+                        _menuItemLogout('assets/icons/logout.png', 'Logout'),
                       ],
                     ),
                   ),
@@ -182,21 +190,42 @@ class HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateMi
     return GestureDetector(
       onTap: () {
         setState(() {
-        _isMenuVisible = false; // Nascondi il menu
-        _controller.reverse();
-          },
-        );
-        Navigator.of(context).pushNamed(route); 
+          _isMenuVisible = false; // Nascondi il menu
+          _controller.reverse();
+        });
+        Navigator.of(context).pushNamed(route);
       },
       child: Padding(
         padding: const EdgeInsets.symmetric(vertical: 12.0),
         child: Row(
           children: [
-            Image.asset(iconPath, height: 24, color: Colors.white),
+            Image.asset(iconPath, height: 24),
             const SizedBox(width: 10),
             Text(
               label,
               style: const TextStyle(color: Colors.white, fontSize: 18),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  // Widget per l'elemento di logout
+  Widget _menuItemLogout(String iconPath, String label) {
+    return GestureDetector(
+      onTap: () {
+        _logout();
+      },
+      child: Padding(
+        padding: const EdgeInsets.symmetric(vertical: 12.0),
+        child: Row(
+          children: [
+            Image.asset(iconPath, height: 24),
+            const SizedBox(width: 10),
+            Text(
+              label,
+              style: const TextStyle(color: Color.fromARGB(255, 131, 69, 238), fontSize: 18),
             ),
           ],
         ),
