@@ -18,13 +18,7 @@ class QuestPage extends StatelessWidget {
       latitude: 43.7229,
       longitude: 10.3966,
     ),
-    // Aggiungi altre quest qui ES:
-  //   Quest(
-  // title: 'Quest del Vaticano',
-  // imagePath: 'assets/images/3D_Vaticano_quest.png',
-  // latitude: 41.9029,
-  // longitude: 12.4534,
-// ),
+    // Aggiungi altre quest qui
   ];
 
   @override
@@ -56,6 +50,7 @@ class QuestBox extends StatelessWidget {
             builder: (context) => MapScreen(
               latitude: quest.latitude,
               longitude: quest.longitude,
+              questTitle: quest.title, // Passa il titolo della quest
             ),
           ),
         );
