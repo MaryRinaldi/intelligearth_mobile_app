@@ -43,7 +43,7 @@ class HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateMi
           ),
         ),
       ),
-      const QuestPage(),
+      QuestPage(),
       const RewardScreen(),
       UserPage(user: currentUser ?? User.empty()),
     ];
@@ -123,13 +123,14 @@ class HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateMi
                       crossAxisAlignment: CrossAxisAlignment.start,
                       mainAxisSize: MainAxisSize.min,
                       children: [
-                        _menuItem('assets/icons/home_com.png', 'Homepage', 0),
-                        _menuItem('assets/icons/quest.png', 'Quests', 1),
-                        _menuItem('assets/icons/premi.png', 'Rewards', 2),
+                        _menuItem('assets/icons/home_com.png', 'Homepage', '/home'),
+                        _menuItem('assets/icons/quest.png', 'Quests', '/quests'),
+                        _menuItem('assets/icons/premi.png', 'Rewards', '/rewards'),
+                        _menuItem('assets/icons/prof_ut.png', 'User', '/user'),
                         const SizedBox(height: 20),
                         const Divider(color: Colors.white),
-                        _menuItem('assets/icons/settings.png', 'Impostazioni', 3),
-                        _menuItem('assets/icons/404.png', 'Aiuto', 4),
+                        _menuItem('assets/icons/settings.png', 'Settings', '/settings'),
+                        _menuItem('assets/icons/404.png', 'Help', '/help'),
                       ],
                     ),
                   ),
@@ -177,10 +178,15 @@ class HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateMi
   }
 
   // Widget per ogni elemento del menu
-  Widget _menuItem(String iconPath, String label, int index) {
+  Widget _menuItem(String iconPath, String label, String route) {
     return GestureDetector(
       onTap: () {
-        Navigator.of(context).pushNamed('/someRoute'); // Cambia '/someRoute' con la tua route
+        setState(() {
+        _isMenuVisible = false; // Nascondi il menu
+        _controller.reverse();
+          },
+        );
+        Navigator.of(context).pushNamed(route); 
       },
       child: Padding(
         padding: const EdgeInsets.symmetric(vertical: 12.0),
@@ -207,7 +213,11 @@ class HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateMi
       case 2:
         return 'Rewards';
       case 3:
-        return 'Userpage'; // Modificato in 'User Page'
+        return 'Userpage';
+      case 4:
+        return 'Settings';
+      case 5:
+        return 'Help';
       default:
         return '';
     }

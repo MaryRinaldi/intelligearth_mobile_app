@@ -7,6 +7,9 @@ import 'screens/quest_page.dart';
 import 'screens/reward_screen.dart';
 import 'screens/user_page.dart';
 import 'models/user_model.dart';
+import 'screens/map_screen.dart'; 
+import 'screens/settings_page.dart';
+import 'screens/help_page.dart'; 
 
 void main() {
   runApp(const MyApp());
@@ -29,12 +32,15 @@ class MyApp extends StatelessWidget {
         '/signin': (context) => const SignInScreen(),
         '/signup': (context) => const SignUpScreen(),
         '/home': (context) => const HomeScreen(),
-        '/quests': (context) => const QuestPage(),
+        '/quests': (context) => QuestPage(),
         '/rewards': (context) => const RewardScreen(),
         '/user': (context) {
-          final User user = ModalRoute.of(context)!.settings.arguments as User; // Recupera l'argomento
-          return UserPage(user: user); // Passa l'argomento a UserPage
+          final User user = ModalRoute.of(context)!.settings.arguments as User; 
+          return UserPage(user: user); 
         },
+        // '/map': (context) => const MapScreen(),
+        '/help': (context) => const HelpPage(),
+        '/settings': (context) => const SettingsPage(),
       },
     );
   }
