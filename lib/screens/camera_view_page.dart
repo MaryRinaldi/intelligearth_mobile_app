@@ -1,4 +1,4 @@
-import 'dart:io'; // Assicurati di avere questa riga
+import 'dart:io'; 
 import 'package:flutter/material.dart';
 
 class CameraViewPage extends StatelessWidget {

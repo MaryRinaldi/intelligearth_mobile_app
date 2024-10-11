@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
-import 'camera_view_page.dart'; // Assicurati di importare la tua pagina
+import 'camera_view_page.dart'; 
+import 'quest_page.dart';
 
 class MapScreen extends StatelessWidget {
   const MapScreen({
@@ -16,11 +17,9 @@ class MapScreen extends StatelessWidget {
     final picker = ImagePicker();
     final pickedFile = await picker.pickImage(source: ImageSource.camera);
 
-    // Controlla se il widget è ancora montato
     if (!context.mounted) return;
 
     if (pickedFile != null) {
-      // Naviga alla pagina di visualizzazione dell'immagine
       Navigator.push(
         context,
         MaterialPageRoute(
@@ -28,7 +27,6 @@ class MapScreen extends StatelessWidget {
         ),
       );
     } else {
-      // Gestisci il caso in cui l'utente annulla l'azione
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Nessuna immagine selezionata.')),
       );
@@ -38,16 +36,53 @@ class MapScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text("Mappa")),
+      appBar: PreferredSize(
+        preferredSize: Size.fromHeight(60), 
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.start,
+          children: [
+            GestureDetector(
+              onTap: () {
+                // Naviga a QuestPage solo se non è presente nello stack
+                if (Navigator.canPop(context)) {
+                  Navigator.pop(context);
+                } else {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (context) => QuestPage()),
+                  );
+                }
+              },
+              child: Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: Image.asset(
+                  'assets/icons/quest.png',
+                  height: 50, 
+                  width: 50,
+                ),
+              ),
+            ),
+            const SizedBox(width: 8), // Spazio tra l'icona e il testo
+            const Text(
+              'Go back to other quests',
+              style: TextStyle(fontSize: 15, fontWeight: FontWeight.w200), // Stile del testo
+            ),
+          ],
+        ),
+      ),
       body: Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             Text("Latitudine: $latitude, Longitudine: $longitude"),
-            const SizedBox(height: 20), // Spazio tra il testo e il pulsante
-            ElevatedButton(
-              onPressed: () => _openCamera(context), // Chiama la funzione quando si preme il pulsante
-              child: const Text('Apri Fotocamera'),
+            const SizedBox(height: 20), 
+            GestureDetector(
+              onTap: () => _openCamera(context),
+              child: Image.asset(
+                'assets/icons/scatta_foto.png', // Percorso della tua icona
+                height: 50, // Altezza dell'icona
+                width: 50, // Larghezza dell'icona
+              ),
             ),
           ],
         ),
