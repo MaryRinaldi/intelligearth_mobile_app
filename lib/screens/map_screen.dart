@@ -8,10 +8,12 @@ class MapScreen extends StatelessWidget {
     super.key,
     required this.latitude,
     required this.longitude,
+    required this.questTitle, // Ricevi anche il titolo della quest
   });
 
   final double latitude;
   final double longitude;
+  final String questTitle; // Aggiungi una variabile per il titolo
 
   Future<void> _openCamera(BuildContext context) async {
     final picker = ImagePicker();
@@ -74,14 +76,19 @@ class MapScreen extends StatelessWidget {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
+            Text(
+              '$questTitle:', // Visualizza il titolo della quest
+              style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+            ),
+            const SizedBox(height: 10),
             Text("Latitudine: $latitude, Longitudine: $longitude"),
             const SizedBox(height: 20), 
             GestureDetector(
               onTap: () => _openCamera(context),
               child: Image.asset(
-                'assets/icons/scatta_foto.png', // Percorso della tua icona
-                height: 50, // Altezza dell'icona
-                width: 50, // Larghezza dell'icona
+                'assets/icons/camera.png', 
+                height: 50, 
+                width: 50, 
               ),
             ),
           ],
