@@ -95,7 +95,7 @@ class HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateMi
         title: Center(child: Text(_getAppBarTitle())),
         leading: _selectedIndex == 3 // Menu hamburger solo per UserPage
             ? IconButton(
-                icon: Image.asset('assets/icons/ham-menu.png'),
+                icon: Image.asset('assets/icons/ham-menu.png', height: 25),
                 onPressed: _toggleMenu, // Toggle menu visibile
               )
             : null,
