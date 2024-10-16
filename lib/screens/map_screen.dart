@@ -8,12 +8,12 @@ class MapScreen extends StatelessWidget {
     super.key,
     required this.latitude,
     required this.longitude,
-    required this.questTitle, // Ricevi anche il titolo della quest
+    required this.questTitle,
   });
 
   final double latitude;
   final double longitude;
-  final String questTitle; // Aggiungi una variabile per il titolo
+  final String questTitle; 
 
   Future<void> _openCamera(BuildContext context) async {
     final picker = ImagePicker();
@@ -38,40 +38,40 @@ class MapScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: PreferredSize(
-        preferredSize: Size.fromHeight(60), 
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.start,
-          children: [
-            GestureDetector(
-              onTap: () {
-                // Naviga a QuestPage solo se non è presente nello stack
-                if (Navigator.canPop(context)) {
-                  Navigator.pop(context);
-                } else {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(builder: (context) => QuestPage()),
-                  );
-                }
-              },
-              child: Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: Image.asset(
-                  'assets/icons/quest.png',
-                  height: 50, 
-                  width: 50,
-                ),
-              ),
-            ),
-            const SizedBox(width: 8), // Spazio tra l'icona e il testo
-            const Text(
-              'Go back to other quests',
-              style: TextStyle(fontSize: 15, fontWeight: FontWeight.w200), // Stile del testo
-            ),
-          ],
+      appBar: AppBar(
+  automaticallyImplyLeading: false, // Rimuove la freccia di navigazione
+  toolbarHeight: 60, // Altezza dell'AppBar
+  title: Row(
+    children: [
+      GestureDetector(
+        onTap: () {
+          // Naviga a QuestPage solo se non è presente nello stack
+          if (Navigator.canPop(context)) {
+            Navigator.pop(context);
+          } else {
+            Navigator.push(
+              context,
+              MaterialPageRoute(builder: (context) => QuestPage()),
+            );
+          }
+        },
+        child: Padding(
+          padding: const EdgeInsets.all(8.0),
+          child: Image.asset(
+            'assets/icons/quest.png',
+            height: 50,  
+            width: 50,   
+          ),
         ),
       ),
+      const SizedBox(width: 4),
+      const Text(
+        'Go back to other quests',
+        style: TextStyle(fontSize: 15, fontWeight: FontWeight.w300),
+      ),
+    ],
+  ),
+),
       body: Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
