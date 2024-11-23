@@ -166,6 +166,31 @@ dist
 # Stores VSCode versions used for testing VSCode extensions
 .vscode-test
 
+# Android Studio and Gradle files
+.gradle/
+/android/.gradle/
+/android/build/
+
+# macOS system files
+.DS_Store
+.AppleDouble
+.LSOverride
+
+# Gradle specific
+.gradle/
+gradle-wrapper.jar
+gradle-wrapper.properties
+
+# Atom configuration
+.atom/
+
+
+# Flutter build files
+/build/
+.flutter-plugins
+.flutter-plugins-dependencies
+.dart_tool/
+
 # yarn v2
 .yarn/cache
 .yarn/unplugged
