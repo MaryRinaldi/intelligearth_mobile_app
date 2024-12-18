@@ -23,9 +23,11 @@ class UserPageState extends State<UserPage> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               // Informazioni utente
-              Text('Nome: ${widget.user.name}', style: const TextStyle(fontSize: 20)),
+              Text('Nome: ${widget.user.name}',
+                  style: const TextStyle(fontSize: 20)),
               const SizedBox(height: 10),
-              Text('Email: ${widget.user.email}', style: const TextStyle(fontSize: 20)),
+              Text('Email: ${widget.user.email}',
+                  style: const TextStyle(fontSize: 20)),
               const SizedBox(height: 20),
 
               // Sezione 1: Quest a cui vuoi partecipare
@@ -74,7 +76,8 @@ class UserPageState extends State<UserPage> {
             scrollDirection: Axis.horizontal,
             itemCount: maxImages,
             itemBuilder: (context, index) {
-              return _buildSlide('assets/images/intelligearth_logo.png', 'Elemento $index');
+              return _buildSlide(
+                  'assets/images/intelligearth_logo.png', 'Elemento $index');
             },
           ),
         ),
@@ -105,7 +108,7 @@ class UserPageState extends State<UserPage> {
       width: 100, // Larghezza del box uguale alla larghezza dell'immagine
       decoration: BoxDecoration(
         borderRadius: BorderRadius.circular(8.0),
-        color: Colors.blueAccent.withOpacity(0.3),
+        color: Color.fromRGBO(0, 0, 0, 0.2),
       ),
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,

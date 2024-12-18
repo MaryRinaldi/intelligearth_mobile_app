@@ -1,0 +1,74 @@
+{
+    "language": "Italiano",
+    "@language": {
+        "description": "La lingua corrente"
+    },
+    "welcomeTitle": "Benvenuto su IntelligEarth",
+    "@welcomeTitle": {
+        "description": "Titolo mostrato nella pagina di benvenuto"
+    },
+    "selectLanguage": "Seleziona la lingua",
+    "@selectLanguage": {
+        "description": "Prompt per la selezione della lingua"
+    },
+    "signIn": "Accedi",
+    "@signIn": {
+        "description": "Testo pulsante accedi"
+    },
+    "signUp": "Registrati",
+    "@signUp": {
+        "description": "Testo pulsante registrati"
+    },
+    "email": "Email",
+    "@email": {
+        "description": "Etichetta campo email"
+    },
+    "password": "Password",
+    "@password": {
+        "description": "Etichetta campo password"
+    },
+    "name": "Nome",
+    "@name": {
+        "description": "Etichetta campo nome"
+    },
+    "goBackToQuests": "Torna alle altre quest",
+    "@goBackToQuests": {
+        "description": "Testo navigazione per tornare alle quest"
+    },
+    "noImageSelected": "Nessuna immagine selezionata",
+    "@noImageSelected": {
+        "description": "Messaggio quando nessuna immagine è selezionata"
+    },
+    "questsTitle": "Quest",
+    "@questsTitle": {
+        "description": "Titolo pagina quest"
+    },
+    "rewardsTitle": "Premi",
+    "@rewardsTitle": {
+        "description": "Titolo pagina premi"
+    },
+    "userPageTitle": "Profilo Utente",
+    "@userPageTitle": {
+        "description": "Titolo pagina utente"
+    },
+    "settings": "Impostazioni",
+    "@settings": {
+        "description": "Testo impostazioni"
+    },
+    "help": "Aiuto",
+    "@help": {
+        "description": "Testo aiuto"
+    },
+    "logout": "Esci",
+    "@logout": {
+        "description": "Testo logout"
+    },
+    "languageSettings": "Impostazioni Lingua",
+    "@languageSettings": {
+        "description": "Titolo sezione impostazioni lingua"
+    },
+    "chooseLanguage": "Scegli la tua lingua",
+    "@chooseLanguage": {
+        "description": "Prompt per la selezione della lingua nelle impostazioni"
+    }
+} 

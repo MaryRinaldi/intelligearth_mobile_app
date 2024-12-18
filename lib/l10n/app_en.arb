@@ -1,0 +1,74 @@
+{
+    "language": "English",
+    "@language": {
+        "description": "The current language"
+    },
+    "welcomeTitle": "Welcome to IntelligEarth",
+    "@welcomeTitle": {
+        "description": "Title shown in welcome page"
+    },
+    "selectLanguage": "Select your language",
+    "@selectLanguage": {
+        "description": "Language selection prompt"
+    },
+    "signIn": "Sign In",
+    "@signIn": {
+        "description": "Sign in button text"
+    },
+    "signUp": "Sign Up",
+    "@signUp": {
+        "description": "Sign up button text"
+    },
+    "email": "Email",
+    "@email": {
+        "description": "Email field label"
+    },
+    "password": "Password",
+    "@password": {
+        "description": "Password field label"
+    },
+    "name": "Name",
+    "@name": {
+        "description": "Name field label"
+    },
+    "goBackToQuests": "Go back to other quests",
+    "@goBackToQuests": {
+        "description": "Navigation text to return to quests"
+    },
+    "noImageSelected": "No image selected",
+    "@noImageSelected": {
+        "description": "Message when no image is selected"
+    },
+    "questsTitle": "Quests",
+    "@questsTitle": {
+        "description": "Quests page title"
+    },
+    "rewardsTitle": "Rewards",
+    "@rewardsTitle": {
+        "description": "Rewards page title"
+    },
+    "userPageTitle": "User Profile",
+    "@userPageTitle": {
+        "description": "User page title"
+    },
+    "settings": "Settings",
+    "@settings": {
+        "description": "Settings text"
+    },
+    "help": "Help",
+    "@help": {
+        "description": "Help text"
+    },
+    "logout": "Logout",
+    "@logout": {
+        "description": "Logout text"
+    },
+    "languageSettings": "Language Settings",
+    "@languageSettings": {
+        "description": "Title for language settings section"
+    },
+    "chooseLanguage": "Choose your language",
+    "@chooseLanguage": {
+        "description": "Prompt for language selection in settings"
+    }
+} 

@@ -12,7 +12,8 @@ class HomeScreen extends StatefulWidget {
   HomeScreenState createState() => HomeScreenState();
 }
 
-class HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateMixin {
+class HomeScreenState extends State<HomeScreen>
+    with SingleTickerProviderStateMixin {
   int _selectedIndex = 0;
   User? currentUser;
   bool _isMenuVisible = false; // Variabile per la visibilità del menu
@@ -83,9 +84,10 @@ class HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateMi
   }
 
   Future<void> _logout() async {
-    await AuthService().signOut(); 
+    await AuthService().signOut();
     if (!mounted) return;
-    Navigator.pushReplacementNamed(context, '/signin'); // Reindirizza alla pagina di accesso
+    Navigator.pushReplacementNamed(
+        context, '/signin'); // Reindirizza alla pagina di accesso
   }
 
   @override
@@ -120,7 +122,7 @@ class HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateMi
             FadeTransition(
               opacity: _animation,
               child: Container(
-                color: Colors.black.withOpacity(0.9),
+                color: Color.fromRGBO(0, 0, 0, 0.2),
                 child: Align(
                   alignment: Alignment.topLeft,
                   child: Padding(
@@ -129,13 +131,17 @@ class HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateMi
                       crossAxisAlignment: CrossAxisAlignment.start,
                       mainAxisSize: MainAxisSize.min,
                       children: [
-                        _menuItem('assets/icons/home_com.png', 'Homepage', '/home'),
-                        _menuItem('assets/icons/quest.png', 'Quests', '/quests'),
-                        _menuItem('assets/icons/premi.png', 'Rewards', '/rewards'),
+                        _menuItem(
+                            'assets/icons/home_com.png', 'Homepage', '/home'),
+                        _menuItem(
+                            'assets/icons/quest.png', 'Quests', '/quests'),
+                        _menuItem(
+                            'assets/icons/premi.png', 'Rewards', '/rewards'),
                         _menuItem('assets/icons/prof_ut.png', 'User', '/user'),
                         const SizedBox(height: 20),
                         const Divider(color: Colors.white),
-                        _menuItem('assets/icons/service.png', 'Settings', '/settings'),
+                        _menuItem('assets/icons/service.png', 'Settings',
+                            '/settings'),
                         _menuItem('assets/icons/info.png', 'Help', '/help'),
                         const Spacer(),
                         _menuItemLogout('assets/icons/logout.png', 'Logout'),
@@ -152,28 +158,36 @@ class HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateMi
         items: [
           BottomNavigationBarItem(
             icon: Image.asset(
-              _selectedIndex == 0 ? 'assets/icons/home_com.png' : 'assets/icons/home_com.png',
+              _selectedIndex == 0
+                  ? 'assets/icons/home_com.png'
+                  : 'assets/icons/home_com.png',
               height: 34,
             ),
             label: '',
           ),
           BottomNavigationBarItem(
             icon: Image.asset(
-              _selectedIndex == 1 ? 'assets/icons/quest.png' : 'assets/icons/quest.png',
+              _selectedIndex == 1
+                  ? 'assets/icons/quest.png'
+                  : 'assets/icons/quest.png',
               height: 34,
             ),
             label: '',
           ),
           BottomNavigationBarItem(
             icon: Image.asset(
-              _selectedIndex == 2 ? 'assets/icons/premi.png' : 'assets/icons/premi.png',
+              _selectedIndex == 2
+                  ? 'assets/icons/premi.png'
+                  : 'assets/icons/premi.png',
               height: 34,
             ),
             label: '',
           ),
           BottomNavigationBarItem(
             icon: Image.asset(
-              _selectedIndex == 3 ? 'assets/icons/prof_ut.png' : 'assets/icons/prof_ut.png',
+              _selectedIndex == 3
+                  ? 'assets/icons/prof_ut.png'
+                  : 'assets/icons/prof_ut.png',
               height: 34,
             ),
             label: '',
@@ -225,7 +239,8 @@ class HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateMi
             const SizedBox(width: 10),
             Text(
               label,
-              style: const TextStyle(color: Color.fromARGB(255, 131, 69, 238), fontSize: 18),
+              style: const TextStyle(
+                  color: Color.fromARGB(255, 131, 69, 238), fontSize: 18),
             ),
           ],
         ),
