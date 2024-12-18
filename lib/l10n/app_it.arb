@@ -70,5 +70,25 @@
     "chooseLanguage": "Scegli la tua lingua",
     "@chooseLanguage": {
         "description": "Prompt per la selezione della lingua nelle impostazioni"
+    },
+    "questPageTitle": "Le tue Missioni",
+    "@questPageTitle": {
+        "description": "Titolo mostrato nell'header della pagina missioni"
+    },
+    "questPageSubtitle": "Traccia le tue missioni ambientali",
+    "@questPageSubtitle": {
+        "description": "Sottotitolo mostrato nell'header della pagina missioni"
+    },
+    "activeQuests": "Attive",
+    "@activeQuests": {
+        "description": "Etichetta per la tab delle missioni attive"
+    },
+    "completedQuests": "Completate",
+    "@completedQuests": {
+        "description": "Etichetta per la tab delle missioni completate"
+    },
+    "upcomingQuests": "In Arrivo",
+    "@upcomingQuests": {
+        "description": "Etichetta per la tab delle missioni in arrivo"
     }
 } 

@@ -122,7 +122,7 @@ class HomeScreenState extends State<HomeScreen>
             FadeTransition(
               opacity: _animation,
               child: Container(
-                color: Color.fromRGBO(0, 0, 0, 0.2),
+                color: Color.fromRGBO(0, 0, 0, 0.9),
                 child: Align(
                   alignment: Alignment.topLeft,
                   child: Padding(

@@ -3,10 +3,10 @@ import 'package:flutter/material.dart';
 class AppTheme {
   // Colori principali
   static const primaryColor = Color(0xFF305A72); // Blu navy
-  static const accentColor = Color(0xFFBF20EC); // Viola acceso
+  static const neutralColor = Color(0xFFBF20EC); // Viola acceso
   static const darkColor = Color(0xFF272F40); // Blu scuro
   static const lightColor = Color(0xFFFDFDFD); // Bianco
-  static const neutralColor = Color(0xFF425950); // Verde grigio
+  static const accentColor = Color(0xFF425950); // Verde grigio
 
   // Gradienti
   static const primaryGradient = LinearGradient(
@@ -22,7 +22,7 @@ class AppTheme {
     begin: Alignment.topLeft,
     end: Alignment.bottomRight,
     colors: [
-      accentColor,
+      neutralColor,
       Color(0xFFD042FF), // Versione più chiara dell'accentColor
     ],
   );
