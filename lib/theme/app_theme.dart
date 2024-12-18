@@ -30,7 +30,7 @@ class AppTheme {
   // Elevazioni e ombre
   static List<BoxShadow> get softShadow => [
         BoxShadow(
-          color: darkColor.withOpacity(0.1),
+          color: const Color.fromRGBO(39, 47, 64, 0.1),
           blurRadius: 10,
           offset: const Offset(0, 4),
         ),
@@ -60,12 +60,10 @@ class AppTheme {
       colorScheme: ColorScheme.light(
         primary: primaryColor,
         secondary: accentColor,
-        background: lightColor,
         surface: lightColor,
+        onSurface: darkColor,
         onPrimary: lightColor,
         onSecondary: lightColor,
-        onBackground: darkColor,
-        onSurface: darkColor,
       ),
       // Stile dei testi
       textTheme: const TextTheme(
@@ -128,7 +126,9 @@ class AppTheme {
         ),
         enabledBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(borderRadiusMedium),
-          borderSide: BorderSide(color: primaryColor.withOpacity(0.1)),
+          borderSide: BorderSide(
+            color: const Color.fromRGBO(48, 90, 114, 0.1),
+          ),
         ),
         focusedBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(borderRadiusMedium),
