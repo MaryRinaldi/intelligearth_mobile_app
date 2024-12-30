@@ -261,8 +261,8 @@ class _QuestCardState extends State<_QuestCard>
                                   .textTheme
                                   .titleLarge
                                   ?.copyWith(
-                                    fontWeight: FontWeight.w600,
-                                    letterSpacing: 0,
+                                    color: AppTheme.textOnLightColor,
+                                    fontWeight: FontWeight.bold,
                                   ),
                             ),
                           ),
@@ -273,11 +273,36 @@ class _QuestCardState extends State<_QuestCard>
                       Text(
                         widget.quest.description,
                         style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                              color: AppTheme.neutralColor,
+                              color: AppTheme.textOnLightColor
+                                  .withValues(alpha: 179),
                             ),
                       ),
                       const SizedBox(height: AppTheme.spacingMedium),
-                      _buildProgressIndicator(),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Text(
+                            'Progress',
+                            style: Theme.of(context)
+                                .textTheme
+                                .labelMedium
+                                ?.copyWith(
+                                  color: AppTheme.textOnLightColor
+                                      .withValues(alpha: 179),
+                                ),
+                          ),
+                          Text(
+                            '${(widget.quest.progress * 100).toInt()}%',
+                            style: Theme.of(context)
+                                .textTheme
+                                .labelMedium
+                                ?.copyWith(
+                                  color: AppTheme.primaryColor,
+                                  fontWeight: FontWeight.w600,
+                                ),
+                          ),
+                        ],
+                      ),
                     ],
                   ),
                 ),
@@ -329,47 +354,6 @@ class _QuestCardState extends State<_QuestCard>
               fontWeight: FontWeight.w600,
             ),
       ),
-    );
-  }
-
-  Widget _buildProgressIndicator() {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            Text(
-              'Progress',
-              style: Theme.of(context).textTheme.labelMedium?.copyWith(
-                    color: AppTheme.neutralColor,
-                  ),
-            ),
-            Text(
-              '${(widget.quest.progress * 100).toInt()}%',
-              style: Theme.of(context).textTheme.labelMedium?.copyWith(
-                    color: AppTheme.primaryColor,
-                    fontWeight: FontWeight.w600,
-                  ),
-            ),
-          ],
-        ),
-        const SizedBox(height: AppTheme.spacingSmall),
-        TweenAnimationBuilder<double>(
-          tween: Tween(begin: 0, end: widget.quest.progress),
-          duration: AppTheme.animationSlow,
-          curve: Curves.easeInOut,
-          builder: (context, value, _) => ClipRRect(
-            borderRadius: BorderRadius.circular(AppTheme.borderRadiusSmall),
-            child: LinearProgressIndicator(
-              value: value,
-              backgroundColor: AppTheme.primaryColor.withValues(alpha: 26),
-              valueColor: AlwaysStoppedAnimation<Color>(AppTheme.primaryColor),
-              minHeight: 6,
-            ),
-          ),
-        ),
-      ],
     );
   }
 }

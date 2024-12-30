@@ -265,6 +265,8 @@ class SignInScreenState extends State<SignInScreen>
                             const SizedBox(height: AppTheme.spacingLarge),
                             TextFormField(
                               controller: _emailController,
+                              keyboardType: TextInputType.emailAddress,
+                              autofocus: true,
                               decoration: InputDecoration(
                                 labelText: 'Email',
                                 prefixIcon: Icon(

@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import '../providers/locale_provider.dart';
 import '../theme/app_theme.dart';
+import '../services/auth_service.dart';
 
 class WelcomePage extends StatefulWidget {
   const WelcomePage({super.key});
@@ -17,6 +19,7 @@ class _WelcomePageState extends State<WelcomePage>
   late final Animation<double> _fadeInAnimation;
   int _currentPage = 0;
   bool _showLanguagePopup = true;
+  bool _dontShowAgain = false;
 
   final List<OnboardingItem> _onboardingItems = [
     OnboardingItem(
@@ -24,7 +27,7 @@ class _WelcomePageState extends State<WelcomePage>
       title: 'Esplora il Mondo',
       description:
           'Scopri luoghi incredibili e partecipa a quest emozionanti nella tua città',
-      color: AppTheme.primaryColor,
+      color: AppTheme.secondaryColor,
     ),
     OnboardingItem(
       icon: Icons.camera_alt_rounded,
@@ -45,6 +48,7 @@ class _WelcomePageState extends State<WelcomePage>
   @override
   void initState() {
     super.initState();
+    _checkUserStatus();
     _pageController = PageController();
     _controller = AnimationController(
       duration: AppTheme.animationSlow,
@@ -57,12 +61,40 @@ class _WelcomePageState extends State<WelcomePage>
     );
 
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      if (_showLanguagePopup) {
-        _showLanguageSelector();
-      }
+      _checkWelcomeStatus();
     });
 
     _controller.forward();
+  }
+
+  Future<void> _checkUserStatus() async {
+    final user = await AuthService().getCurrentUser();
+    if (user != null) {
+      if (!mounted) return;
+      Navigator.pushReplacementNamed(context, '/home');
+    }
+  }
+
+  Future<void> _checkWelcomeStatus() async {
+    final prefs = await SharedPreferences.getInstance();
+    final skipWelcome = prefs.getBool('skip_welcome') ?? false;
+    if (skipWelcome) {
+      if (!mounted) return;
+      Navigator.pushReplacementNamed(context, '/signin');
+      return;
+    }
+    if (_showLanguagePopup) {
+      _showLanguageSelector();
+    }
+  }
+
+  Future<void> _finishOnboarding() async {
+    if (_dontShowAgain) {
+      final prefs = await SharedPreferences.getInstance();
+      await prefs.setBool('skip_welcome', true);
+    }
+    if (!mounted) return;
+    Navigator.pushReplacementNamed(context, '/signin');
   }
 
   @override
@@ -185,26 +217,24 @@ class _WelcomePageState extends State<WelcomePage>
               child: Icon(
                 item.icon,
                 size: 80,
-                color: Colors.white,
+                color: Colors.black,
               ),
             ),
             const SizedBox(height: AppTheme.spacingXLarge),
             Text(
               item.title,
               style: Theme.of(context).textTheme.headlineMedium?.copyWith(
-                    color: Colors.white,
+                    color: AppTheme.darkColor,
                     fontWeight: FontWeight.bold,
                   ),
               textAlign: TextAlign.center,
             ),
             const SizedBox(height: AppTheme.spacingMedium),
-            Text(
-              item.description,
-              style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                    color: Colors.white.withValues(alpha: 230),
-                  ),
-              textAlign: TextAlign.center,
-            ),
+            Text(item.description,
+                style: Theme.of(context).textTheme.bodyLarge?.copyWith(
+                      color: AppTheme.textOnLightColor.withValues(alpha: 30),
+                    ),
+                textAlign: TextAlign.center),
           ],
         ),
       ),
@@ -224,7 +254,7 @@ class _WelcomePageState extends State<WelcomePage>
               child: Container(
                 padding: const EdgeInsets.all(AppTheme.spacingMedium),
                 decoration: BoxDecoration(
-                  color: Colors.white,
+                  color: Colors.black,
                   borderRadius:
                       BorderRadius.circular(AppTheme.borderRadiusLarge),
                   boxShadow: AppTheme.softShadow,
@@ -239,7 +269,7 @@ class _WelcomePageState extends State<WelcomePage>
             Text(
               'Benvenuto in IntelligEarth',
               style: Theme.of(context).textTheme.displayMedium?.copyWith(
-                    color: Colors.white,
+                    color: AppTheme.textOnPrimaryColor,
                     fontWeight: FontWeight.bold,
                   ),
               textAlign: TextAlign.center,
@@ -248,14 +278,40 @@ class _WelcomePageState extends State<WelcomePage>
             Text(
               'Inizia il tuo viaggio alla scoperta del mondo',
               style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                    color: Colors.white.withValues(alpha: 230),
+                    color: AppTheme.textOnPrimaryColor.withValues(alpha: 230),
                   ),
               textAlign: TextAlign.center,
             ),
             const SizedBox(height: AppTheme.spacingXLarge),
+            Row(
+              children: [
+                Checkbox(
+                  value: _dontShowAgain,
+                  onChanged: (value) {
+                    setState(() {
+                      _dontShowAgain = value ?? false;
+                    });
+                  },
+                  fillColor: WidgetStateProperty.resolveWith<Color>(
+                    (Set<WidgetState> states) {
+                      if (states.contains(WidgetState.selected)) {
+                        return AppTheme.textOnPrimaryColor;
+                      }
+                      return AppTheme.textOnPrimaryColor.withValues(alpha: 77);
+                    },
+                  ),
+                ),
+                Text(
+                  'Non mostrare più',
+                  style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                        color: AppTheme.textOnPrimaryColor,
+                      ),
+                ),
+              ],
+            ),
+            const SizedBox(height: AppTheme.spacingMedium),
             ElevatedButton(
-              onPressed: () =>
-                  Navigator.pushReplacementNamed(context, '/signin'),
+              onPressed: _finishOnboarding,
               style: ElevatedButton.styleFrom(
                 backgroundColor: Colors.white,
                 foregroundColor: AppTheme.primaryColor,

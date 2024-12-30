@@ -3,6 +3,7 @@ class User {
   final String name;
   final String email;
   final String role;
+  final String position;
 
   // Costruttore
   User({
@@ -10,13 +11,15 @@ class User {
     required this.name,
     required this.email,
     required this.role,
+    this.position = 'Guest',
   });
 
-   User.empty()
+  User.empty()
       : id = '',
         name = '',
         email = '',
-        role = '';
+        role = '',
+        position = 'Guest';
 
   // Metodo factory per creare un oggetto User da un JSON
   factory User.fromJson(Map<String, dynamic> json) {
@@ -25,6 +28,7 @@ class User {
       name: json['name'] as String,
       email: json['email'] as String,
       role: json['role'] as String, //es admin o utente normale
+      position: json['position'] as String? ?? 'Guest',
     );
   }
 
@@ -35,6 +39,7 @@ class User {
       'name': name,
       'email': email,
       'role': role,
+      'position': position,
     };
   }
 }

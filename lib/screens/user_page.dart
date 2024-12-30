@@ -37,7 +37,9 @@ class UserPage extends StatelessWidget {
             radius: 50,
             backgroundColor: Colors.white,
             child: Text(
-              user.name.substring(0, 1).toUpperCase(),
+              user.name.isNotEmpty
+                  ? user.name.substring(0, 1).toUpperCase()
+                  : '?',
               style: Theme.of(context).textTheme.displayMedium?.copyWith(
                     color: AppTheme.primaryColor,
                     fontWeight: FontWeight.bold,
@@ -48,14 +50,14 @@ class UserPage extends StatelessWidget {
           Text(
             user.name,
             style: Theme.of(context).textTheme.headlineSmall?.copyWith(
-                  color: Colors.white,
+                  color: AppTheme.textOnPrimaryColor,
                   fontWeight: FontWeight.bold,
                 ),
           ),
           Text(
             user.email,
             style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                  color: Colors.white.withValues(alpha: 230),
+                  color: AppTheme.textOnPrimaryColor.withValues(alpha: 230),
                 ),
           ),
           const SizedBox(height: AppTheme.spacingMedium),
@@ -65,13 +67,13 @@ class UserPage extends StatelessWidget {
               vertical: AppTheme.spacingSmall,
             ),
             decoration: BoxDecoration(
-              color: Colors.white.withValues(alpha: 26),
+              color: AppTheme.textOnPrimaryColor.withValues(alpha: 26),
               borderRadius: BorderRadius.circular(AppTheme.borderRadiusLarge),
             ),
             child: Text(
               'Level 15 Explorer',
               style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                    color: Colors.white,
+                    color: AppTheme.textOnPrimaryColor,
                     fontWeight: FontWeight.w600,
                   ),
             ),
@@ -279,19 +281,19 @@ class UserPage extends StatelessWidget {
         title: 'Colosseum Quest',
         date: '2 days ago',
         points: '+150',
-        image: 'assets/images/colosseum.jpg'
+        imagePath: 'assets/images/3D_Colosseum_quest.png'
       ),
       (
         title: 'Roman Forum',
         date: '1 week ago',
         points: '+120',
-        image: 'assets/images/forum.jpg'
+        imagePath: 'assets/images/roman_forum.png'
       ),
       (
-        title: 'Trevi Fountain',
+        title: 'Pantheon',
         date: '2 weeks ago',
         points: '+100',
-        image: 'assets/images/trevi.jpg'
+        imagePath: 'assets/images/roman_pantheon.png'
       ),
     ];
 
@@ -321,7 +323,7 @@ class UserPage extends StatelessWidget {
                     top: Radius.circular(AppTheme.borderRadiusLarge),
                   ),
                   child: Image.asset(
-                    quest.image,
+                    quest.imagePath,
                     height: 160,
                     width: double.infinity,
                     fit: BoxFit.cover,

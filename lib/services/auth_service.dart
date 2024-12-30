@@ -94,6 +94,16 @@ class AuthService {
     String? token = prefs.getString('jwt_token');
 
     if (token != null) {
+      // Gestione utente hardcoded
+      if (token == 'mary_test_token') {
+        return User(
+          id: 'mary123',
+          name: 'Mary',
+          email: 'mary@example.com',
+          role: 'user',
+        );
+      }
+
       // Fai una chiamata API per verificare il token JWT
       final response = await http.get(
         Uri.parse('$apiUrl/current_user'),

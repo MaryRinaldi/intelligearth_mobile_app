@@ -22,7 +22,12 @@ class HomeScreenState extends State<HomeScreen>
   late Animation<double> _animation;
   late Animation<Offset> _slideAnimation;
 
-  late final List<Widget> _pages;
+  List<Widget> get _pages => [
+        _DashboardPage(onNavigateToQuests: () => _onItemTapped(1)),
+        const QuestPage(),
+        const RewardScreen(),
+        UserPage(user: currentUser ?? User.empty()),
+      ];
 
   @override
   void initState() {
@@ -42,13 +47,6 @@ class HomeScreenState extends State<HomeScreen>
       begin: const Offset(-1, 0),
       end: Offset.zero,
     ).animate(_animation);
-
-    _pages = [
-      const _DashboardPage(),
-      const QuestPage(),
-      const RewardScreen(),
-      UserPage(user: currentUser ?? User.empty()),
-    ];
   }
 
   @override
@@ -58,16 +56,15 @@ class HomeScreenState extends State<HomeScreen>
   }
 
   Future<void> _checkIfLoggedIn() async {
-    final currentUser = await AuthService().getCurrentUser();
-    if (currentUser == null) {
+    final user = await AuthService().getCurrentUser();
+    if (user == null) {
       if (!mounted) return;
       Navigator.pushReplacementNamed(context, '/signin');
       return;
     }
     if (!mounted) return;
     setState(() {
-      this.currentUser = currentUser;
-      _pages[3] = UserPage(user: currentUser);
+      currentUser = user;
     });
   }
 
@@ -134,34 +131,34 @@ class HomeScreenState extends State<HomeScreen>
       title: _getAppBarTitle(),
       automaticallyImplyLeading: _selectedIndex == 3,
       actions: [
-        Padding(
-          padding: const EdgeInsets.only(right: AppTheme.spacingMedium),
-          child: Container(
-            padding: const EdgeInsets.all(AppTheme.spacingSmall),
-            decoration: BoxDecoration(
-              color: Colors.white.withValues(alpha: 26),
-              borderRadius: BorderRadius.circular(AppTheme.borderRadiusMedium),
-            ),
-            child: Row(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Image.asset(
-                  'assets/images/intelligearth_logo.png',
-                  height: 24,
-                  color: Colors.white,
-                ),
-                const SizedBox(width: AppTheme.spacingSmall),
-                Text(
-                  'IntelligEarth',
-                  style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                        color: Colors.white,
-                        fontWeight: FontWeight.w600,
-                      ),
-                ),
-              ],
+        if (_selectedIndex != 3)
+          Padding(
+            padding: const EdgeInsets.only(right: AppTheme.spacingMedium),
+            child: Container(
+              padding: const EdgeInsets.all(AppTheme.spacingSmall),
+              decoration: BoxDecoration(
+                color: AppTheme.secondaryColor.withValues(alpha: 30),
+                borderRadius:
+                    BorderRadius.circular(AppTheme.borderRadiusMedium),
+              ),
+              child: Row(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Image.asset(
+                    'assets/images/intelligearth_logo.png',
+                    height: 34,
+                  ),
+                  const SizedBox(width: AppTheme.spacingXSmall),
+                ],
+              ),
             ),
           ),
-        ),
+        if (_selectedIndex == 3)
+          IconButton(
+            icon: const Icon(Icons.menu),
+            onPressed: _toggleMenu,
+            color: AppTheme.darkColor,
+          ),
       ],
     );
   }
@@ -175,7 +172,7 @@ class HomeScreenState extends State<HomeScreen>
           width: MediaQuery.of(context).size.width * 0.75,
           height: MediaQuery.of(context).size.height,
           decoration: BoxDecoration(
-            color: Colors.white,
+            color: AppTheme.darkColor.withValues(alpha: 3),
             boxShadow: AppTheme.softShadow,
           ),
           child: SafeArea(
@@ -189,7 +186,7 @@ class HomeScreenState extends State<HomeScreen>
                       CircleAvatar(
                         radius: 30,
                         backgroundColor:
-                            AppTheme.primaryColor.withValues(alpha: 26),
+                            AppTheme.primaryColor.withValues(alpha: 66),
                         child: Text(
                           currentUser?.name.substring(0, 1).toUpperCase() ??
                               'U',
@@ -213,16 +210,18 @@ class HomeScreenState extends State<HomeScreen>
                                   .textTheme
                                   .titleLarge
                                   ?.copyWith(
+                                    color: AppTheme.textOnLightColor,
                                     fontWeight: FontWeight.w600,
                                   ),
                             ),
                             Text(
-                              currentUser?.email ?? 'email@example.com',
+                              currentUser?.position ?? 'Guest',
                               style: Theme.of(context)
                                   .textTheme
                                   .bodyMedium
                                   ?.copyWith(
-                                    color: AppTheme.neutralColor,
+                                    color: AppTheme.textOnLightColor
+                                        .withValues(alpha: 79),
                                   ),
                             ),
                           ],
@@ -279,7 +278,7 @@ class HomeScreenState extends State<HomeScreen>
                   icon: Icons.logout_rounded,
                   label: 'Logout',
                   onTap: _logout,
-                  color: AppTheme.errorColor,
+                  color: AppTheme.neutralColor,
                 ),
               ],
             ),
@@ -313,15 +312,15 @@ class HomeScreenState extends State<HomeScreen>
             children: [
               Icon(
                 icon,
-                color: color ?? AppTheme.darkColor,
+                color: color ?? AppTheme.accentColor,
                 size: 24,
               ),
               const SizedBox(width: AppTheme.spacingMedium),
               Text(
                 label,
                 style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                      color: color ?? AppTheme.darkColor,
-                      fontWeight: FontWeight.w500,
+                      color: color ?? AppTheme.textOnLightColor,
+                      fontWeight: FontWeight.w600,
                     ),
               ),
             ],
@@ -338,18 +337,17 @@ class HomeScreenState extends State<HomeScreen>
       (icon: Icons.emoji_events_rounded, label: 'Rewards'),
       (icon: Icons.person_rounded, label: 'Profile'),
     ];
-
     return Container(
       decoration: BoxDecoration(
-        color: Colors.white,
-        boxShadow: AppTheme.softShadow,
+        color: AppTheme.primaryColor.withValues(alpha: 206),
+        boxShadow: AppTheme.neumorphicShadow,
       ),
       child: SafeArea(
         top: false,
         child: Padding(
           padding: const EdgeInsets.symmetric(
-            horizontal: AppTheme.spacingMedium,
-            vertical: AppTheme.spacingSmall,
+            horizontal: AppTheme.spacingSmall,
+            vertical: AppTheme.spacingXSmall,
           ),
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceAround,
@@ -368,33 +366,26 @@ class HomeScreenState extends State<HomeScreen>
                       padding: const EdgeInsets.symmetric(
                         vertical: AppTheme.spacingSmall,
                       ),
-                      decoration: BoxDecoration(
-                        color: isSelected
-                            ? AppTheme.primaryColor.withValues(alpha: 26)
-                            : Colors.transparent,
-                        borderRadius:
-                            BorderRadius.circular(AppTheme.borderRadiusMedium),
-                      ),
                       child: Column(
                         mainAxisSize: MainAxisSize.min,
                         children: [
                           Icon(
                             item.icon,
                             color: isSelected
-                                ? AppTheme.primaryColor
-                                : AppTheme.neutralColor,
-                            size: 24,
+                                ? AppTheme.accentColor
+                                : AppTheme.secondaryColor,
+                            size: 26,
                           ),
                           const SizedBox(height: AppTheme.spacingXSmall),
                           Text(
                             item.label,
                             style: Theme.of(context)
                                 .textTheme
-                                .labelSmall
+                                .labelMedium
                                 ?.copyWith(
                                   color: isSelected
-                                      ? AppTheme.primaryColor
-                                      : AppTheme.neutralColor,
+                                      ? AppTheme.accentColor
+                                      : AppTheme.secondaryColor,
                                   fontWeight: isSelected
                                       ? FontWeight.w600
                                       : FontWeight.w500,
@@ -415,7 +406,9 @@ class HomeScreenState extends State<HomeScreen>
 }
 
 class _DashboardPage extends StatelessWidget {
-  const _DashboardPage();
+  final VoidCallback onNavigateToQuests;
+
+  const _DashboardPage({required this.onNavigateToQuests});
 
   @override
   Widget build(BuildContext context) {
@@ -438,7 +431,7 @@ class _DashboardPage extends StatelessWidget {
       padding: const EdgeInsets.all(AppTheme.spacingLarge),
       decoration: BoxDecoration(
         gradient: AppTheme.primaryGradient,
-        borderRadius: BorderRadius.circular(AppTheme.borderRadiusLarge),
+        borderRadius: BorderRadius.circular(AppTheme.borderRadiusXLarge),
         boxShadow: AppTheme.softShadow,
       ),
       child: Column(
@@ -447,7 +440,7 @@ class _DashboardPage extends StatelessWidget {
           Text(
             'Community Highlights',
             style: Theme.of(context).textTheme.headlineSmall?.copyWith(
-                  color: Colors.white,
+                  color: AppTheme.textOnPrimaryColor,
                   fontWeight: FontWeight.bold,
                 ),
           ),
@@ -455,14 +448,14 @@ class _DashboardPage extends StatelessWidget {
           Text(
             'Join 1,234 active members in your area!',
             style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                  color: Colors.white.withValues(alpha: 230),
+                  color: AppTheme.textOnPrimaryColor.withValues(alpha: 30),
                 ),
           ),
           const SizedBox(height: AppTheme.spacingLarge),
           Row(
             children: [
               ElevatedButton(
-                onPressed: () => Navigator.pushNamed(context, '/quests'),
+                onPressed: onNavigateToQuests,
                 style: ElevatedButton.styleFrom(
                   backgroundColor: Colors.white,
                   foregroundColor: AppTheme.primaryColor,
@@ -613,7 +606,7 @@ class _DashboardPage extends StatelessWidget {
             padding: const EdgeInsets.all(AppTheme.spacingMedium),
             decoration: BoxDecoration(
               color: user.isCurrentUser
-                  ? AppTheme.primaryColor.withValues(alpha: 26)
+                  ? AppTheme.primaryColor.withValues(alpha: 106)
                   : Colors.white,
               borderRadius: BorderRadius.circular(AppTheme.borderRadiusLarge),
               boxShadow: AppTheme.softShadow,
@@ -642,8 +635,8 @@ class _DashboardPage extends StatelessWidget {
                 CircleAvatar(
                   radius: 20,
                   backgroundColor: user.isCurrentUser
-                      ? AppTheme.primaryColor.withValues(alpha: 26)
-                      : AppTheme.accentColor.withValues(alpha: 26),
+                      ? AppTheme.primaryColor.withValues(alpha: 206)
+                      : AppTheme.accentColor.withValues(alpha: 206),
                   child: Text(
                     user.avatar,
                     style: Theme.of(context).textTheme.titleMedium?.copyWith(
@@ -663,13 +656,15 @@ class _DashboardPage extends StatelessWidget {
                         user.name,
                         style:
                             Theme.of(context).textTheme.titleMedium?.copyWith(
+                                  color: AppTheme.textOnLightColor,
                                   fontWeight: FontWeight.w600,
                                 ),
                       ),
                       Text(
                         '${user.points} points',
                         style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                              color: AppTheme.neutralColor,
+                              color: AppTheme.textOnLightColor
+                                  .withValues(alpha: 179),
                             ),
                       ),
                     ],
@@ -709,21 +704,24 @@ class _DashboardPage extends StatelessWidget {
         title: 'New Quest Completed',
         subtitle: 'by Maria R. • Colosseum Quest',
         time: '2h ago',
-        color: AppTheme.successColor
+        color: AppTheme.successColor,
+        backgroundColor: AppTheme.warningColor.withValues(alpha: 26),
       ),
       (
         icon: Icons.emoji_events_rounded,
         title: 'New Achievement',
         subtitle: 'Alex K. earned Explorer Badge',
         time: '5h ago',
-        color: AppTheme.warningColor
+        color: AppTheme.secondaryColor,
+        backgroundColor: AppTheme.warningColor.withValues(alpha: 26),
       ),
       (
         icon: Icons.location_on_rounded,
         title: 'Popular Location',
         subtitle: '5 members visited Roman Forum',
         time: '1d ago',
-        color: AppTheme.accentColor
+        color: AppTheme.accentColor,
+        backgroundColor: AppTheme.warningColor.withValues(alpha: 26),
       ),
     ];
 
@@ -752,7 +750,7 @@ class _DashboardPage extends StatelessWidget {
                   Container(
                     padding: const EdgeInsets.all(AppTheme.spacingSmall),
                     decoration: BoxDecoration(
-                      color: activity.color.withValues(alpha: 26),
+                      color: activity.backgroundColor,
                       borderRadius:
                           BorderRadius.circular(AppTheme.borderRadiusMedium),
                     ),

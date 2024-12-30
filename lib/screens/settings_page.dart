@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import '../providers/locale_provider.dart';
+import '../theme/app_theme.dart';
 
 class SettingsPage extends StatelessWidget {
   const SettingsPage({super.key});
@@ -12,43 +13,53 @@ class SettingsPage extends StatelessWidget {
     final localeProvider = Provider.of<LocaleProvider>(context);
 
     return Scaffold(
-      appBar: AppBar(
-        title: Text(l10n.settings),
+      appBar: CustomAppBar(
+        title: l10n.settings,
       ),
       body: ListView(
+        padding: const EdgeInsets.all(AppTheme.spacingMedium),
         children: [
-          // Sezione Lingua
-          Card(
-            margin: const EdgeInsets.all(8.0),
+          Container(
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(AppTheme.borderRadiusLarge),
+              boxShadow: AppTheme.softShadow,
+            ),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Padding(
-                  padding: const EdgeInsets.all(16.0),
+                  padding: const EdgeInsets.all(AppTheme.spacingLarge),
                   child: Text(
                     l10n.languageSettings,
-                    style: Theme.of(context).textTheme.titleLarge,
+                    style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                          color: AppTheme.textOnLightColor,
+                          fontWeight: FontWeight.w600,
+                        ),
                   ),
                 ),
                 const Divider(),
                 Padding(
-                  padding: const EdgeInsets.all(16.0),
+                  padding: const EdgeInsets.all(AppTheme.spacingLarge),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
                         l10n.chooseLanguage,
-                        style: Theme.of(context).textTheme.titleMedium,
+                        style:
+                            Theme.of(context).textTheme.titleMedium?.copyWith(
+                                  color: AppTheme.textOnLightColor,
+                                  fontWeight: FontWeight.w500,
+                                ),
                       ),
-                      const SizedBox(height: 16),
-                      // Opzioni lingua
+                      const SizedBox(height: AppTheme.spacingLarge),
                       _LanguageOption(
                         title: 'English',
                         flag: '🇬🇧',
                         locale: const Locale('en'),
                         isSelected: localeProvider.locale.languageCode == 'en',
                       ),
-                      const SizedBox(height: 8),
+                      const SizedBox(height: AppTheme.spacingMedium),
                       _LanguageOption(
                         title: 'Italiano',
                         flag: '🇮🇹',
@@ -61,7 +72,6 @@ class SettingsPage extends StatelessWidget {
               ],
             ),
           ),
-          // Altre impostazioni possono essere aggiunte qui
         ],
       ),
     );
@@ -87,29 +97,38 @@ class _LanguageOption extends StatelessWidget {
 
     return InkWell(
       onTap: () => localeProvider.setLocale(locale),
+      borderRadius: BorderRadius.circular(AppTheme.borderRadiusMedium),
       child: Container(
-        padding: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 16.0),
+        padding: const EdgeInsets.symmetric(
+          vertical: AppTheme.spacingMedium,
+          horizontal: AppTheme.spacingLarge,
+        ),
         decoration: BoxDecoration(
-          color: isSelected ? const Color.fromRGBO(0, 0, 255, 0.1) : null,
-          borderRadius: BorderRadius.circular(8),
+          color: isSelected
+              ? AppTheme.primaryColor.withValues(alpha: 26)
+              : Colors.white,
+          borderRadius: BorderRadius.circular(AppTheme.borderRadiusMedium),
           border: Border.all(
-            color: isSelected ? Colors.blue : Colors.grey.shade300,
+            color: isSelected
+                ? AppTheme.primaryColor
+                : AppTheme.neutralColor.withValues(alpha: 77),
           ),
         ),
         child: Row(
           children: [
             Text(flag, style: const TextStyle(fontSize: 24)),
-            const SizedBox(width: 16),
+            const SizedBox(width: AppTheme.spacingMedium),
             Text(
               title,
-              style: TextStyle(
-                fontSize: 16,
-                fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
-                color: isSelected ? Colors.blue : null,
-              ),
+              style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                    color: isSelected
+                        ? AppTheme.primaryColor
+                        : AppTheme.textOnLightColor,
+                    fontWeight: isSelected ? FontWeight.bold : FontWeight.w500,
+                  ),
             ),
             const Spacer(),
-            if (isSelected) const Icon(Icons.check, color: Colors.blue),
+            if (isSelected) Icon(Icons.check, color: AppTheme.primaryColor),
           ],
         ),
       ),

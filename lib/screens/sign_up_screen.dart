@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:intelligearth_mobile/services/auth_service.dart';
 
-
 class SignUpScreen extends StatefulWidget {
   const SignUpScreen({super.key});
 
@@ -14,17 +13,18 @@ class SignUpScreenState extends State<SignUpScreen> {
   final TextEditingController _nameController = TextEditingController();
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
-  final TextEditingController _confirmPasswordController = TextEditingController();
+  final TextEditingController _confirmPasswordController =
+      TextEditingController();
   String? errorMessage;
 
   void _signUp() async {
-     if (!mounted) return;
+    if (!mounted) return;
 
-     if (_passwordController.text != _confirmPasswordController.text) {
+    if (_passwordController.text != _confirmPasswordController.text) {
       setState(() {
         errorMessage = 'Passwords do not match';
       });
-      return; 
+      return;
     }
 
     final user = await _authService.signUp(
@@ -46,12 +46,14 @@ class SignUpScreenState extends State<SignUpScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final screenSize = MediaQuery.of(context).size; // Ottieni la dimensione dello schermo
+    final screenSize =
+        MediaQuery.of(context).size; // Ottieni la dimensione dello schermo
 
     return Scaffold(
       body: Padding(
         padding: const EdgeInsets.all(16.0),
-        child: SingleChildScrollView( // Scorrimento verticale per contenuti lunghi
+        child: SingleChildScrollView(
+          // Scorrimento verticale per contenuti lunghi
           child: Column(
             mainAxisAlignment: MainAxisAlignment.start,
             crossAxisAlignment: CrossAxisAlignment.center,
@@ -80,8 +82,8 @@ class SignUpScreenState extends State<SignUpScreen> {
                       TextField(
                         controller: _nameController,
                         decoration: const InputDecoration(labelText: 'Name'),
-                        ),
-                        const SizedBox(height: 20),
+                      ),
+                      const SizedBox(height: 20),
                       TextField(
                         controller: _emailController,
                         decoration: const InputDecoration(labelText: 'Email'),
@@ -89,31 +91,37 @@ class SignUpScreenState extends State<SignUpScreen> {
                       const SizedBox(height: 20),
                       TextField(
                         controller: _passwordController,
-                        decoration: const InputDecoration(labelText: 'Password'),
+                        decoration:
+                            const InputDecoration(labelText: 'Password'),
                         obscureText: true,
                       ),
                       const SizedBox(height: 20),
                       TextField(
                         controller: _confirmPasswordController,
-                        decoration: const InputDecoration(labelText: 'Confirm Password'),
+                        decoration: const InputDecoration(
+                            labelText: 'Confirm Password'),
                         obscureText: true,
                       ),
-                       if (errorMessage != null)
-              Padding(
-                padding: const EdgeInsets.only(top: 8.0),
-                child: Text(errorMessage!, style: TextStyle(color: Colors.red)),
-              ),
+                      if (errorMessage != null)
+                        Padding(
+                          padding: const EdgeInsets.only(top: 8.0),
+                          child: Text(errorMessage!,
+                              style: TextStyle(color: Colors.red)),
+                        ),
                       const SizedBox(height: 20),
                       // Pulsante di registrazione
                       SizedBox(
                         width: double.infinity,
                         child: ElevatedButton(
                           style: ElevatedButton.styleFrom(
-                            backgroundColor: const Color.fromARGB(255, 225, 225, 225), // Colore di sfondo
-                            shape: RoundedRectangleBorder( // Forma del pulsante
+                            backgroundColor: const Color.fromARGB(
+                                255, 225, 225, 225), // Colore di sfondo
+                            shape: RoundedRectangleBorder(
+                              // Forma del pulsante
                               borderRadius: BorderRadius.circular(12),
                             ),
-                            padding: const EdgeInsets.symmetric(vertical: 16.0), // Altezza del pulsante
+                            padding: const EdgeInsets.symmetric(
+                                vertical: 16.0), // Altezza del pulsante
                           ),
                           onPressed: _signUp,
                           child: const Text('Sign Up'),

@@ -3,23 +3,27 @@ import 'package:google_fonts/google_fonts.dart';
 
 class AppTheme {
   // Colors
-  static const Color primaryColor = Color(0xFF668FE6);
-  static const Color secondaryColor = Color(0xFF39437A);
-  static const Color accentColor = Color(0xFFBF20EC);
-  static const Color successColor = Color(0xFF4CAF50);
-  static const Color warningColor = Color(0xFFFFC107);
-  static const Color errorColor = Color(0xFFE53935);
-  static const Color darkColor = Color(0xFF1E1E1E);
-  static const Color neutralColor = Color(0xFF425950);
-  static const Color lightColor = Color(0xFFFAFAFA);
+  static const Color primaryColor = Color(0xFF668FE6); // Blu chiaro
+  static const Color secondaryColor = Color(0xFF39437A); // Blu scuro
+  static const Color accentColor = Color(0xFFBF20EC); // Viola
+  static const Color successColor = Color(0xFF4CAF50); // Verde
+  static const Color warningColor = Color(0xFFFFC107); // Giallo
+  static const Color errorColor = Color(0xFFE53935); // Rosso
+  static const Color darkColor = Color(0xFF1E1E1E); // Nero
+  static const Color neutralColor = Color(0xFF425950); // Grigio scuro
+  static const Color lightColor = Color(0xFFFAFAFA); // Bianco sporco
+  static const Color textOnPrimaryColor =
+      Colors.white; // Testo su sfondo primario
+  static const Color textOnLightColor =
+      Color(0xFF39437A); // Testo su sfondo chiaro
 
   // Gradients
   static const LinearGradient primaryGradient = LinearGradient(
     begin: Alignment.topLeft,
     end: Alignment.bottomRight,
     colors: [
-      Color(0xFF305A72), // primaryColor
-      Color(0xFF1D3D4E), // darker version of primaryColor
+      Color(0xFF668FE6), // primaryColor
+      Color(0xFF39437A), // secondaryColor
     ],
   );
 
@@ -85,8 +89,8 @@ class AppTheme {
         secondary: accentColor,
         surface: Colors.white,
         onSurface: darkColor,
-        onPrimary: Colors.white,
-        onSecondary: Colors.white,
+        onPrimary: textOnPrimaryColor,
+        onSecondary: textOnPrimaryColor,
         error: errorColor,
       ),
       // Typography moderna con Google Fonts
@@ -95,35 +99,35 @@ class AppTheme {
           fontSize: 32,
           fontWeight: FontWeight.bold,
           letterSpacing: -0.5,
-          color: darkColor,
+          color: textOnLightColor,
         ),
         displayMedium: GoogleFonts.inter(
           fontSize: 28,
           fontWeight: FontWeight.bold,
           letterSpacing: -0.5,
-          color: darkColor,
+          color: textOnLightColor,
         ),
         titleLarge: GoogleFonts.inter(
           fontSize: 22,
           fontWeight: FontWeight.w600,
           letterSpacing: 0,
-          color: darkColor,
+          color: textOnLightColor,
         ),
         bodyLarge: GoogleFonts.inter(
           fontSize: 16,
           letterSpacing: 0.15,
-          color: darkColor,
+          color: textOnLightColor,
         ),
         bodyMedium: GoogleFonts.inter(
           fontSize: 14,
           letterSpacing: 0.25,
-          color: darkColor,
+          color: textOnLightColor,
         ),
         labelLarge: GoogleFonts.inter(
           fontSize: 14,
           letterSpacing: 0.1,
           fontWeight: FontWeight.w500,
-          color: darkColor,
+          color: textOnLightColor,
         ),
       ),
       // Bottoni moderni
@@ -262,7 +266,7 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
         title: Text(
           title,
           style: Theme.of(context).textTheme.headlineMedium?.copyWith(
-                color: Colors.white,
+                color: AppTheme.textOnPrimaryColor,
                 fontWeight: FontWeight.bold,
                 letterSpacing: -0.5,
               ),
@@ -270,7 +274,7 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
         backgroundColor: Colors.transparent,
         elevation: 0,
         automaticallyImplyLeading: automaticallyImplyLeading,
-        iconTheme: const IconThemeData(color: Colors.white),
+        iconTheme: IconThemeData(color: AppTheme.textOnPrimaryColor),
         actions: actions,
         flexibleSpace: SizedBox.expand(
           child: Stack(
@@ -282,9 +286,9 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
                 child: Container(
                   width: 200,
                   height: 200,
-                  decoration: const BoxDecoration(
+                  decoration: BoxDecoration(
                     shape: BoxShape.circle,
-                    color: Color.fromRGBO(255, 255, 255, 0.1),
+                    color: AppTheme.textOnPrimaryColor.withValues(alpha: 26),
                   ),
                 ),
               ),
@@ -294,9 +298,9 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
                 child: Container(
                   width: 120,
                   height: 120,
-                  decoration: const BoxDecoration(
+                  decoration: BoxDecoration(
                     shape: BoxShape.circle,
-                    color: Color.fromRGBO(255, 255, 255, 0.05),
+                    color: AppTheme.textOnPrimaryColor.withValues(alpha: 13),
                   ),
                 ),
               ),
