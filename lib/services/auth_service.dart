@@ -21,23 +21,23 @@ String getApiUrl() {
     }
   }
 }
+
 class AuthService {
-final String apiUrl = getApiUrl();
+  final String apiUrl = getApiUrl();
 
-Future<User?> signIn(String email, String password) async {
-final response = await http.post(
-  Uri.parse('$apiUrl/signin'),
-  headers: {
-    'Content-Type': 'application/json',
-},
-body: json.encode({
-  'email': email,
-  'password': password,
-}),
-);
+  Future<User?> signIn(String email, String password) async {
+    final response = await http.post(
+      Uri.parse('$apiUrl/signin'),
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: json.encode({
+        'email': email,
+        'password': password,
+      }),
+    );
 
-if (response.statusCode == 200) {
-
+    if (response.statusCode == 200) {
       final data = json.decode(response.body);
       SharedPreferences prefs = await SharedPreferences.getInstance();
       await prefs.setString('jwt_token', data['token']);
@@ -70,7 +70,6 @@ if (response.statusCode == 200) {
     );
 
     if (response.statusCode == 201) {
-
       final data = json.decode(response.body);
       return User(
         id: data['id'].toString(),
@@ -89,11 +88,11 @@ if (response.statusCode == 200) {
     }
   }
 
-  // Recupera l'utente corrente 
+  // Recupera l'utente corrente
   Future<User?> getCurrentUser() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     String? token = prefs.getString('jwt_token');
-    
+
     if (token != null) {
       // Fai una chiamata API per verificare il token JWT
       final response = await http.get(
@@ -113,7 +112,6 @@ if (response.statusCode == 200) {
           role: data['role'],
         );
       } else {
-
         return null;
       }
     } else {
@@ -126,7 +124,17 @@ if (response.statusCode == 200) {
   // Simula il logout (da implementare)
   Future<void> signOut() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
-    await prefs.remove('jwt_token'); // Rimuove il token salvato per effettuare il logout
+    await prefs.remove(
+        'jwt_token'); // Rimuove il token salvato per effettuare il logout
+  }
 
+  Future<bool> resetPassword(String email) async {
+    try {
+      //  Replace with your actual API call
+      await Future.delayed(const Duration(seconds: 1)); // Simulate API call
+      return true;
+    } catch (e) {
+      return false;
+    }
   }
 }

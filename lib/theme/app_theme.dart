@@ -1,57 +1,80 @@
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 
 class AppTheme {
-  // Colori principali
-  static const primaryColor = Color(0xFF305A72); // Blu navy
-  static const neutralColor = Color(0xFFBF20EC); // Viola acceso
-  static const darkColor = Color(0xFF272F40); // Blu scuro
-  static const lightColor = Color(0xFFFDFDFD); // Bianco
-  static const accentColor = Color(0xFF425950); // Verde grigio
+  // Colors
+  static const Color primaryColor = Color(0xFF668FE6);
+  static const Color secondaryColor = Color(0xFF39437A);
+  static const Color accentColor = Color(0xFFBF20EC);
+  static const Color successColor = Color(0xFF4CAF50);
+  static const Color warningColor = Color(0xFFFFC107);
+  static const Color errorColor = Color(0xFFE53935);
+  static const Color darkColor = Color(0xFF1E1E1E);
+  static const Color neutralColor = Color(0xFF425950);
+  static const Color lightColor = Color(0xFFFAFAFA);
 
-  // Gradienti
-  static const primaryGradient = LinearGradient(
+  // Gradients
+  static const LinearGradient primaryGradient = LinearGradient(
     begin: Alignment.topLeft,
     end: Alignment.bottomRight,
     colors: [
-      primaryColor,
-      Color(0xFF3A6D89), // Versione più chiara del primaryColor
+      Color(0xFF305A72), // primaryColor
+      Color(0xFF1D3D4E), // darker version of primaryColor
     ],
   );
 
-  static const accentGradient = LinearGradient(
+  static const LinearGradient accentGradient = LinearGradient(
     begin: Alignment.topLeft,
     end: Alignment.bottomRight,
     colors: [
-      neutralColor,
-      Color(0xFFD042FF), // Versione più chiara dell'accentColor
+      Color(0xFFBF20EC), // accentColor
+      Color(0xFF9918B9), // darker version of accentColor
     ],
   );
 
-  // Elevazioni e ombre
-  static List<BoxShadow> get softShadow => [
+  // Neumorphic shadows
+  static List<BoxShadow> get neumorphicShadow => [
         BoxShadow(
-          color: const Color.fromRGBO(39, 47, 64, 0.1),
+          color: Colors.white.withValues(alpha: 204),
+          offset: const Offset(-4, -4),
           blurRadius: 10,
-          offset: const Offset(0, 4),
+          spreadRadius: 1,
+        ),
+        BoxShadow(
+          color: Color.fromRGBO(48, 90, 114, 0.2),
+          offset: const Offset(4, 4),
+          blurRadius: 10,
+          spreadRadius: 1,
         ),
       ];
 
-  // Bordi arrotondati
-  static const double borderRadiusSmall = 8.0;
+  // Soft shadows for cards and elevated elements
+  static List<BoxShadow> get softShadow => [
+        BoxShadow(
+          color: Color.fromRGBO(0, 0, 0, 0.05),
+          blurRadius: 4,
+          offset: Offset(0, 2),
+        ),
+      ];
+
+  // Bordi arrotondati moderni
+  static const double borderRadiusSmall = 12.0;
   static const double borderRadiusMedium = 16.0;
   static const double borderRadiusLarge = 24.0;
+  static const double borderRadiusXLarge = 32.0;
 
-  // Spaziature
+  // Spaziature generose
   static const double spacingXSmall = 4.0;
   static const double spacingSmall = 8.0;
   static const double spacingMedium = 16.0;
   static const double spacingLarge = 24.0;
   static const double spacingXLarge = 32.0;
+  static const double spacingXXLarge = 48.0;
 
-  // Animazioni
+  // Animazioni fluide
   static const Duration animationFast = Duration(milliseconds: 200);
   static const Duration animationNormal = Duration(milliseconds: 300);
-  static const Duration animationSlow = Duration(milliseconds: 400);
+  static const Duration animationSlow = Duration(milliseconds: 500);
 
   // Theme Data
   static ThemeData get lightTheme {
@@ -60,33 +83,50 @@ class AppTheme {
       colorScheme: ColorScheme.light(
         primary: primaryColor,
         secondary: accentColor,
-        surface: lightColor,
+        surface: Colors.white,
         onSurface: darkColor,
-        onPrimary: lightColor,
-        onSecondary: lightColor,
+        onPrimary: Colors.white,
+        onSecondary: Colors.white,
+        error: errorColor,
       ),
-      // Stile dei testi
-      textTheme: const TextTheme(
-        displayLarge: TextStyle(
+      // Typography moderna con Google Fonts
+      textTheme: TextTheme(
+        displayLarge: GoogleFonts.inter(
           fontSize: 32,
           fontWeight: FontWeight.bold,
+          letterSpacing: -0.5,
           color: darkColor,
         ),
-        displayMedium: TextStyle(
+        displayMedium: GoogleFonts.inter(
           fontSize: 28,
           fontWeight: FontWeight.bold,
+          letterSpacing: -0.5,
           color: darkColor,
         ),
-        bodyLarge: TextStyle(
+        titleLarge: GoogleFonts.inter(
+          fontSize: 22,
+          fontWeight: FontWeight.w600,
+          letterSpacing: 0,
+          color: darkColor,
+        ),
+        bodyLarge: GoogleFonts.inter(
           fontSize: 16,
+          letterSpacing: 0.15,
           color: darkColor,
         ),
-        bodyMedium: TextStyle(
+        bodyMedium: GoogleFonts.inter(
           fontSize: 14,
+          letterSpacing: 0.25,
+          color: darkColor,
+        ),
+        labelLarge: GoogleFonts.inter(
+          fontSize: 14,
+          letterSpacing: 0.1,
+          fontWeight: FontWeight.w500,
           color: darkColor,
         ),
       ),
-      // Stile dei bottoni
+      // Bottoni moderni
       elevatedButtonTheme: ElevatedButtonThemeData(
         style: ElevatedButton.styleFrom(
           elevation: 0,
@@ -98,28 +138,43 @@ class AppTheme {
             borderRadius: BorderRadius.circular(borderRadiusMedium),
           ),
           backgroundColor: primaryColor,
-          foregroundColor: lightColor,
+          foregroundColor: Colors.white,
+          minimumSize: Size(0, 48), // Dimensione minima per accessibilità
+        ).copyWith(
+          elevation: WidgetStateProperty.resolveWith<double>(
+            (Set<WidgetState> states) {
+              if (states.contains(WidgetState.pressed)) return 0;
+              return 2;
+            },
+          ),
         ),
       ),
-      // Card Theme
+      // Card Theme moderno
       cardTheme: CardTheme(
         elevation: 0,
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(borderRadiusMedium),
         ),
-        color: lightColor,
+        color: Colors.white,
+        margin: EdgeInsets.all(spacingSmall),
       ),
-      // AppBar Theme
-      appBarTheme: const AppBarTheme(
+      // AppBar Theme moderno
+      appBarTheme: AppBarTheme(
         elevation: 0,
-        backgroundColor: lightColor,
-        foregroundColor: darkColor,
+        backgroundColor: Colors.transparent,
         centerTitle: true,
+        iconTheme: IconThemeData(color: darkColor, size: 24),
+        titleTextStyle: GoogleFonts.inter(
+          color: darkColor,
+          fontSize: 20,
+          fontWeight: FontWeight.w600,
+          letterSpacing: 0.15,
+        ),
       ),
-      // Input Decoration
+      // Input Decoration moderna
       inputDecorationTheme: InputDecorationTheme(
         filled: true,
-        fillColor: lightColor,
+        fillColor: Colors.white,
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(borderRadiusMedium),
           borderSide: BorderSide.none,
@@ -127,15 +182,156 @@ class AppTheme {
         enabledBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(borderRadiusMedium),
           borderSide: BorderSide(
-            color: const Color.fromRGBO(48, 90, 114, 0.1),
+            color: Color.fromRGBO(0, 0, 0, 0.1),
+            width: 1,
           ),
         ),
         focusedBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(borderRadiusMedium),
-          borderSide: const BorderSide(color: primaryColor),
+          borderSide: BorderSide(color: primaryColor, width: 2),
         ),
-        contentPadding: const EdgeInsets.all(spacingMedium),
+        errorBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(borderRadiusMedium),
+          borderSide: BorderSide(color: errorColor, width: 1),
+        ),
+        focusedErrorBorder: OutlineInputBorder(
+          borderRadius: BorderRadius.circular(borderRadiusMedium),
+          borderSide: BorderSide(color: errorColor, width: 2),
+        ),
+        contentPadding: EdgeInsets.all(spacingMedium),
+        hintStyle: GoogleFonts.inter(
+          color: neutralColor.withValues(alpha: 128),
+          fontSize: 16,
+        ),
       ),
+      // Floating Action Button Theme
+      floatingActionButtonTheme: FloatingActionButtonThemeData(
+        elevation: 2,
+        highlightElevation: 4,
+        backgroundColor: accentColor,
+        foregroundColor: Colors.white,
+        extendedPadding: EdgeInsets.symmetric(
+          horizontal: spacingLarge,
+          vertical: spacingMedium,
+        ),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(borderRadiusLarge),
+        ),
+      ),
+    );
+  }
+
+  // Dark Theme
+  static ThemeData get darkTheme {
+    return lightTheme.copyWith(
+      brightness: Brightness.dark,
+      colorScheme: ColorScheme.dark(
+        primary: primaryColor,
+        secondary: accentColor,
+        surface: darkColor,
+        onSurface: Colors.white,
+        onPrimary: Colors.white,
+        onSecondary: Colors.white,
+        error: errorColor,
+      ),
+    );
+  }
+}
+
+// CustomAppBar
+class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
+  final String title;
+  final List<Widget>? actions;
+  final bool automaticallyImplyLeading;
+
+  const CustomAppBar({
+    super.key,
+    required this.title,
+    this.actions,
+    this.automaticallyImplyLeading = true,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      height: preferredSize.height,
+      decoration: BoxDecoration(
+        gradient: AppTheme.primaryGradient,
+      ),
+      child: AppBar(
+        title: Text(
+          title,
+          style: Theme.of(context).textTheme.headlineMedium?.copyWith(
+                color: Colors.white,
+                fontWeight: FontWeight.bold,
+                letterSpacing: -0.5,
+              ),
+        ),
+        backgroundColor: Colors.transparent,
+        elevation: 0,
+        automaticallyImplyLeading: automaticallyImplyLeading,
+        iconTheme: const IconThemeData(color: Colors.white),
+        actions: actions,
+        flexibleSpace: SizedBox.expand(
+          child: Stack(
+            clipBehavior: Clip.none,
+            children: [
+              Positioned(
+                right: -50,
+                top: -50,
+                child: Container(
+                  width: 200,
+                  height: 200,
+                  decoration: const BoxDecoration(
+                    shape: BoxShape.circle,
+                    color: Color.fromRGBO(255, 255, 255, 0.1),
+                  ),
+                ),
+              ),
+              Positioned(
+                left: -30,
+                bottom: -30,
+                child: Container(
+                  width: 120,
+                  height: 120,
+                  decoration: const BoxDecoration(
+                    shape: BoxShape.circle,
+                    color: Color.fromRGBO(255, 255, 255, 0.05),
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  @override
+  Size get preferredSize => const Size.fromHeight(130);
+}
+
+// ExampleScreen
+class ExampleScreen extends StatelessWidget {
+  final String title;
+  final Widget body;
+  final List<Widget>? actions;
+
+  const ExampleScreen({
+    super.key,
+    required this.title,
+    required this.body,
+    this.actions,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: CustomAppBar(
+        title: title,
+        actions: actions,
+      ),
+      body: body,
     );
   }
 }

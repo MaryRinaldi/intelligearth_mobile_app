@@ -4,7 +4,6 @@ import 'package:latlong2/latlong.dart';
 import 'package:image_picker/image_picker.dart';
 import '../theme/app_theme.dart';
 import 'camera_view_page.dart';
-import 'quest_page.dart';
 
 class MapScreen extends StatefulWidget {
   const MapScreen({
@@ -25,10 +24,9 @@ class MapScreen extends StatefulWidget {
 class _MapScreenState extends State<MapScreen>
     with SingleTickerProviderStateMixin {
   late final AnimationController _controller;
-  late final Animation<double> _slideAnimation;
-  bool _isPanelExpanded = false;
   final MapController _mapController = MapController();
   String currentLayer = 'OpenStreetMap DE';
+  bool _isMarkerSelected = false;
 
   final Map<String, TileLayer> mapLayers = {
     'OpenStreetMap DE': TileLayer(
@@ -50,9 +48,6 @@ class _MapScreenState extends State<MapScreen>
     _controller = AnimationController(
       duration: AppTheme.animationNormal,
       vsync: this,
-    );
-    _slideAnimation = Tween<double>(begin: 0, end: 1).animate(
-      CurvedAnimation(parent: _controller, curve: Curves.easeInOut),
     );
   }
 
@@ -77,20 +72,16 @@ class _MapScreenState extends State<MapScreen>
       );
     } else {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Nessuna immagine selezionata.')),
+        SnackBar(
+          content: Text('Nessuna immagine selezionata.'),
+          behavior: SnackBarBehavior.floating,
+          backgroundColor: AppTheme.darkColor,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(AppTheme.borderRadiusMedium),
+          ),
+        ),
       );
     }
-  }
-
-  void _togglePanel() {
-    if (_isPanelExpanded) {
-      _controller.reverse();
-    } else {
-      _controller.forward();
-    }
-    setState(() {
-      _isPanelExpanded = !_isPanelExpanded;
-    });
   }
 
   @override
@@ -101,9 +92,8 @@ class _MapScreenState extends State<MapScreen>
           _buildMap(),
           _buildTopBar(),
           _buildLayerSelector(),
-          _buildBottomPanel(),
-          _buildCameraButton(),
-          _buildMapControls(),
+          _buildFloatingActionButtons(),
+          if (_isMarkerSelected) _buildMarkerInfoPanel(),
         ],
       ),
     );
@@ -117,9 +107,14 @@ class _MapScreenState extends State<MapScreen>
         initialZoom: 13.0,
         minZoom: 3.0,
         maxZoom: 18.0,
-        interactionOptions: InteractionOptions(
+        interactionOptions: const InteractionOptions(
           flags: InteractiveFlag.all,
         ),
+        onTap: (_, __) {
+          if (_isMarkerSelected) {
+            setState(() => _isMarkerSelected = false);
+          }
+        },
       ),
       children: [
         mapLayers[currentLayer]!,
@@ -129,7 +124,12 @@ class _MapScreenState extends State<MapScreen>
               point: LatLng(widget.latitude, widget.longitude),
               width: 40,
               height: 40,
-              child: _buildCustomMarker(),
+              child: GestureDetector(
+                onTap: () {
+                  setState(() => _isMarkerSelected = true);
+                },
+                child: _buildCustomMarker(),
+              ),
             ),
           ],
         ),
@@ -138,17 +138,26 @@ class _MapScreenState extends State<MapScreen>
   }
 
   Widget _buildCustomMarker() {
-    return Container(
-      decoration: BoxDecoration(
-        gradient: AppTheme.accentGradient,
-        shape: BoxShape.circle,
-        boxShadow: AppTheme.softShadow,
-      ),
-      child: const Icon(
-        Icons.location_on,
-        color: AppTheme.lightColor,
-        size: 24,
-      ),
+    return TweenAnimationBuilder<double>(
+      tween: Tween(begin: 0.0, end: _isMarkerSelected ? 1.2 : 1.0),
+      duration: AppTheme.animationFast,
+      builder: (context, value, child) {
+        return Transform.scale(
+          scale: value,
+          child: Container(
+            decoration: BoxDecoration(
+              gradient: AppTheme.primaryGradient,
+              shape: BoxShape.circle,
+              boxShadow: AppTheme.neumorphicShadow,
+            ),
+            child: const Icon(
+              Icons.location_on,
+              color: Colors.white,
+              size: 24,
+            ),
+          ),
+        );
+      },
     );
   }
 
@@ -161,39 +170,18 @@ class _MapScreenState extends State<MapScreen>
           vertical: AppTheme.spacingSmall,
         ),
         decoration: BoxDecoration(
-          color: AppTheme.lightColor,
-          borderRadius: BorderRadius.circular(AppTheme.borderRadiusMedium),
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(AppTheme.borderRadiusLarge),
           boxShadow: AppTheme.softShadow,
         ),
         child: Row(
           children: [
-            GestureDetector(
-              onTap: () {
-                if (Navigator.canPop(context)) {
-                  Navigator.pop(context);
-                } else {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(builder: (context) => QuestPage()),
-                  );
-                }
-              },
-              child: Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: Image.asset(
-                  'assets/icons/quest.png',
-                  height: 50,
-                  width: 50,
-                ),
-              ),
-            ),
-            const SizedBox(width: 4),
+            _buildBackButton(),
+            const SizedBox(width: AppTheme.spacingMedium),
             Expanded(
               child: Text(
-                'Go back to other quests',
-                style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                      fontWeight: FontWeight.w300,
-                    ),
+                widget.questTitle,
+                style: Theme.of(context).textTheme.titleLarge,
                 overflow: TextOverflow.ellipsis,
               ),
             ),
@@ -203,45 +191,67 @@ class _MapScreenState extends State<MapScreen>
     );
   }
 
+  Widget _buildBackButton() {
+    return Material(
+      color: Colors.transparent,
+      child: InkWell(
+        borderRadius: BorderRadius.circular(AppTheme.borderRadiusMedium),
+        onTap: () => Navigator.maybePop(context),
+        child: Container(
+          padding: const EdgeInsets.all(AppTheme.spacingSmall),
+          decoration: BoxDecoration(
+            color: AppTheme.primaryColor.withValues(alpha: 26),
+            borderRadius: BorderRadius.circular(AppTheme.borderRadiusMedium),
+          ),
+          child: Icon(
+            Icons.arrow_back,
+            color: AppTheme.primaryColor,
+          ),
+        ),
+      ),
+    );
+  }
+
   Widget _buildLayerSelector() {
     return Positioned(
-      top: 80,
-      right: 16,
+      top: 100,
+      right: AppTheme.spacingMedium,
       child: Container(
-        padding: const EdgeInsets.all(AppTheme.spacingSmall),
         decoration: BoxDecoration(
-          color: AppTheme.lightColor,
-          borderRadius: BorderRadius.circular(AppTheme.borderRadiusMedium),
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(AppTheme.borderRadiusLarge),
           boxShadow: AppTheme.softShadow,
         ),
         child: Column(
           children: mapLayers.keys.map((String layer) {
             final isSelected = currentLayer == layer;
-            return Container(
-              margin: const EdgeInsets.only(bottom: AppTheme.spacingSmall),
-              width: 120,
-              child: ElevatedButton(
-                style: ElevatedButton.styleFrom(
-                  backgroundColor:
-                      isSelected ? AppTheme.primaryColor : AppTheme.lightColor,
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: AppTheme.spacingMedium,
-                    vertical: AppTheme.spacingSmall,
-                  ),
-                  elevation: isSelected ? 0 : 2,
-                ),
-                onPressed: () {
-                  setState(() {
-                    currentLayer = layer;
-                  });
-                },
-                child: Text(
-                  layer,
-                  style: TextStyle(
-                    color:
-                        isSelected ? AppTheme.lightColor : AppTheme.darkColor,
-                    fontSize: 14,
-                    fontWeight: FontWeight.bold,
+            return Padding(
+              padding: const EdgeInsets.all(AppTheme.spacingSmall),
+              child: Material(
+                color: Colors.transparent,
+                child: InkWell(
+                  borderRadius:
+                      BorderRadius.circular(AppTheme.borderRadiusMedium),
+                  onTap: () => setState(() => currentLayer = layer),
+                  child: Container(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: AppTheme.spacingMedium,
+                      vertical: AppTheme.spacingSmall,
+                    ),
+                    decoration: BoxDecoration(
+                      color: isSelected
+                          ? AppTheme.primaryColor
+                          : Colors.transparent,
+                      borderRadius:
+                          BorderRadius.circular(AppTheme.borderRadiusMedium),
+                    ),
+                    child: Text(
+                      layer,
+                      style: Theme.of(context).textTheme.labelLarge?.copyWith(
+                            color:
+                                isSelected ? Colors.white : AppTheme.darkColor,
+                          ),
+                    ),
                   ),
                 ),
               ),
@@ -252,149 +262,133 @@ class _MapScreenState extends State<MapScreen>
     );
   }
 
-  Widget _buildBottomPanel() {
-    return AnimatedBuilder(
-      animation: _slideAnimation,
-      builder: (context, child) {
-        return Positioned(
-          bottom: 0,
-          left: 0,
-          right: 0,
-          child: GestureDetector(
-            onVerticalDragUpdate: (details) {
-              if (details.primaryDelta! < -20 && !_isPanelExpanded) {
-                _togglePanel();
-              } else if (details.primaryDelta! > 20 && _isPanelExpanded) {
-                _togglePanel();
-              }
-            },
-            child: Container(
-              height: 300 * _slideAnimation.value + 80,
-              decoration: BoxDecoration(
-                color: AppTheme.lightColor,
-                borderRadius: const BorderRadius.vertical(
-                  top: Radius.circular(AppTheme.borderRadiusLarge),
-                ),
-                boxShadow: AppTheme.softShadow,
-              ),
-              child: Column(
-                children: [
-                  _buildPanelHandle(),
-                  Expanded(child: _buildPanelContent()),
-                ],
-              ),
+  Widget _buildFloatingActionButtons() {
+    return Positioned(
+      right: AppTheme.spacingMedium,
+      bottom: AppTheme.spacingLarge,
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          _buildMapControlButton(
+            icon: Icons.add,
+            onPressed: () => _mapController.move(
+              _mapController.camera.center,
+              _mapController.camera.zoom + 1,
             ),
           ),
-        );
-      },
-    );
-  }
-
-  Widget _buildPanelHandle() {
-    return Container(
-      margin: const EdgeInsets.symmetric(vertical: AppTheme.spacingSmall),
-      width: 40,
-      height: 4,
-      decoration: BoxDecoration(
-        color: const Color.fromRGBO(39, 47, 64, 0.2),
-        borderRadius: BorderRadius.circular(AppTheme.borderRadiusSmall),
+          const SizedBox(height: AppTheme.spacingSmall),
+          _buildMapControlButton(
+            icon: Icons.remove,
+            onPressed: () => _mapController.move(
+              _mapController.camera.center,
+              _mapController.camera.zoom - 1,
+            ),
+          ),
+          const SizedBox(height: AppTheme.spacingSmall),
+          _buildMapControlButton(
+            icon: Icons.my_location,
+            onPressed: () => _mapController.move(
+              LatLng(widget.latitude, widget.longitude),
+              _mapController.camera.zoom,
+            ),
+          ),
+          const SizedBox(height: AppTheme.spacingLarge),
+          FloatingActionButton(
+            onPressed: () => _openCamera(context),
+            backgroundColor: AppTheme.accentColor,
+            child: const Icon(Icons.camera_alt, color: Colors.white),
+          ),
+        ],
       ),
     );
   }
 
-  Widget _buildPanelContent() {
-    // Implementa il contenuto del pannello qui
-    return const Placeholder();
-  }
-
-  Widget _buildCameraButton() {
-    return Positioned(
-      right: AppTheme.spacingLarge,
-      bottom: _isPanelExpanded ? 320 : 100,
-      child: GestureDetector(
-        onTap: () => _openCamera(context),
-        child: Container(
-          padding: const EdgeInsets.all(AppTheme.spacingMedium),
-          decoration: BoxDecoration(
-            gradient: AppTheme.accentGradient,
-            borderRadius: BorderRadius.circular(30),
-            boxShadow: AppTheme.softShadow,
-          ),
-          child: Image.asset(
-            'assets/icons/camera.png',
-            height: 40,
-            width: 40,
+  Widget _buildMapControlButton({
+    required IconData icon,
+    required VoidCallback onPressed,
+  }) {
+    return Container(
+      decoration: BoxDecoration(
+        shape: BoxShape.circle,
+        boxShadow: AppTheme.softShadow,
+      ),
+      child: Material(
+        color: Colors.white,
+        shape: const CircleBorder(),
+        child: InkWell(
+          customBorder: const CircleBorder(),
+          onTap: onPressed,
+          child: Container(
+            padding: const EdgeInsets.all(AppTheme.spacingMedium),
+            child: Icon(icon, color: AppTheme.darkColor),
           ),
         ),
       ),
     );
   }
 
-  Widget _buildMapControls() {
-    return Positioned(
-      right: AppTheme.spacingMedium,
-      bottom: _isPanelExpanded ? 380 : 160,
-      child: Column(
-        children: [
-          _MapControlButton(
-            icon: Icons.add,
-            onPressed: () {
-              final currentZoom = _mapController.camera.zoom;
-              _mapController.move(
-                _mapController.camera.center,
-                currentZoom + 1,
-              );
-            },
+  Widget _buildMarkerInfoPanel() {
+    return AnimatedPositioned(
+      duration: AppTheme.animationNormal,
+      curve: Curves.easeInOut,
+      left: 0,
+      right: 0,
+      bottom: _isMarkerSelected ? 0 : -200,
+      child: Container(
+        height: 200,
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: const BorderRadius.vertical(
+            top: Radius.circular(AppTheme.borderRadiusXLarge),
           ),
-          const SizedBox(height: AppTheme.spacingSmall),
-          _MapControlButton(
-            icon: Icons.remove,
-            onPressed: () {
-              final currentZoom = _mapController.camera.zoom;
-              _mapController.move(
-                _mapController.camera.center,
-                currentZoom - 1,
-              );
-            },
-          ),
-          const SizedBox(height: AppTheme.spacingSmall),
-          _MapControlButton(
-            icon: Icons.my_location,
-            onPressed: () {
-              _mapController.move(
-                LatLng(widget.latitude, widget.longitude),
-                15,
-              );
-            },
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-class _MapControlButton extends StatelessWidget {
-  const _MapControlButton({
-    required this.icon,
-    required this.onPressed,
-  });
-
-  final IconData icon;
-  final VoidCallback onPressed;
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      decoration: BoxDecoration(
-        color: AppTheme.lightColor,
-        borderRadius: BorderRadius.circular(AppTheme.borderRadiusSmall),
-        boxShadow: AppTheme.softShadow,
-      ),
-      child: IconButton(
-        icon: Icon(icon),
-        onPressed: onPressed,
-        color: AppTheme.darkColor,
-        tooltip: 'Map control',
+          boxShadow: AppTheme.softShadow,
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Center(
+              child: Container(
+                margin: const EdgeInsets.symmetric(
+                    vertical: AppTheme.spacingMedium),
+                width: 40,
+                height: 4,
+                decoration: BoxDecoration(
+                  color: Colors.grey[300],
+                  borderRadius: BorderRadius.circular(2),
+                ),
+              ),
+            ),
+            Padding(
+              padding:
+                  const EdgeInsets.symmetric(horizontal: AppTheme.spacingLarge),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    widget.questTitle,
+                    style: Theme.of(context).textTheme.titleLarge,
+                  ),
+                  const SizedBox(height: AppTheme.spacingSmall),
+                  Text(
+                    'Lat: ${widget.latitude.toStringAsFixed(6)}\nLong: ${widget.longitude.toStringAsFixed(6)}',
+                    style: Theme.of(context).textTheme.bodyMedium,
+                  ),
+                  const SizedBox(height: AppTheme.spacingMedium),
+                  ElevatedButton.icon(
+                    onPressed: () => _openCamera(context),
+                    icon: const Icon(Icons.camera_alt),
+                    label: const Text('Scatta una foto'),
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: AppTheme.accentColor,
+                      foregroundColor: Colors.white,
+                      minimumSize: const Size(double.infinity, 48),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }

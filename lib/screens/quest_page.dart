@@ -14,7 +14,7 @@ class QuestPage extends StatefulWidget {
 class _QuestPageState extends State<QuestPage>
     with SingleTickerProviderStateMixin {
   late TabController _tabController;
-  final ScrollController _scrollController = ScrollController();
+  int _selectedTabIndex = 0;
 
   final List<Quest> quests = [
     Quest(
@@ -40,13 +40,17 @@ class _QuestPageState extends State<QuestPage>
   @override
   void initState() {
     super.initState();
-    _tabController = TabController(length: 3, vsync: this);
+    _tabController = TabController(length: 3, vsync: this)
+      ..addListener(() {
+        setState(() {
+          _selectedTabIndex = _tabController.index;
+        });
+      });
   }
 
   @override
   void dispose() {
     _tabController.dispose();
-    _scrollController.dispose();
     super.dispose();
   }
 
@@ -54,110 +58,62 @@ class _QuestPageState extends State<QuestPage>
   Widget build(BuildContext context) {
     final l10n = AppLocalizations.of(context)!;
 
-    return PopScope(
-      canPop: false,
-      child: Scaffold(
-        body: NestedScrollView(
-          controller: _scrollController,
-          headerSliverBuilder: (context, innerBoxIsScrolled) => [
-            _buildAppBar(l10n),
-            _buildTabBar(l10n),
-          ],
-          body: TabBarView(
+    return Column(
+      children: [
+        Container(
+          color: Theme.of(context).scaffoldBackgroundColor,
+          child: TabBar(
+            controller: _tabController,
+            labelColor: AppTheme.primaryColor,
+            unselectedLabelColor: AppTheme.neutralColor.withValues(alpha: 128),
+            labelStyle: Theme.of(context).textTheme.labelLarge,
+            unselectedLabelStyle: Theme.of(context).textTheme.labelLarge,
+            indicatorSize: TabBarIndicatorSize.label,
+            indicatorWeight: 3,
+            indicatorColor: AppTheme.primaryColor,
+            tabs: [
+              _buildTab(l10n.activeQuests, 0),
+              _buildTab(l10n.completedQuests, 1),
+              _buildTab(l10n.upcomingQuests, 2),
+            ],
+          ),
+        ),
+        Expanded(
+          child: TabBarView(
             controller: _tabController,
             children: [
-              _QuestList(status: QuestStatus.active, quests: quests),
-              _QuestList(status: QuestStatus.completed, quests: quests),
-              _QuestList(status: QuestStatus.upcoming, quests: quests),
-            ],
-          ),
-        ),
-        floatingActionButton: FloatingActionButton(
-          onPressed: () {
-            // Implementa la funzionalità per aggiungere nuove quest
-          },
-          backgroundColor: AppTheme.accentColor,
-          child: const Icon(Icons.add, color: AppTheme.lightColor),
-        ),
-      ),
-    );
-  }
-
-  Widget _buildAppBar(AppLocalizations l10n) {
-    return SliverAppBar(
-      automaticallyImplyLeading: false,
-      expandedHeight: 130,
-      floating: false,
-      pinned: true,
-      flexibleSpace: FlexibleSpaceBar(
-        background: Container(
-          decoration: BoxDecoration(
-            gradient: AppTheme.primaryGradient,
-          ),
-          child: Stack(
-            children: [
-              Positioned(
-                right: -50,
-                top: -50,
-                child: Container(
-                  width: 200,
-                  height: 200,
-                  decoration: BoxDecoration(
-                    shape: BoxShape.circle,
-                    color: const Color.fromRGBO(253, 253, 253, 0.1),
-                  ),
-                ),
+              _QuestList(
+                status: QuestStatus.active,
+                quests: quests,
               ),
-              SafeArea(
-                child: Padding(
-                  padding: const EdgeInsets.all(AppTheme.spacingLarge),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
-                        l10n.questPageTitle,
-                        style: Theme.of(context)
-                            .textTheme
-                            .headlineMedium
-                            ?.copyWith(
-                              color: AppTheme.lightColor,
-                              fontWeight: FontWeight.bold,
-                            ),
-                      ),
-                      const SizedBox(height: AppTheme.spacingSmall),
-                      Text(
-                        l10n.questPageSubtitle,
-                        style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                              color: const Color.fromRGBO(253, 253, 253, 0.8),
-                            ),
-                      ),
-                    ],
-                  ),
-                ),
+              _QuestList(
+                status: QuestStatus.completed,
+                quests: quests,
+              ),
+              _QuestList(
+                status: QuestStatus.upcoming,
+                quests: quests,
               ),
             ],
           ),
         ),
-      ),
+      ],
     );
   }
 
-  Widget _buildTabBar(AppLocalizations l10n) {
-    return SliverPersistentHeader(
-      pinned: true,
-      delegate: _SliverAppBarDelegate(
-        TabBar(
-          controller: _tabController,
-          labelColor: AppTheme.primaryColor,
-          unselectedLabelColor: const Color.fromRGBO(39, 47, 64, 0.5),
-          indicatorColor: AppTheme.primaryColor,
-          indicatorWeight: 3,
-          tabs: [
-            Tab(text: l10n.activeQuests),
-            Tab(text: l10n.completedQuests),
-            Tab(text: l10n.upcomingQuests),
-          ],
+  Widget _buildTab(String text, int index) {
+    final isSelected = _selectedTabIndex == index;
+    return Tab(
+      child: AnimatedDefaultTextStyle(
+        duration: AppTheme.animationFast,
+        style: TextStyle(
+          fontSize: isSelected ? 16 : 14,
+          fontWeight: isSelected ? FontWeight.w600 : FontWeight.w500,
+          color: isSelected
+              ? AppTheme.primaryColor
+              : AppTheme.neutralColor.withValues(alpha: 128),
         ),
+        child: Text(text),
       ),
     );
   }
@@ -179,14 +135,29 @@ class _QuestList extends StatelessWidget {
     return ListView.builder(
       padding: const EdgeInsets.all(AppTheme.spacingMedium),
       itemCount: filteredQuests.length,
-      itemBuilder: (context, index) => _QuestCard(
-        quest: filteredQuests[index],
-      ),
+      itemBuilder: (context, index) {
+        final quest = filteredQuests[index];
+        return TweenAnimationBuilder<double>(
+          tween: Tween(begin: 0.0, end: 1.0),
+          duration: Duration(milliseconds: 400 + (index * 100)),
+          curve: Curves.easeOutQuad,
+          builder: (context, value, child) {
+            return Transform.translate(
+              offset: Offset(0, 50 * (1 - value)),
+              child: Opacity(
+                opacity: value,
+                child: child,
+              ),
+            );
+          },
+          child: _QuestCard(quest: quest),
+        );
+      },
     );
   }
 }
 
-class _QuestCard extends StatelessWidget {
+class _QuestCard extends StatefulWidget {
   const _QuestCard({
     required this.quest,
   });
@@ -194,78 +165,122 @@ class _QuestCard extends StatelessWidget {
   final Quest quest;
 
   @override
+  State<_QuestCard> createState() => _QuestCardState();
+}
+
+class _QuestCardState extends State<_QuestCard>
+    with SingleTickerProviderStateMixin {
+  late AnimationController _controller;
+  late Animation<double> _scaleAnimation;
+  bool _isPressed = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _controller = AnimationController(
+      duration: AppTheme.animationFast,
+      vsync: this,
+    );
+    _scaleAnimation = Tween<double>(
+      begin: 1.0,
+      end: 0.95,
+    ).animate(CurvedAnimation(
+      parent: _controller,
+      curve: Curves.easeInOut,
+    ));
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  void _onTapDown(TapDownDetails details) {
+    setState(() => _isPressed = true);
+    _controller.forward();
+  }
+
+  void _onTapUp(TapUpDetails details) {
+    setState(() => _isPressed = false);
+    _controller.reverse();
+  }
+
+  void _onTapCancel() {
+    setState(() => _isPressed = false);
+    _controller.reverse();
+  }
+
+  @override
   Widget build(BuildContext context) {
-    return Hero(
-      tag: 'quest_${quest.title}',
-      child: Card(
-        margin: const EdgeInsets.only(bottom: AppTheme.spacingMedium),
-        elevation: 0,
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(AppTheme.borderRadiusMedium),
-          side: BorderSide(
-            color: const Color.fromRGBO(48, 90, 114, 0.1),
-          ),
+    return Padding(
+      padding: const EdgeInsets.only(bottom: AppTheme.spacingMedium),
+      child: AnimatedBuilder(
+        animation: _scaleAnimation,
+        builder: (context, child) => Transform.scale(
+          scale: _scaleAnimation.value,
+          child: child,
         ),
-        child: InkWell(
+        child: GestureDetector(
+          onTapDown: _onTapDown,
+          onTapUp: _onTapUp,
+          onTapCancel: _onTapCancel,
           onTap: () {
             Navigator.push(
               context,
               MaterialPageRoute(
                 builder: (context) => MapScreen(
-                  latitude: quest.latitude,
-                  longitude: quest.longitude,
-                  questTitle: quest.title,
+                  latitude: widget.quest.latitude,
+                  longitude: widget.quest.longitude,
+                  questTitle: widget.quest.title,
                 ),
               ),
             );
           },
-          borderRadius: BorderRadius.circular(AppTheme.borderRadiusMedium),
-          child: Padding(
-            padding: const EdgeInsets.all(AppTheme.spacingMedium),
+          child: Container(
+            decoration: BoxDecoration(
+              color: Colors.white.withValues(alpha: 230),
+              borderRadius: BorderRadius.circular(AppTheme.borderRadiusLarge),
+              boxShadow: _isPressed ? [] : AppTheme.softShadow,
+            ),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Row(
-                  children: [
-                    _buildQuestImage(),
-                    const SizedBox(width: AppTheme.spacingMedium),
-                    Expanded(
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
+                _buildQuestImage(),
+                Padding(
+                  padding: const EdgeInsets.all(AppTheme.spacingMedium),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Row(
                         children: [
-                          Text(
-                            quest.title,
-                            style: Theme.of(context)
-                                .textTheme
-                                .titleMedium
-                                ?.copyWith(
-                                  fontWeight: FontWeight.bold,
-                                ),
+                          Expanded(
+                            child: Text(
+                              widget.quest.title,
+                              style: Theme.of(context)
+                                  .textTheme
+                                  .titleLarge
+                                  ?.copyWith(
+                                    fontWeight: FontWeight.w600,
+                                    letterSpacing: 0,
+                                  ),
+                            ),
                           ),
-                          const SizedBox(height: AppTheme.spacingXSmall),
-                          Text(
-                            quest.description,
-                            style: Theme.of(context)
-                                .textTheme
-                                .bodyMedium
-                                ?.copyWith(
-                                  color: const Color.fromRGBO(39, 47, 64, 0.6),
-                                ),
-                          ),
+                          _buildStatusBadge(),
                         ],
                       ),
-                    ),
-                    Image.asset(
-                      'assets/icons/go-to.png',
-                      width: 24,
-                      height: 24,
-                    ),
-                  ],
+                      const SizedBox(height: AppTheme.spacingSmall),
+                      Text(
+                        widget.quest.description,
+                        style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                              color: AppTheme.neutralColor,
+                            ),
+                      ),
+                      const SizedBox(height: AppTheme.spacingMedium),
+                      _buildProgressIndicator(),
+                    ],
+                  ),
                 ),
-                if (quest.status == QuestStatus.active) ...[
-                  const SizedBox(height: AppTheme.spacingMedium),
-                  _buildProgressIndicator(),
-                ],
               ],
             ),
           ),
@@ -276,18 +291,43 @@ class _QuestCard extends StatelessWidget {
 
   Widget _buildQuestImage() {
     return Container(
-      width: 60,
-      height: 60,
+      height: 160,
       decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(AppTheme.borderRadiusMedium),
-        boxShadow: AppTheme.softShadow,
-      ),
-      child: ClipRRect(
-        borderRadius: BorderRadius.circular(AppTheme.borderRadiusMedium),
-        child: Image.asset(
-          quest.imagePath,
+        borderRadius: const BorderRadius.vertical(
+          top: Radius.circular(AppTheme.borderRadiusLarge),
+        ),
+        image: DecorationImage(
+          image: AssetImage(widget.quest.imagePath),
           fit: BoxFit.cover,
         ),
+      ),
+    );
+  }
+
+  Widget _buildStatusBadge() {
+    final statusConfig = {
+      QuestStatus.active: (color: AppTheme.accentColor, label: 'Active'),
+      QuestStatus.completed: (color: AppTheme.successColor, label: 'Completed'),
+      QuestStatus.upcoming: (color: AppTheme.warningColor, label: 'Upcoming'),
+    };
+
+    final config = statusConfig[widget.quest.status]!;
+
+    return Container(
+      padding: const EdgeInsets.symmetric(
+        horizontal: AppTheme.spacingSmall,
+        vertical: AppTheme.spacingXSmall,
+      ),
+      decoration: BoxDecoration(
+        color: config.color.withValues(alpha: 26),
+        borderRadius: BorderRadius.circular(AppTheme.borderRadiusSmall),
+      ),
+      child: Text(
+        config.label,
+        style: Theme.of(context).textTheme.labelSmall?.copyWith(
+              color: config.color,
+              fontWeight: FontWeight.w600,
+            ),
       ),
     );
   }
@@ -299,43 +339,37 @@ class _QuestCard extends StatelessWidget {
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            const Text('Progress'),
-            Text('${(quest.progress * 100).toInt()}%'),
+            Text(
+              'Progress',
+              style: Theme.of(context).textTheme.labelMedium?.copyWith(
+                    color: AppTheme.neutralColor,
+                  ),
+            ),
+            Text(
+              '${(widget.quest.progress * 100).toInt()}%',
+              style: Theme.of(context).textTheme.labelMedium?.copyWith(
+                    color: AppTheme.primaryColor,
+                    fontWeight: FontWeight.w600,
+                  ),
+            ),
           ],
         ),
         const SizedBox(height: AppTheme.spacingSmall),
-        LinearProgressIndicator(
-          value: quest.progress,
-          backgroundColor: const Color.fromRGBO(48, 90, 114, 0.1),
-          valueColor: AlwaysStoppedAnimation<Color>(AppTheme.primaryColor),
-          borderRadius: BorderRadius.circular(AppTheme.borderRadiusSmall),
+        TweenAnimationBuilder<double>(
+          tween: Tween(begin: 0, end: widget.quest.progress),
+          duration: AppTheme.animationSlow,
+          curve: Curves.easeInOut,
+          builder: (context, value, _) => ClipRRect(
+            borderRadius: BorderRadius.circular(AppTheme.borderRadiusSmall),
+            child: LinearProgressIndicator(
+              value: value,
+              backgroundColor: AppTheme.primaryColor.withValues(alpha: 26),
+              valueColor: AlwaysStoppedAnimation<Color>(AppTheme.primaryColor),
+              minHeight: 6,
+            ),
+          ),
         ),
       ],
     );
-  }
-}
-
-class _SliverAppBarDelegate extends SliverPersistentHeaderDelegate {
-  _SliverAppBarDelegate(this._tabBar);
-
-  final TabBar _tabBar;
-
-  @override
-  double get minExtent => _tabBar.preferredSize.height;
-  @override
-  double get maxExtent => _tabBar.preferredSize.height;
-
-  @override
-  Widget build(
-      BuildContext context, double shrinkOffset, bool overlapsContent) {
-    return Container(
-      color: AppTheme.lightColor,
-      child: _tabBar,
-    );
-  }
-
-  @override
-  bool shouldRebuild(_SliverAppBarDelegate oldDelegate) {
-    return false;
   }
 }
