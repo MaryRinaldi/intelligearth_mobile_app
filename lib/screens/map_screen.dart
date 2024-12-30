@@ -77,7 +77,7 @@ class _MapScreenState extends State<MapScreen>
           behavior: SnackBarBehavior.floating,
           backgroundColor: AppTheme.darkColor,
           shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(AppTheme.borderRadiusMedium),
+            borderRadius: BorderRadius.circular(AppTheme.borderRadiusLarge),
           ),
         ),
       );
@@ -106,10 +106,9 @@ class _MapScreenState extends State<MapScreen>
         initialCenter: LatLng(widget.latitude, widget.longitude),
         initialZoom: 13.0,
         minZoom: 3.0,
-        maxZoom: 18.0,
-        interactionOptions: const InteractionOptions(
-          flags: InteractiveFlag.all,
-        ),
+        maxZoom: 17.0,
+        interactionOptions:
+            const InteractionOptions(flags: InteractiveFlag.all),
         onTap: (_, __) {
           if (_isMarkerSelected) {
             setState(() => _isMarkerSelected = false);
@@ -127,6 +126,10 @@ class _MapScreenState extends State<MapScreen>
               child: GestureDetector(
                 onTap: () {
                   setState(() => _isMarkerSelected = true);
+                  _mapController.move(
+                    LatLng(widget.latitude, widget.longitude),
+                    17.0,
+                  );
                 },
                 child: _buildCustomMarker(),
               ),
@@ -146,14 +149,14 @@ class _MapScreenState extends State<MapScreen>
           scale: value,
           child: Container(
             decoration: BoxDecoration(
-              gradient: AppTheme.primaryGradient,
+              gradient: AppTheme.accentGradient,
               shape: BoxShape.circle,
               boxShadow: AppTheme.neumorphicShadow,
             ),
             child: const Icon(
               Icons.location_on,
               color: Colors.white,
-              size: 24,
+              size: 26,
             ),
           ),
         );
@@ -166,7 +169,7 @@ class _MapScreenState extends State<MapScreen>
       child: Container(
         margin: const EdgeInsets.all(AppTheme.spacingMedium),
         padding: const EdgeInsets.symmetric(
-          horizontal: AppTheme.spacingMedium,
+          horizontal: AppTheme.spacingXSmall,
           vertical: AppTheme.spacingSmall,
         ),
         decoration: BoxDecoration(
@@ -177,7 +180,7 @@ class _MapScreenState extends State<MapScreen>
         child: Row(
           children: [
             _buildBackButton(),
-            const SizedBox(width: AppTheme.spacingMedium),
+            const SizedBox(width: AppTheme.spacingXSmall),
             Expanded(
               child: Text(
                 widget.questTitle,
@@ -195,17 +198,17 @@ class _MapScreenState extends State<MapScreen>
     return Material(
       color: Colors.transparent,
       child: InkWell(
-        borderRadius: BorderRadius.circular(AppTheme.borderRadiusMedium),
+        borderRadius: BorderRadius.circular(AppTheme.borderRadiusLarge),
         onTap: () => Navigator.maybePop(context),
         child: Container(
           padding: const EdgeInsets.all(AppTheme.spacingSmall),
           decoration: BoxDecoration(
-            color: AppTheme.primaryColor.withValues(alpha: 26),
-            borderRadius: BorderRadius.circular(AppTheme.borderRadiusMedium),
+            color: AppTheme.primaryColor.withValues(alpha: 106),
+            borderRadius: BorderRadius.circular(AppTheme.borderRadiusLarge),
           ),
           child: Icon(
             Icons.arrow_back,
-            color: AppTheme.primaryColor,
+            color: AppTheme.secondaryColor,
           ),
         ),
       ),
@@ -231,7 +234,7 @@ class _MapScreenState extends State<MapScreen>
                 color: Colors.transparent,
                 child: InkWell(
                   borderRadius:
-                      BorderRadius.circular(AppTheme.borderRadiusMedium),
+                      BorderRadius.circular(AppTheme.borderRadiusLarge),
                   onTap: () => setState(() => currentLayer = layer),
                   child: Container(
                     padding: const EdgeInsets.symmetric(
@@ -243,7 +246,7 @@ class _MapScreenState extends State<MapScreen>
                           ? AppTheme.primaryColor
                           : Colors.transparent,
                       borderRadius:
-                          BorderRadius.circular(AppTheme.borderRadiusMedium),
+                          BorderRadius.circular(AppTheme.borderRadiusLarge),
                     ),
                     child: Text(
                       layer,
@@ -295,7 +298,7 @@ class _MapScreenState extends State<MapScreen>
           const SizedBox(height: AppTheme.spacingLarge),
           FloatingActionButton(
             onPressed: () => _openCamera(context),
-            backgroundColor: AppTheme.accentColor,
+            backgroundColor: AppTheme.accentColor.withValues(alpha: 106),
             child: const Icon(Icons.camera_alt, color: Colors.white),
           ),
         ],
@@ -366,7 +369,7 @@ class _MapScreenState extends State<MapScreen>
                 children: [
                   Text(
                     widget.questTitle,
-                    style: Theme.of(context).textTheme.titleLarge,
+                    style: Theme.of(context).textTheme.titleMedium,
                   ),
                   const SizedBox(height: AppTheme.spacingSmall),
                   Text(
@@ -379,7 +382,8 @@ class _MapScreenState extends State<MapScreen>
                     icon: const Icon(Icons.camera_alt),
                     label: const Text('Scatta una foto'),
                     style: ElevatedButton.styleFrom(
-                      backgroundColor: AppTheme.accentColor,
+                      backgroundColor:
+                          AppTheme.accentColor.withValues(alpha: 106),
                       foregroundColor: Colors.white,
                       minimumSize: const Size(double.infinity, 48),
                     ),

@@ -258,7 +258,7 @@ class SignInScreenState extends State<SignInScreen>
                                   .textTheme
                                   .bodyLarge
                                   ?.copyWith(
-                                    color: AppTheme.neutralColor,
+                                    color: AppTheme.darkColor,
                                   ),
                               textAlign: TextAlign.center,
                             ),
@@ -277,13 +277,13 @@ class SignInScreenState extends State<SignInScreen>
                                     TextStyle(color: AppTheme.primaryColor),
                                 focusedBorder: OutlineInputBorder(
                                   borderRadius: BorderRadius.circular(
-                                      AppTheme.borderRadiusMedium),
+                                      AppTheme.borderRadiusLarge),
                                   borderSide: BorderSide(
                                       color: AppTheme.primaryColor, width: 2),
                                 ),
                                 enabledBorder: OutlineInputBorder(
                                   borderRadius: BorderRadius.circular(
-                                      AppTheme.borderRadiusMedium),
+                                      AppTheme.borderRadiusLarge),
                                   borderSide: BorderSide(
                                     color: AppTheme.primaryColor
                                         .withValues(alpha: 51),
@@ -324,13 +324,13 @@ class SignInScreenState extends State<SignInScreen>
                                 ),
                                 focusedBorder: OutlineInputBorder(
                                   borderRadius: BorderRadius.circular(
-                                      AppTheme.borderRadiusMedium),
+                                      AppTheme.borderRadiusLarge),
                                   borderSide: BorderSide(
                                       color: AppTheme.primaryColor, width: 2),
                                 ),
                                 enabledBorder: OutlineInputBorder(
                                   borderRadius: BorderRadius.circular(
-                                      AppTheme.borderRadiusMedium),
+                                      AppTheme.borderRadiusLarge),
                                   borderSide: BorderSide(
                                     color: AppTheme.primaryColor
                                         .withValues(alpha: 51),
@@ -364,7 +364,7 @@ class SignInScreenState extends State<SignInScreen>
                                   color:
                                       AppTheme.errorColor.withValues(alpha: 26),
                                   borderRadius: BorderRadius.circular(
-                                      AppTheme.borderRadiusSmall),
+                                      AppTheme.borderRadiusLarge),
                                 ),
                                 child: Row(
                                   children: [
@@ -395,13 +395,13 @@ class SignInScreenState extends State<SignInScreen>
                               onPressed: _isLoading ? null : _signIn,
                               style: ElevatedButton.styleFrom(
                                 backgroundColor: AppTheme.secondaryColor,
-                                foregroundColor: Colors.white,
+                                foregroundColor: Colors.black,
                                 padding: const EdgeInsets.symmetric(
                                   vertical: AppTheme.spacingMedium,
                                 ),
                                 shape: RoundedRectangleBorder(
                                   borderRadius: BorderRadius.circular(
-                                      AppTheme.borderRadiusMedium),
+                                      AppTheme.borderRadiusLarge),
                                 ),
                                 elevation: 0,
                               ),
@@ -413,16 +413,21 @@ class SignInScreenState extends State<SignInScreen>
                                         strokeWidth: 2,
                                         valueColor:
                                             AlwaysStoppedAnimation<Color>(
-                                                Colors.white),
+                                                Colors.black),
                                       ),
                                     )
-                                  : const Text('Accedi'),
+                                  : const Text(
+                                      'Accedi',
+                                      style: TextStyle(
+                                          fontWeight: FontWeight.w700,
+                                          fontSize: 16),
+                                    ),
                             ),
                           ],
                         ),
                       ),
                     ),
-                    const SizedBox(height: AppTheme.spacingLarge),
+                    const SizedBox(height: AppTheme.spacingMedium),
                     Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
@@ -430,7 +435,8 @@ class SignInScreenState extends State<SignInScreen>
                           'Non hai un account?',
                           style:
                               Theme.of(context).textTheme.bodyMedium?.copyWith(
-                                    color: Colors.white,
+                                    color: AppTheme.darkColor,
+                                    fontWeight: FontWeight.w600,
                                   ),
                         ),
                         TextButton(
@@ -442,11 +448,11 @@ class SignInScreenState extends State<SignInScreen>
                             );
                           },
                           style: TextButton.styleFrom(
-                            foregroundColor: Colors.white,
+                            foregroundColor: AppTheme.darkColor,
                           ),
                           child: const Text(
                             'Registrati',
-                            style: TextStyle(fontWeight: FontWeight.bold),
+                            style: TextStyle(fontWeight: FontWeight.w700),
                           ),
                         ),
                       ],

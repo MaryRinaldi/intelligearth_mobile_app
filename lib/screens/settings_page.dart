@@ -97,7 +97,7 @@ class _LanguageOption extends StatelessWidget {
 
     return InkWell(
       onTap: () => localeProvider.setLocale(locale),
-      borderRadius: BorderRadius.circular(AppTheme.borderRadiusMedium),
+      borderRadius: BorderRadius.circular(AppTheme.borderRadiusLarge),
       child: Container(
         padding: const EdgeInsets.symmetric(
           vertical: AppTheme.spacingMedium,
@@ -107,7 +107,7 @@ class _LanguageOption extends StatelessWidget {
           color: isSelected
               ? AppTheme.primaryColor.withValues(alpha: 26)
               : Colors.white,
-          borderRadius: BorderRadius.circular(AppTheme.borderRadiusMedium),
+          borderRadius: BorderRadius.circular(AppTheme.borderRadiusLarge),
           border: Border.all(
             color: isSelected
                 ? AppTheme.primaryColor

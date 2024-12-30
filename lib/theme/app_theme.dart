@@ -139,7 +139,7 @@ class AppTheme {
             vertical: spacingMedium,
           ),
           shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(borderRadiusMedium),
+            borderRadius: BorderRadius.circular(borderRadiusLarge),
           ),
           backgroundColor: primaryColor,
           foregroundColor: Colors.white,
@@ -157,7 +157,7 @@ class AppTheme {
       cardTheme: CardTheme(
         elevation: 0,
         shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(borderRadiusMedium),
+          borderRadius: BorderRadius.circular(borderRadiusLarge),
         ),
         color: Colors.white,
         margin: EdgeInsets.all(spacingSmall),
@@ -178,28 +178,28 @@ class AppTheme {
       // Input Decoration moderna
       inputDecorationTheme: InputDecorationTheme(
         filled: true,
-        fillColor: Colors.white,
+        fillColor: const Color.fromARGB(255, 0, 0, 0),
         border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(borderRadiusMedium),
+          borderRadius: BorderRadius.circular(borderRadiusLarge),
           borderSide: BorderSide.none,
         ),
         enabledBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(borderRadiusMedium),
+          borderRadius: BorderRadius.circular(borderRadiusLarge),
           borderSide: BorderSide(
             color: Color.fromRGBO(0, 0, 0, 0.1),
             width: 1,
           ),
         ),
         focusedBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(borderRadiusMedium),
+          borderRadius: BorderRadius.circular(borderRadiusLarge),
           borderSide: BorderSide(color: primaryColor, width: 2),
         ),
         errorBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(borderRadiusMedium),
+          borderRadius: BorderRadius.circular(borderRadiusLarge),
           borderSide: BorderSide(color: errorColor, width: 1),
         ),
         focusedErrorBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(borderRadiusMedium),
+          borderRadius: BorderRadius.circular(borderRadiusLarge),
           borderSide: BorderSide(color: errorColor, width: 2),
         ),
         contentPadding: EdgeInsets.all(spacingMedium),
@@ -266,7 +266,7 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
         title: Text(
           title,
           style: Theme.of(context).textTheme.headlineMedium?.copyWith(
-                color: AppTheme.textOnPrimaryColor,
+                color: AppTheme.darkColor,
                 fontWeight: FontWeight.bold,
                 letterSpacing: -0.5,
               ),
@@ -278,7 +278,7 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
         actions: actions,
         flexibleSpace: SizedBox.expand(
           child: Stack(
-            clipBehavior: Clip.none,
+            clipBehavior: Clip.hardEdge,
             children: [
               Positioned(
                 right: -50,
@@ -288,7 +288,7 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
                   height: 200,
                   decoration: BoxDecoration(
                     shape: BoxShape.circle,
-                    color: AppTheme.textOnPrimaryColor.withValues(alpha: 26),
+                    color: AppTheme.secondaryColor.withValues(alpha: 96),
                   ),
                 ),
               ),
@@ -300,7 +300,7 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
                   height: 120,
                   decoration: BoxDecoration(
                     shape: BoxShape.circle,
-                    color: AppTheme.textOnPrimaryColor.withValues(alpha: 13),
+                    color: AppTheme.primaryColor.withValues(alpha: 13),
                   ),
                 ),
               ),

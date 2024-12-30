@@ -39,7 +39,7 @@ class UserPage extends StatelessWidget {
             child: Text(
               user.name.isNotEmpty
                   ? user.name.substring(0, 1).toUpperCase()
-                  : '?',
+                  : 'Mary',
               style: Theme.of(context).textTheme.displayMedium?.copyWith(
                     color: AppTheme.primaryColor,
                     fontWeight: FontWeight.bold,
@@ -73,7 +73,7 @@ class UserPage extends StatelessWidget {
             child: Text(
               'Level 15 Explorer',
               style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                    color: AppTheme.textOnPrimaryColor,
+                    color: AppTheme.warningColor,
                     fontWeight: FontWeight.w600,
                   ),
             ),
@@ -132,9 +132,9 @@ class UserPage extends StatelessWidget {
                 Container(
                   padding: const EdgeInsets.all(AppTheme.spacingSmall),
                   decoration: BoxDecoration(
-                    color: achievement.color.withValues(alpha: 26),
+                    color: achievement.color.withValues(alpha: 106),
                     borderRadius:
-                        BorderRadius.circular(AppTheme.borderRadiusMedium),
+                        BorderRadius.circular(AppTheme.borderRadiusLarge),
                   ),
                   child: Icon(
                     achievement.icon,
@@ -163,7 +163,7 @@ class UserPage extends StatelessWidget {
                       const SizedBox(height: AppTheme.spacingSmall),
                       ClipRRect(
                         borderRadius:
-                            BorderRadius.circular(AppTheme.borderRadiusSmall),
+                            BorderRadius.circular(AppTheme.borderRadiusLarge),
                         child: LinearProgressIndicator(
                           value: achievement.progress,
                           backgroundColor:
@@ -241,7 +241,7 @@ class UserPage extends StatelessWidget {
                 children: [
                   Icon(
                     stat.icon,
-                    color: AppTheme.primaryColor,
+                    color: AppTheme.accentColor,
                     size: 32,
                   ),
                   const SizedBox(height: AppTheme.spacingSmall),
@@ -364,9 +364,9 @@ class UserPage extends StatelessWidget {
                           vertical: AppTheme.spacingXSmall,
                         ),
                         decoration: BoxDecoration(
-                          color: AppTheme.successColor.withValues(alpha: 26),
+                          color: AppTheme.successColor.withValues(alpha: 106),
                           borderRadius:
-                              BorderRadius.circular(AppTheme.borderRadiusSmall),
+                              BorderRadius.circular(AppTheme.borderRadiusLarge),
                         ),
                         child: Text(
                           quest.points,

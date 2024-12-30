@@ -34,6 +34,26 @@ class _QuestPageState extends State<QuestPage>
       progress: 0.7,
       status: QuestStatus.active,
     ),
+    Quest(
+      title: 'Quest del Pantheon',
+      imagePath: 'assets/images/roman_pantheon.png',
+      latitude: 41.8986,
+      longitude: 12.4768,
+      description:
+          'Scopri la maestosità del Pantheon romano nella suggestiva Piazza della Rotonda',
+      progress: 1.0,
+      status: QuestStatus.completed,
+    ),
+    Quest(
+      title: 'Quest del Roman Forum',
+      imagePath: 'assets/images/roman_forum.png',
+      latitude: 41.8924,
+      longitude: 12.4853,
+      description:
+          'Esplora le antiche rovine del Foro Romano, cuore dell\'antica Roma',
+      progress: 1.0,
+      status: QuestStatus.completed,
+    ),
     // Altre quest...
   ];
 
@@ -65,7 +85,7 @@ class _QuestPageState extends State<QuestPage>
           child: TabBar(
             controller: _tabController,
             labelColor: AppTheme.primaryColor,
-            unselectedLabelColor: AppTheme.neutralColor.withValues(alpha: 128),
+            unselectedLabelColor: AppTheme.neutralColor.withValues(alpha: 108),
             labelStyle: Theme.of(context).textTheme.labelLarge,
             unselectedLabelStyle: Theme.of(context).textTheme.labelLarge,
             indicatorSize: TabBarIndicatorSize.label,
@@ -111,7 +131,7 @@ class _QuestPageState extends State<QuestPage>
           fontWeight: isSelected ? FontWeight.w600 : FontWeight.w500,
           color: isSelected
               ? AppTheme.primaryColor
-              : AppTheme.neutralColor.withValues(alpha: 128),
+              : AppTheme.neutralColor.withValues(alpha: 108),
         ),
         child: Text(text),
       ),
@@ -332,7 +352,10 @@ class _QuestCardState extends State<_QuestCard>
   Widget _buildStatusBadge() {
     final statusConfig = {
       QuestStatus.active: (color: AppTheme.accentColor, label: 'Active'),
-      QuestStatus.completed: (color: AppTheme.successColor, label: 'Completed'),
+      QuestStatus.completed: (
+        color: AppTheme.successColor,
+        label: 'Not available'
+      ),
       QuestStatus.upcoming: (color: AppTheme.warningColor, label: 'Upcoming'),
     };
 
@@ -344,8 +367,8 @@ class _QuestCardState extends State<_QuestCard>
         vertical: AppTheme.spacingXSmall,
       ),
       decoration: BoxDecoration(
-        color: config.color.withValues(alpha: 26),
-        borderRadius: BorderRadius.circular(AppTheme.borderRadiusSmall),
+        color: config.color.withValues(alpha: 206),
+        borderRadius: BorderRadius.circular(AppTheme.borderRadiusLarge),
       ),
       child: Text(
         config.label,

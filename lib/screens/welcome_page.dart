@@ -27,7 +27,7 @@ class _WelcomePageState extends State<WelcomePage>
       title: 'Esplora il Mondo',
       description:
           'Scopri luoghi incredibili e partecipa a quest emozionanti nella tua città',
-      color: AppTheme.secondaryColor,
+      color: AppTheme.successColor,
     ),
     OnboardingItem(
       icon: Icons.camera_alt_rounded,
@@ -41,7 +41,7 @@ class _WelcomePageState extends State<WelcomePage>
       title: 'Guadagna Ricompense',
       description:
           'Completa le quest, ottieni punti e sblocca achievement esclusivi',
-      color: AppTheme.successColor,
+      color: AppTheme.warningColor,
     ),
   ];
 
@@ -232,7 +232,7 @@ class _WelcomePageState extends State<WelcomePage>
             const SizedBox(height: AppTheme.spacingMedium),
             Text(item.description,
                 style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                      color: AppTheme.textOnLightColor.withValues(alpha: 30),
+                      color: AppTheme.textOnLightColor.withValues(alpha: 10),
                     ),
                 textAlign: TextAlign.center),
           ],
@@ -261,7 +261,7 @@ class _WelcomePageState extends State<WelcomePage>
                 ),
                 child: Image.asset(
                   'assets/images/intelligearth_logo.png',
-                  height: 120,
+                  height: 100,
                 ),
               ),
             ),
@@ -269,7 +269,7 @@ class _WelcomePageState extends State<WelcomePage>
             Text(
               'Benvenuto in IntelligEarth',
               style: Theme.of(context).textTheme.displayMedium?.copyWith(
-                    color: AppTheme.textOnPrimaryColor,
+                    color: Colors.black,
                     fontWeight: FontWeight.bold,
                   ),
               textAlign: TextAlign.center,
@@ -278,7 +278,7 @@ class _WelcomePageState extends State<WelcomePage>
             Text(
               'Inizia il tuo viaggio alla scoperta del mondo',
               style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                    color: AppTheme.textOnPrimaryColor.withValues(alpha: 230),
+                    color: AppTheme.textOnPrimaryColor.withValues(alpha: 10),
                   ),
               textAlign: TextAlign.center,
             ),
@@ -295,7 +295,7 @@ class _WelcomePageState extends State<WelcomePage>
                   fillColor: WidgetStateProperty.resolveWith<Color>(
                     (Set<WidgetState> states) {
                       if (states.contains(WidgetState.selected)) {
-                        return AppTheme.textOnPrimaryColor;
+                        return AppTheme.darkColor;
                       }
                       return AppTheme.textOnPrimaryColor.withValues(alpha: 77);
                     },
@@ -407,7 +407,7 @@ class _LanguageOption extends StatelessWidget {
           provider.setLocale(locale);
           Navigator.pop(context);
         },
-        borderRadius: BorderRadius.circular(AppTheme.borderRadiusMedium),
+        borderRadius: BorderRadius.circular(AppTheme.borderRadiusLarge),
         child: Container(
           padding: const EdgeInsets.symmetric(
             horizontal: AppTheme.spacingMedium,
@@ -417,7 +417,7 @@ class _LanguageOption extends StatelessWidget {
             border: Border.all(
               color: AppTheme.primaryColor.withValues(alpha: 77),
             ),
-            borderRadius: BorderRadius.circular(AppTheme.borderRadiusMedium),
+            borderRadius: BorderRadius.circular(AppTheme.borderRadiusLarge),
           ),
           child: Column(
             children: [

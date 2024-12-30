@@ -23,7 +23,9 @@ class HomeScreenState extends State<HomeScreen>
   late Animation<Offset> _slideAnimation;
 
   List<Widget> get _pages => [
-        _DashboardPage(onNavigateToQuests: () => _onItemTapped(1)),
+        _DashboardPage(
+            onNavigateToQuests: () => _onItemTapped(1),
+            onNavigateToRewards: () => _onItemTapped(2)),
         const QuestPage(),
         const RewardScreen(),
         UserPage(user: currentUser ?? User.empty()),
@@ -138,8 +140,7 @@ class HomeScreenState extends State<HomeScreen>
               padding: const EdgeInsets.all(AppTheme.spacingSmall),
               decoration: BoxDecoration(
                 color: AppTheme.secondaryColor.withValues(alpha: 30),
-                borderRadius:
-                    BorderRadius.circular(AppTheme.borderRadiusMedium),
+                borderRadius: BorderRadius.circular(AppTheme.borderRadiusLarge),
               ),
               child: Row(
                 mainAxisSize: MainAxisSize.min,
@@ -158,6 +159,8 @@ class HomeScreenState extends State<HomeScreen>
             icon: const Icon(Icons.menu),
             onPressed: _toggleMenu,
             color: AppTheme.darkColor,
+            iconSize: 34,
+            padding: const EdgeInsets.only(right: AppTheme.spacingLarge),
           ),
       ],
     );
@@ -360,7 +363,7 @@ class HomeScreenState extends State<HomeScreen>
                   child: InkWell(
                     onTap: () => _onItemTapped(index),
                     borderRadius:
-                        BorderRadius.circular(AppTheme.borderRadiusMedium),
+                        BorderRadius.circular(AppTheme.borderRadiusLarge),
                     child: AnimatedContainer(
                       duration: AppTheme.animationFast,
                       padding: const EdgeInsets.symmetric(
@@ -407,8 +410,12 @@ class HomeScreenState extends State<HomeScreen>
 
 class _DashboardPage extends StatelessWidget {
   final VoidCallback onNavigateToQuests;
+  final VoidCallback onNavigateToRewards;
 
-  const _DashboardPage({required this.onNavigateToQuests});
+  const _DashboardPage({
+    required this.onNavigateToQuests,
+    required this.onNavigateToRewards,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -469,9 +476,9 @@ class _DashboardPage extends StatelessWidget {
               ),
               const SizedBox(width: AppTheme.spacingMedium),
               ElevatedButton(
-                onPressed: () => Navigator.pushNamed(context, '/community'),
+                onPressed: onNavigateToRewards,
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.white.withValues(alpha: 26),
+                  backgroundColor: Colors.black.withValues(alpha: 26),
                   foregroundColor: Colors.white,
                   elevation: 0,
                   padding: const EdgeInsets.symmetric(
@@ -664,7 +671,7 @@ class _DashboardPage extends StatelessWidget {
                         '${user.points} points',
                         style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                               color: AppTheme.textOnLightColor
-                                  .withValues(alpha: 179),
+                                  .withValues(alpha: 79),
                             ),
                       ),
                     ],
@@ -677,14 +684,14 @@ class _DashboardPage extends StatelessWidget {
                       vertical: AppTheme.spacingXSmall,
                     ),
                     decoration: BoxDecoration(
-                      color: AppTheme.primaryColor,
+                      color: AppTheme.primaryColor.withValues(alpha: 56),
                       borderRadius:
-                          BorderRadius.circular(AppTheme.borderRadiusSmall),
+                          BorderRadius.circular(AppTheme.borderRadiusLarge),
                     ),
                     child: Text(
                       'You',
                       style: Theme.of(context).textTheme.labelSmall?.copyWith(
-                            color: Colors.white,
+                            color: Colors.black,
                             fontWeight: FontWeight.w500,
                           ),
                     ),
@@ -752,7 +759,7 @@ class _DashboardPage extends StatelessWidget {
                     decoration: BoxDecoration(
                       color: activity.backgroundColor,
                       borderRadius:
-                          BorderRadius.circular(AppTheme.borderRadiusMedium),
+                          BorderRadius.circular(AppTheme.borderRadiusLarge),
                     ),
                     child: Icon(
                       activity.icon,

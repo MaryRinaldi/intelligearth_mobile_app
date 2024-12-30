@@ -83,9 +83,9 @@
     "@activeQuests": {
         "description": "Etichetta per la tab delle missioni attive"
     },
-    "completedQuests": "Completate",
+    "completedQuests": "Non disponibili",
     "@completedQuests": {
-        "description": "Etichetta per la tab delle missioni completate"
+        "description": "Etichetta per la tab delle missioni non attive"
     },
     "upcomingQuests": "In Arrivo",
     "@upcomingQuests": {
