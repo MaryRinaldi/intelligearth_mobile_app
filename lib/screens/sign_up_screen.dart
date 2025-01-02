@@ -80,7 +80,7 @@ class SignUpScreenState extends State<SignUpScreen> {
                     child: Container(
                       padding: const EdgeInsets.all(AppTheme.spacingMedium),
                       decoration: BoxDecoration(
-                        color: Colors.white,
+                        color: Colors.black,
                         borderRadius:
                             BorderRadius.circular(AppTheme.borderRadiusLarge),
                         boxShadow: AppTheme.softShadow,
@@ -97,7 +97,7 @@ class SignUpScreenState extends State<SignUpScreen> {
                     constraints: const BoxConstraints(maxWidth: 400),
                     padding: const EdgeInsets.all(AppTheme.spacingLarge),
                     decoration: BoxDecoration(
-                      color: Colors.white,
+                      color: Colors.black,
                       borderRadius:
                           BorderRadius.circular(AppTheme.borderRadiusLarge),
                       boxShadow: AppTheme.softShadow,
@@ -123,7 +123,7 @@ class SignUpScreenState extends State<SignUpScreen> {
                             'Unisciti alla community di IntelligEarth',
                             style:
                                 Theme.of(context).textTheme.bodyLarge?.copyWith(
-                                      color: AppTheme.darkColor,
+                                      color: AppTheme.textOnLightColor,
                                     ),
                             textAlign: TextAlign.center,
                           ),
@@ -348,7 +348,7 @@ class SignUpScreenState extends State<SignUpScreen> {
                                         strokeWidth: 2,
                                         valueColor:
                                             AlwaysStoppedAnimation<Color>(
-                                                Colors.black),
+                                                Colors.white),
                                       ),
                                     )
                                   : const Text(

@@ -97,13 +97,19 @@ class SignInScreenState extends State<SignInScreen>
       builder: (context) => StatefulBuilder(
         builder: (context, setState) => AlertDialog(
           title: Text('Recupera Password',
-              style: TextStyle(color: AppTheme.secondaryColor)),
+              style: TextStyle(
+                color: AppTheme.textOnLightColor,
+                fontWeight: FontWeight.w600,
+              )),
           content: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
               Text(
                 'Inserisci la tua email per ricevere le istruzioni di recupero',
-                style: TextStyle(color: AppTheme.neutralColor),
+                style: TextStyle(
+                  color: AppTheme.primaryColor,
+                  fontWeight: FontWeight.w600,
+                ),
               ),
               const SizedBox(height: AppTheme.spacingMedium),
               TextFormField(
@@ -111,6 +117,7 @@ class SignInScreenState extends State<SignInScreen>
                 enabled: !isLoading,
                 decoration: InputDecoration(
                   labelText: 'Email',
+                  labelStyle: TextStyle(color: AppTheme.primaryColor),
                   prefixIcon:
                       Icon(Icons.email_rounded, color: AppTheme.primaryColor),
                 ),
@@ -121,7 +128,7 @@ class SignInScreenState extends State<SignInScreen>
             TextButton(
               onPressed: isLoading ? null : () => Navigator.pop(context),
               child: Text('Annulla',
-                  style: TextStyle(color: AppTheme.neutralColor)),
+                  style: TextStyle(color: AppTheme.textOnLightColor)),
             ),
             ElevatedButton(
               onPressed: isLoading
@@ -169,10 +176,10 @@ class SignInScreenState extends State<SignInScreen>
                       width: 20,
                       child: CircularProgressIndicator(
                         strokeWidth: 2,
-                        valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+                        valueColor: AlwaysStoppedAnimation<Color>(Colors.black),
                       ),
                     )
-                  : const Text('Invia'),
+                  : const Text('Invia', style: TextStyle(color: Colors.black)),
             ),
           ],
         ),
@@ -208,7 +215,7 @@ class SignInScreenState extends State<SignInScreen>
                       child: Container(
                         padding: const EdgeInsets.all(AppTheme.spacingMedium),
                         decoration: BoxDecoration(
-                          color: Colors.white,
+                          color: Colors.black,
                           borderRadius:
                               BorderRadius.circular(AppTheme.borderRadiusLarge),
                           boxShadow: AppTheme.softShadow,
@@ -223,7 +230,7 @@ class SignInScreenState extends State<SignInScreen>
                     Container(
                       padding: const EdgeInsets.all(AppTheme.spacingLarge),
                       decoration: BoxDecoration(
-                        color: Colors.white,
+                        color: Colors.black,
                         borderRadius:
                             BorderRadius.circular(AppTheme.borderRadiusLarge),
                         boxShadow: [
@@ -253,12 +260,12 @@ class SignInScreenState extends State<SignInScreen>
                             ),
                             const SizedBox(height: AppTheme.spacingMedium),
                             Text(
-                              'Accedi per continuare la tua avventura',
+                              'Accedi per continuare la tua missione',
                               style: Theme.of(context)
                                   .textTheme
                                   .bodyLarge
                                   ?.copyWith(
-                                    color: AppTheme.darkColor,
+                                    color: AppTheme.secondaryColor,
                                   ),
                               textAlign: TextAlign.center,
                             ),
