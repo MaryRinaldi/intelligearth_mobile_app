@@ -88,7 +88,7 @@ class _WelcomePageState extends State<WelcomePage>
       ),
     );
 
-    WidgetsBinding.instance.addPostFrameCallback((_) {
+    Future.delayed(const Duration(seconds: 3), () {
       _initializeApp();
     });
 
@@ -97,7 +97,7 @@ class _WelcomePageState extends State<WelcomePage>
 
   Future<void> _initializeApp() async {
     // Simula il caricamento delle risorse
-    await Future.delayed(const Duration(seconds: 2));
+    await Future.delayed(const Duration(seconds: 1));
 
     if (!mounted) return;
     setState(() => _isLoading = false);
@@ -165,99 +165,87 @@ class _WelcomePageState extends State<WelcomePage>
   }
 
   Widget _buildSplashScreen() {
-    return Column(
-      mainAxisAlignment: MainAxisAlignment.center,
-      children: [
-        const Spacer(),
-        Center(
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Hero(
-                tag: 'app_logo',
-                child: ScaleTransition(
-                  scale: _pulseAnimation,
-                  child: Container(
-                    padding: const EdgeInsets.all(AppTheme.spacingMedium),
-                    decoration: BoxDecoration(
-                      shape: BoxShape.circle,
-                      boxShadow: [
-                        BoxShadow(
-                          color: Colors.black.withValues(alpha: 51),
-                          blurRadius: 10,
-                          offset: const Offset(0, 4),
-                        ),
-                        BoxShadow(
-                          color: Colors.white.withValues(alpha: 26),
-                          blurRadius: 8,
-                          offset: const Offset(0, -2),
-                        ),
-                      ],
-                    ),
-                    child: Image.asset(
-                      'assets/images/intelligearth_logo.png',
-                      height: 120,
-                      width: 120,
-                      fit: BoxFit.contain,
-                      filterQuality: FilterQuality.high,
-                    ),
-                  ),
+    return Center(
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          ScaleTransition(
+            scale: _pulseAnimation,
+            child: Container(
+              padding: const EdgeInsets.all(AppTheme.spacingSmall),
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                border: Border.all(
+                  color: AppTheme.textOnPrimaryColor,
+                  width: 1,
                 ),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black.withValues(alpha: 51),
+                    blurRadius: 10,
+                    offset: const Offset(0, 4),
+                  ),
+                  BoxShadow(
+                    color: Colors.white.withValues(alpha: 26),
+                    blurRadius: 8,
+                    offset: const Offset(0, -2),
+                  ),
+                ],
               ),
-              const SizedBox(height: AppTheme.spacingLarge),
-              FadeTransition(
-                opacity: _fadeInAnimation,
-                child: SlideTransition(
-                  position: Tween<Offset>(
-                    begin: const Offset(0, 0.5),
-                    end: Offset.zero,
-                  ).animate(_fadeInAnimation),
-                  child: Column(
-                    children: [
-                      Text(
-                        'IntelligEarth',
-                        style:
-                            Theme.of(context).textTheme.displaySmall?.copyWith(
-                                  color: AppTheme.textOnPrimaryColor,
-                                  fontWeight: FontWeight.bold,
-                                ),
-                      ),
-                      const SizedBox(height: AppTheme.spacingMedium),
-                      Text(
-                        'Documenta. Monitora. Preserva.',
-                        style:
-                            Theme.of(context).textTheme.headlineSmall?.copyWith(
-                                  color: AppTheme.textOnPrimaryColor
-                                      .withValues(alpha: 179),
-                                ),
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-            ],
-          ),
-        ),
-        const Spacer(),
-        Padding(
-          padding: const EdgeInsets.all(AppTheme.spacingLarge),
-          child: Center(
-            child: RotationTransition(
-              turns: _controller,
-              child: SizedBox(
-                width: 36,
-                height: 36,
-                child: CircularProgressIndicator(
-                  valueColor: AlwaysStoppedAnimation<Color>(
-                    AppTheme.textOnPrimaryColor.withValues(alpha: 179),
-                  ),
-                  strokeWidth: 2,
-                ),
+              child: Image.asset(
+                'assets/images/intelligearth_logo.png',
+                height: 120,
+                width: 120,
+                fit: BoxFit.contain,
+                filterQuality: FilterQuality.high,
               ),
             ),
           ),
-        ),
-      ],
+          const SizedBox(height: AppTheme.spacingLarge),
+          FadeTransition(
+            opacity: _fadeInAnimation,
+            child: SlideTransition(
+              position: Tween<Offset>(
+                begin: const Offset(0, 0.5),
+                end: Offset.zero,
+              ).animate(_fadeInAnimation),
+              child: Column(
+                children: [
+                  Text(
+                    'IntelligEarth',
+                    style: Theme.of(context).textTheme.displaySmall?.copyWith(
+                          color: AppTheme.textOnPrimaryColor,
+                          fontWeight: FontWeight.bold,
+                        ),
+                  ),
+                  const SizedBox(height: AppTheme.spacingMedium),
+                  Text(
+                    'Documenta. Monitora. Preserva.',
+                    style: Theme.of(context).textTheme.headlineSmall?.copyWith(
+                          color: AppTheme.textOnPrimaryColor
+                              .withValues(alpha: 179),
+                        ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+          const SizedBox(height: AppTheme.spacingXLarge),
+          RotationTransition(
+            turns: _controller,
+            child: SizedBox(
+              width: 36,
+              height: 36,
+              child: CircularProgressIndicator(
+                valueColor: AlwaysStoppedAnimation<Color>(
+                  AppTheme.textOnPrimaryColor.withValues(alpha: 179),
+                ),
+                strokeWidth: 2,
+              ),
+            ),
+          ),
+        ],
+      ),
     );
   }
 

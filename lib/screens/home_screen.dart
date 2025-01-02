@@ -342,7 +342,15 @@ class HomeScreenState extends State<HomeScreen>
     ];
     return Container(
       decoration: BoxDecoration(
-        color: AppTheme.primaryColor.withValues(alpha: 206),
+        gradient: LinearGradient(
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+          colors: [
+            AppTheme.primaryColor.withValues(alpha: 86),
+            const Color(0xFF9918B9)
+                .withValues(alpha: 200), // darker version of accentColor
+          ],
+        ),
         boxShadow: AppTheme.neumorphicShadow,
       ),
       child: SafeArea(
@@ -461,32 +469,34 @@ class _DashboardPage extends StatelessWidget {
           const SizedBox(height: AppTheme.spacingLarge),
           Row(
             children: [
-              ElevatedButton(
-                onPressed: onNavigateToQuests,
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.white,
-                  foregroundColor: AppTheme.primaryColor,
-                  elevation: 0,
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: AppTheme.spacingLarge,
-                    vertical: AppTheme.spacingMedium,
+              Expanded(
+                child: ElevatedButton(
+                  onPressed: onNavigateToQuests,
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.white,
+                    foregroundColor: AppTheme.primaryColor,
+                    elevation: 0,
+                    padding: const EdgeInsets.symmetric(
+                      vertical: AppTheme.spacingMedium,
+                    ),
                   ),
+                  child: const Text('Join Quest'),
                 ),
-                child: const Text('Join Quest'),
               ),
               const SizedBox(width: AppTheme.spacingMedium),
-              ElevatedButton(
-                onPressed: onNavigateToRewards,
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.black.withValues(alpha: 26),
-                  foregroundColor: Colors.white,
-                  elevation: 0,
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: AppTheme.spacingLarge,
-                    vertical: AppTheme.spacingMedium,
+              Expanded(
+                child: ElevatedButton(
+                  onPressed: onNavigateToRewards,
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.black.withValues(alpha: 26),
+                    foregroundColor: Colors.white,
+                    elevation: 0,
+                    padding: const EdgeInsets.symmetric(
+                      vertical: AppTheme.spacingMedium,
+                    ),
                   ),
+                  child: const Text('View Community'),
                 ),
-                child: const Text('View Community'),
               ),
             ],
           ),

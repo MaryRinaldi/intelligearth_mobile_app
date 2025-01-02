@@ -15,7 +15,7 @@ class AppTheme {
   static const Color textOnPrimaryColor =
       Colors.white; // Testo su sfondo primario
   static const Color textOnLightColor =
-      Color(0xFF39437A); // Testo su sfondo chiaro
+      Color.fromARGB(255, 44, 53, 103); // Testo su sfondo chiaro
 
   // Gradients
   static const LinearGradient primaryGradient = LinearGradient(
@@ -31,7 +31,7 @@ class AppTheme {
     begin: Alignment.topLeft,
     end: Alignment.bottomRight,
     colors: [
-      Color(0xFFBF20EC), // accentColor
+      Color(0xFF668FE6), // primaryColor
       Color(0xFF9918B9), // darker version of accentColor
     ],
   );
@@ -93,23 +93,23 @@ class AppTheme {
         onSecondary: textOnPrimaryColor,
         error: errorColor,
       ),
-      // Typography moderna con mix di Oxygen Mono e Poppins
+      // Typography moderna con mix di Noto Sans e Poppins
       textTheme: TextTheme(
-        // UI Elements - Oxygen Mono
-        labelLarge: GoogleFonts.oxygenMono(
+        // UI Elements - Noto Sans
+        labelLarge: GoogleFonts.notoSans(
           color: textOnLightColor,
           fontSize: 16,
-          fontWeight: FontWeight.w400,
+          fontWeight: FontWeight.w500,
         ),
-        labelMedium: GoogleFonts.oxygenMono(
+        labelMedium: GoogleFonts.notoSans(
           color: textOnLightColor,
           fontSize: 14,
-          fontWeight: FontWeight.w400,
+          fontWeight: FontWeight.w500,
         ),
-        labelSmall: GoogleFonts.oxygenMono(
+        labelSmall: GoogleFonts.notoSans(
           color: textOnLightColor,
           fontSize: 12,
-          fontWeight: FontWeight.w400,
+          fontWeight: FontWeight.w500,
         ),
         // Headers - Poppins
         displayLarge: GoogleFonts.poppins(
@@ -147,12 +147,12 @@ class AppTheme {
           color: textOnLightColor,
         ),
       ),
-      // Bottoni con Oxygen Mono
+      // Bottoni con Noto Sans
       elevatedButtonTheme: ElevatedButtonThemeData(
         style: ElevatedButton.styleFrom(
-          textStyle: GoogleFonts.oxygenMono(
+          textStyle: GoogleFonts.notoSans(
             fontSize: 16,
-            fontWeight: FontWeight.w400,
+            fontWeight: FontWeight.w500,
           ),
           elevation: 0,
           padding: const EdgeInsets.symmetric(
@@ -183,33 +183,39 @@ class AppTheme {
         color: Colors.white,
         margin: EdgeInsets.all(spacingSmall),
       ),
-      // AppBar Theme con Oxygen Mono
+      // AppBar Theme con Noto Sans
       appBarTheme: AppBarTheme(
         elevation: 0,
         backgroundColor: Colors.transparent,
         centerTitle: true,
         iconTheme: IconThemeData(color: darkColor, size: 24),
-        titleTextStyle: GoogleFonts.oxygenMono(
+        titleTextStyle: GoogleFonts.notoSans(
           color: darkColor,
           fontSize: 16,
-          fontWeight: FontWeight.w400,
+          fontWeight: FontWeight.w500,
           letterSpacing: 0.15,
         ),
       ),
-      // Input fields con Oxygen Mono
+      // Input fields con Noto Sans
       inputDecorationTheme: InputDecorationTheme(
-        labelStyle: GoogleFonts.oxygenMono(
+        labelStyle: GoogleFonts.notoSans(
           color: textOnPrimaryColor,
           fontSize: 14,
+          fontWeight: FontWeight.w500,
         ),
-      ),
-      // Tab labels con Oxygen Mono
-      tabBarTheme: TabBarTheme(
-        labelStyle: GoogleFonts.oxygenMono(
+        hintStyle: GoogleFonts.notoSans(
+          color: neutralColor.withValues(alpha: 128),
           fontSize: 14,
           fontWeight: FontWeight.w400,
         ),
-        unselectedLabelStyle: GoogleFonts.oxygenMono(
+      ),
+      // Tab labels con Noto Sans
+      tabBarTheme: TabBarTheme(
+        labelStyle: GoogleFonts.notoSans(
+          fontSize: 14,
+          fontWeight: FontWeight.w500,
+        ),
+        unselectedLabelStyle: GoogleFonts.notoSans(
           fontSize: 14,
           fontWeight: FontWeight.w400,
         ),
@@ -252,7 +258,7 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
     return Container(
       height: preferredSize.height,
       decoration: BoxDecoration(
-        gradient: AppTheme.primaryGradient,
+        gradient: AppTheme.accentGradient,
       ),
       child: AppBar(
         title: Text(

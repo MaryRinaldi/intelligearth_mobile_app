@@ -30,9 +30,9 @@
     "termsText": "By signing in, you agree to our Terms of Service and Privacy Policy",
     "questsTitle": "Monitoring Missions",
     "questsEmpty": "No missions available at the moment",
-    "questsCompleted": "Completed Missions",
+    "questsCompleted": "Ended Missions",
     "@questsCompleted": {
-        "description": "Label for completed missions tab"
+        "description": "Label for finished missions tab"
     },
     "questsAvailable": "Available Missions",
     "activeQuests": "Active Missions",

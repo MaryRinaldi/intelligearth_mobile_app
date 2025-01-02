@@ -60,13 +60,14 @@ class SignInScreenState extends State<SignInScreen>
     });
 
     try {
+      final prefs = await SharedPreferences.getInstance();
+
       if (_emailController.text == 'mary' &&
           _passwordController.text == '1234') {
         await Future.delayed(
             const Duration(seconds: 1)); // Simula il caricamento
 
         // Salva i dati dell'utente hardcoded come se fosse un utente normale
-        final prefs = await SharedPreferences.getInstance();
         if (_rememberMe) {
           await prefs.setString('jwt_token', 'fake_token_for_mary');
           await prefs.setString(
@@ -78,6 +79,8 @@ class SignInScreenState extends State<SignInScreen>
                 'role': 'user',
               }));
         }
+
+        // Salva sempre la preferenza remember_me
         await prefs.setBool('remember_me', _rememberMe);
 
         if (!mounted) return;
@@ -85,6 +88,7 @@ class SignInScreenState extends State<SignInScreen>
         return;
       }
 
+      // Login normale con AuthService
       final user = await _authService.signIn(
         _emailController.text,
         _passwordController.text,
@@ -234,9 +238,13 @@ class SignInScreenState extends State<SignInScreen>
                   Hero(
                     tag: 'app_logo',
                     child: Container(
-                      padding: const EdgeInsets.all(AppTheme.spacingMedium),
+                      padding: const EdgeInsets.all(AppTheme.spacingSmall),
                       decoration: BoxDecoration(
                         shape: BoxShape.circle,
+                        border: Border.all(
+                          color: AppTheme.textOnPrimaryColor,
+                          width: 1,
+                        ),
                         boxShadow: [
                           BoxShadow(
                             color: Colors.black.withValues(alpha: 51),
@@ -270,7 +278,7 @@ class SignInScreenState extends State<SignInScreen>
                   ),
                   const SizedBox(height: AppTheme.spacingMedium),
                   Text(
-                    'Accedi per continuare a contribuire alla documentazione del patrimonio culturale',
+                    'Accedi per continuare la tua missione',
                     style: Theme.of(context).textTheme.titleMedium?.copyWith(
                           color: AppTheme.textOnPrimaryColor
                               .withValues(alpha: 179),
@@ -371,29 +379,39 @@ class SignInScreenState extends State<SignInScreen>
                         const SizedBox(height: AppTheme.spacingSmall),
                         Row(
                           children: [
-                            Checkbox(
-                              value: _rememberMe,
-                              onChanged: (value) {
-                                setState(() {
-                                  _rememberMe = value ?? false;
-                                });
-                              },
-                              fillColor: WidgetStateProperty.resolveWith<Color>(
-                                (Set<WidgetState> states) {
-                                  if (states.contains(WidgetState.selected)) {
-                                    return AppTheme.textOnPrimaryColor;
-                                  }
-                                  return AppTheme.textOnPrimaryColor
-                                      .withValues(alpha: 51);
+                            Transform.translate(
+                              offset: const Offset(-8, 0),
+                              child: Checkbox(
+                                value: _rememberMe,
+                                onChanged: (value) {
+                                  setState(() {
+                                    _rememberMe = value ?? false;
+                                  });
                                 },
+                                fillColor:
+                                    WidgetStateProperty.resolveWith<Color>(
+                                  (Set<WidgetState> states) {
+                                    if (states.contains(WidgetState.selected)) {
+                                      return AppTheme.textOnPrimaryColor;
+                                    }
+                                    return AppTheme.textOnPrimaryColor
+                                        .withValues(alpha: 51);
+                                  },
+                                ),
+                                checkColor: AppTheme.primaryColor,
+                                materialTapTargetSize:
+                                    MaterialTapTargetSize.shrinkWrap,
+                                visualDensity: VisualDensity.compact,
                               ),
-                              checkColor: AppTheme.primaryColor,
                             ),
-                            Text(
-                              'Ricordami',
-                              style: TextStyle(
-                                color: AppTheme.textOnPrimaryColor,
-                                fontSize: 14,
+                            Transform.translate(
+                              offset: const Offset(-8, 0),
+                              child: Text(
+                                'Ricordami',
+                                style: TextStyle(
+                                  color: AppTheme.textOnPrimaryColor,
+                                  fontSize: 14,
+                                ),
                               ),
                             ),
                             const Spacer(),

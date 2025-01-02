@@ -30,7 +30,7 @@
     "termsText": "Accedendo, accetti i nostri Termini di Servizio e la Privacy Policy",
     "questsTitle": "Missioni di Monitoraggio",
     "questsEmpty": "Nessuna missione disponibile al momento",
-    "questsCompleted": "Missioni Completate",
+    "questsCompleted": "Missioni Finite",
     "@questsCompleted": {
         "description": "Label for completed missions tab"
     },
@@ -39,7 +39,7 @@
     "@activeQuests": {
         "description": "Label for active missions tab"
     },
-    "completedQuests": "Missioni Completate",
+    "completedQuests": "Missioni Terminate",
     "@completedQuests": {
         "description": "Label for completed missions tab"
     },
