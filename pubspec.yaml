@@ -41,6 +41,7 @@ dependencies:
   google_maps_flutter: ^2.9.0
   flutter_map: ^7.0.2
   latlong2: ^0.9.1
+  path_provider: ^2.1.2
   flutter_localizations:
     sdk: flutter
   intl: ^0.19.0
@@ -71,7 +72,7 @@ flutter:
   assets:
     - assets/images/
     - assets/icons/
-
+  
   # To add assets to your application, add an assets section, like this:
   # assets:
   #   - images/a_dot_burr.jpeg
@@ -103,5 +104,4 @@ flutter:
   # For details regarding fonts from package dependencies,
   # see https://flutter.dev/to/font-from-package
 
-  generate: true  # Abilita la generazione dei file l10n
- 
+  generate: true  # Abilita la generazione dei file l10n 

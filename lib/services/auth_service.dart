@@ -25,7 +25,7 @@ String getApiUrl() {
 class AuthService {
   final String apiUrl = getApiUrl();
 
-  Future<User?> signIn(String email, String password) async {
+  Future<User?> signIn(String email, String password, bool rememberMe) async {
     final response = await http.post(
       Uri.parse('$apiUrl/signin'),
       headers: {
@@ -40,7 +40,22 @@ class AuthService {
     if (response.statusCode == 200) {
       final data = json.decode(response.body);
       SharedPreferences prefs = await SharedPreferences.getInstance();
-      await prefs.setString('jwt_token', data['token']);
+
+      // Salva il token e i dati utente solo se "ricordami" è attivo
+      if (rememberMe) {
+        await prefs.setString('jwt_token', data['token']);
+        await prefs.setString(
+            'user_data',
+            json.encode({
+              'id': data['id'],
+              'name': data['name'],
+              'email': data['email'],
+              'role': data['role'],
+            }));
+      }
+
+      // Salva sempre la preferenza "ricordami"
+      await prefs.setBool('remember_me', rememberMe);
 
       return User(
         id: data['id'].toString(),
@@ -49,8 +64,6 @@ class AuthService {
         role: data['role'],
       );
     } else {
-      // Gestisci gli errori di login
-
       return null;
     }
   }
@@ -92,50 +105,34 @@ class AuthService {
   Future<User?> getCurrentUser() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     String? token = prefs.getString('jwt_token');
+    String? userData = prefs.getString('user_data');
+    bool rememberMe = prefs.getBool('remember_me') ?? false;
 
-    if (token != null) {
-      // Gestione utente hardcoded
-      if (token == 'mary_test_token') {
-        return User(
-          id: 'mary123',
-          name: 'Mary',
-          email: 'mary@example.com',
-          role: 'user',
-        );
-      }
-
-      // Fai una chiamata API per verificare il token JWT
-      final response = await http.get(
-        Uri.parse('$apiUrl/current_user'),
-        headers: {
-          'Authorization': 'Bearer $token',
-          'Content-Type': 'application/json',
-        },
-      );
-
-      if (response.statusCode == 200) {
-        final data = json.decode(response.body);
-        return User(
-          id: data['id'].toString(),
-          name: data['name'],
-          email: data['email'],
-          role: data['role'],
-        );
-      } else {
-        return null;
-      }
-    } else {
-      // Nessun token salvato, l'utente non è autenticato
-
+    // Se "ricordami" non è attivo o non ci sono dati, ritorna null
+    if (!rememberMe || token == null || userData == null) {
       return null;
     }
+
+    final data = json.decode(userData);
+    return User(
+      id: data['id'].toString(),
+      name: data['name'],
+      email: data['email'],
+      role: data['role'],
+    );
   }
 
-  // Simula il logout (da implementare)
+  // Logout completo
   Future<void> signOut() async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
-    await prefs.remove(
-        'jwt_token'); // Rimuove il token salvato per effettuare il logout
+    bool rememberMe = prefs.getBool('remember_me') ?? false;
+
+    if (!rememberMe) {
+      // Se "ricordami" non è attivo, rimuovi tutti i dati
+      await prefs.remove('jwt_token');
+      await prefs.remove('user_data');
+    }
+    // Mantieni comunque la preferenza "ricordami"
   }
 
   Future<bool> resetPassword(String email) async {

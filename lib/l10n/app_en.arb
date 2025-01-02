@@ -1,94 +1,71 @@
 {
-    "language": "English",
-    "@language": {
-        "description": "The current language"
-    },
+    "@@locale": "en",
+    "appTitle": "IntelligEarth",
     "welcomeTitle": "Welcome to IntelligEarth",
-    "@welcomeTitle": {
-        "description": "Title shown in welcome page"
+    "welcomeSubtitle": "Document. Monitor. Preserve.",
+    "onboardingTitle1": "Document Heritage",
+    "onboardingDesc1": "Contribute to cultural heritage conservation through photographic monitoring",
+    "onboardingTitle2": "Monitor Changes",
+    "onboardingDesc2": "Help preserve monuments and infrastructure by reporting changes over time",
+    "onboardingTitle3": "Earn Recognition",
+    "onboardingDesc3": "Receive points and badges for your contribution to cultural heritage preservation",
+    "skipButton": "Skip",
+    "nextButton": "Next",
+    "startButton": "Start",
+    "signInTitle": "Welcome Back",
+    "signInSubtitle": "Sign in to continue contributing to cultural heritage documentation",
+    "signUpTitle": "Join the Project",
+    "signUpSubtitle": "Become part of the cultural heritage monitoring network",
+    "emailLabel": "Email",
+    "passwordLabel": "Password",
+    "confirmPasswordLabel": "Confirm Password",
+    "nameLabel": "Name",
+    "rememberMe": "Remember me",
+    "forgotPassword": "Forgot Password?",
+    "signInButton": "Sign In",
+    "signUpButton": "Sign Up",
+    "noAccountText": "Don't have an account?",
+    "hasAccountText": "Already have an account? Sign in",
+    "createAccountTitle": "Create your account",
+    "termsText": "By signing in, you agree to our Terms of Service and Privacy Policy",
+    "questsTitle": "Monitoring Missions",
+    "questsEmpty": "No missions available at the moment",
+    "questsCompleted": "Completed Missions",
+    "@questsCompleted": {
+        "description": "Label for completed missions tab"
     },
-    "selectLanguage": "Select your language",
-    "@selectLanguage": {
-        "description": "Language selection prompt"
-    },
-    "signIn": "Sign In",
-    "@signIn": {
-        "description": "Sign in button text"
-    },
-    "signUp": "Sign Up",
-    "@signUp": {
-        "description": "Sign up button text"
-    },
-    "email": "Email",
-    "@email": {
-        "description": "Email field label"
-    },
-    "password": "Password",
-    "@password": {
-        "description": "Password field label"
-    },
-    "name": "Name",
-    "@name": {
-        "description": "Name field label"
-    },
-    "goBackToQuests": "Go back to other quests",
-    "@goBackToQuests": {
-        "description": "Navigation text to return to quests"
-    },
-    "noImageSelected": "No image selected",
-    "@noImageSelected": {
-        "description": "Message when no image is selected"
-    },
-    "questsTitle": "Quests",
-    "@questsTitle": {
-        "description": "Quests page title"
-    },
-    "rewardsTitle": "Rewards",
-    "@rewardsTitle": {
-        "description": "Rewards page title"
-    },
-    "userPageTitle": "User Profile",
-    "@userPageTitle": {
-        "description": "User page title"
-    },
-    "settings": "Settings",
-    "@settings": {
-        "description": "Settings text"
-    },
-    "help": "Help",
-    "@help": {
-        "description": "Help text"
-    },
-    "logout": "Logout",
-    "@logout": {
-        "description": "Logout text"
-    },
-    "languageSettings": "Language Settings",
-    "@languageSettings": {
-        "description": "Title for language settings section"
-    },
-    "chooseLanguage": "Choose your language",
-    "@chooseLanguage": {
-        "description": "Prompt for language selection in settings"
-    },
-    "questPageTitle": "Your Quests",
-    "@questPageTitle": {
-        "description": "Title shown in the quests page header"
-    },
-    "questPageSubtitle": "Track your environmental missions",
-    "@questPageSubtitle": {
-        "description": "Subtitle shown in the quests page header"
-    },
-    "activeQuests": "Active",
+    "questsAvailable": "Available Missions",
+    "activeQuests": "Active Missions",
     "@activeQuests": {
-        "description": "Label for active quests tab"
+        "description": "Label for active missions tab"
     },
-    "completedQuests": "Not available",
+    "completedQuests": "Completed Missions",
     "@completedQuests": {
-        "description": "Label for inactive quests tab"
+        "description": "Label for completed missions tab"
     },
-    "upcomingQuests": "Upcoming",
+    "upcomingQuests": "Upcoming Missions",
     "@upcomingQuests": {
-        "description": "Label for upcoming quests tab"
-    }
+        "description": "Label for upcoming missions tab"
+    },
+    "rewardsTitle": "Recognition",
+    "rewardsEmpty": "No recognition earned yet",
+    "rewardsPoints": "Points",
+    "profileTitle": "Profile",
+    "settingsTitle": "Settings",
+    "languageTitle": "Select your language",
+    "languageSubtitle": "Seleziona la tua lingua",
+    "resetTitle": "Reset Application",
+    "resetSubtitle": "Reset to default settings",
+    "resetOnboarding": "Reset Tutorial",
+    "resetData": "Clear Data",
+    "resetPhotos": "Clear Photos",
+    "resetConfirm": "Are you sure you want to proceed?",
+    "errorTitle": "Error",
+    "errorGeneric": "An error occurred. Please try again later.",
+    "errorLogin": "Invalid credentials. Please try again.",
+    "errorSignup": "Registration failed. Please try again.",
+    "errorPasswordMatch": "Passwords do not match",
+    "successTitle": "Success",
+    "successPhotoUpload": "Photo uploaded successfully",
+    "successMissionComplete": "Mission completed successfully"
 } 

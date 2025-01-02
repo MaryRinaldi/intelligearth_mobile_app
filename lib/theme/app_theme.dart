@@ -93,46 +93,67 @@ class AppTheme {
         onSecondary: textOnPrimaryColor,
         error: errorColor,
       ),
-      // Typography moderna con Google Fonts
+      // Typography moderna con mix di Oxygen Mono e Poppins
       textTheme: TextTheme(
-        displayLarge: GoogleFonts.inter(
-          fontSize: 32,
-          fontWeight: FontWeight.bold,
-          letterSpacing: -0.5,
+        // UI Elements - Oxygen Mono
+        labelLarge: GoogleFonts.oxygenMono(
           color: textOnLightColor,
-        ),
-        displayMedium: GoogleFonts.inter(
-          fontSize: 28,
-          fontWeight: FontWeight.bold,
-          letterSpacing: -0.5,
-          color: textOnLightColor,
-        ),
-        titleLarge: GoogleFonts.inter(
-          fontSize: 22,
-          fontWeight: FontWeight.w600,
-          letterSpacing: 0,
-          color: textOnLightColor,
-        ),
-        bodyLarge: GoogleFonts.inter(
           fontSize: 16,
-          letterSpacing: 0.15,
+          fontWeight: FontWeight.w400,
+        ),
+        labelMedium: GoogleFonts.oxygenMono(
+          color: textOnLightColor,
+          fontSize: 14,
+          fontWeight: FontWeight.w400,
+        ),
+        labelSmall: GoogleFonts.oxygenMono(
+          color: textOnLightColor,
+          fontSize: 12,
+          fontWeight: FontWeight.w400,
+        ),
+        // Headers - Poppins
+        displayLarge: GoogleFonts.poppins(
+          color: textOnLightColor,
+          fontWeight: FontWeight.bold,
+        ),
+        displayMedium: GoogleFonts.poppins(
+          color: textOnLightColor,
+          fontWeight: FontWeight.bold,
+        ),
+        displaySmall: GoogleFonts.poppins(
+          color: textOnLightColor,
+          fontWeight: FontWeight.bold,
+        ),
+        headlineLarge: GoogleFonts.poppins(
+          color: textOnLightColor,
+          fontWeight: FontWeight.w600,
+        ),
+        headlineMedium: GoogleFonts.poppins(
+          color: textOnLightColor,
+          fontWeight: FontWeight.w600,
+        ),
+        headlineSmall: GoogleFonts.poppins(
+          color: textOnLightColor,
+          fontWeight: FontWeight.w600,
+        ),
+        // Body text - Poppins
+        bodyLarge: GoogleFonts.poppins(
           color: textOnLightColor,
         ),
-        bodyMedium: GoogleFonts.inter(
-          fontSize: 14,
-          letterSpacing: 0.25,
+        bodyMedium: GoogleFonts.poppins(
           color: textOnLightColor,
         ),
-        labelLarge: GoogleFonts.inter(
-          fontSize: 14,
-          letterSpacing: 0.1,
-          fontWeight: FontWeight.w500,
+        bodySmall: GoogleFonts.poppins(
           color: textOnLightColor,
         ),
       ),
-      // Bottoni moderni
+      // Bottoni con Oxygen Mono
       elevatedButtonTheme: ElevatedButtonThemeData(
         style: ElevatedButton.styleFrom(
+          textStyle: GoogleFonts.oxygenMono(
+            fontSize: 16,
+            fontWeight: FontWeight.w400,
+          ),
           elevation: 0,
           padding: const EdgeInsets.symmetric(
             horizontal: spacingLarge,
@@ -143,7 +164,7 @@ class AppTheme {
           ),
           backgroundColor: primaryColor,
           foregroundColor: Colors.white,
-          minimumSize: Size(0, 48), // Dimensione minima per accessibilità
+          minimumSize: Size(0, 48),
         ).copyWith(
           elevation: WidgetStateProperty.resolveWith<double>(
             (Set<WidgetState> states) {
@@ -162,64 +183,35 @@ class AppTheme {
         color: Colors.white,
         margin: EdgeInsets.all(spacingSmall),
       ),
-      // AppBar Theme moderno
+      // AppBar Theme con Oxygen Mono
       appBarTheme: AppBarTheme(
         elevation: 0,
         backgroundColor: Colors.transparent,
         centerTitle: true,
         iconTheme: IconThemeData(color: darkColor, size: 24),
-        titleTextStyle: GoogleFonts.inter(
+        titleTextStyle: GoogleFonts.oxygenMono(
           color: darkColor,
-          fontSize: 20,
-          fontWeight: FontWeight.w600,
+          fontSize: 16,
+          fontWeight: FontWeight.w400,
           letterSpacing: 0.15,
         ),
       ),
-      // Input Decoration moderna
+      // Input fields con Oxygen Mono
       inputDecorationTheme: InputDecorationTheme(
-        filled: true,
-        fillColor: const Color.fromARGB(255, 0, 0, 0),
-        border: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(borderRadiusLarge),
-          borderSide: BorderSide.none,
-        ),
-        enabledBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(borderRadiusLarge),
-          borderSide: BorderSide(
-            color: Color.fromRGBO(0, 0, 0, 0.1),
-            width: 1,
-          ),
-        ),
-        focusedBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(borderRadiusLarge),
-          borderSide: BorderSide(color: primaryColor, width: 2),
-        ),
-        errorBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(borderRadiusLarge),
-          borderSide: BorderSide(color: errorColor, width: 1),
-        ),
-        focusedErrorBorder: OutlineInputBorder(
-          borderRadius: BorderRadius.circular(borderRadiusLarge),
-          borderSide: BorderSide(color: errorColor, width: 2),
-        ),
-        contentPadding: EdgeInsets.all(spacingMedium),
-        hintStyle: GoogleFonts.inter(
-          color: neutralColor.withValues(alpha: 128),
-          fontSize: 16,
+        labelStyle: GoogleFonts.oxygenMono(
+          color: textOnPrimaryColor,
+          fontSize: 14,
         ),
       ),
-      // Floating Action Button Theme
-      floatingActionButtonTheme: FloatingActionButtonThemeData(
-        elevation: 2,
-        highlightElevation: 4,
-        backgroundColor: accentColor,
-        foregroundColor: Colors.white,
-        extendedPadding: EdgeInsets.symmetric(
-          horizontal: spacingLarge,
-          vertical: spacingMedium,
+      // Tab labels con Oxygen Mono
+      tabBarTheme: TabBarTheme(
+        labelStyle: GoogleFonts.oxygenMono(
+          fontSize: 14,
+          fontWeight: FontWeight.w400,
         ),
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(borderRadiusLarge),
+        unselectedLabelStyle: GoogleFonts.oxygenMono(
+          fontSize: 14,
+          fontWeight: FontWeight.w400,
         ),
       ),
     );
