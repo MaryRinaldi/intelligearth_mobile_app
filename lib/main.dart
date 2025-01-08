@@ -15,8 +15,11 @@ import 'screens/help_page.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'theme/app_theme.dart';
+import 'package:intelligearth_mobile/config/app_config.dart';
 
-void main() {
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await AppConfig.load();
   runApp(
     ChangeNotifierProvider(
       create: (_) => LocaleProvider(),

@@ -9,6 +9,15 @@ class UserPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    if (user.id.isEmpty) {
+      return const Center(
+        child: Text(
+          'Utente non trovato. Per favore effettua il login.',
+          style: TextStyle(fontSize: 16),
+        ),
+      );
+    }
+
     return ListView(
       padding: const EdgeInsets.all(AppTheme.spacingMedium),
       children: [
@@ -57,7 +66,7 @@ class UserPage extends StatelessWidget {
           Text(
             user.email,
             style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                  color: AppTheme.textOnPrimaryColor.withValues(alpha: 230),
+                  color: AppTheme.textOnPrimaryColor.withValues(alpha: 130),
                 ),
           ),
           const SizedBox(height: AppTheme.spacingMedium),

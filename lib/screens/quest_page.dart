@@ -3,6 +3,9 @@ import '../theme/app_theme.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import '../models/quest_model.dart';
 import '../screens/map_screen.dart';
+import '../screens/quest_detail_screen.dart';
+import 'package:geolocator/geolocator.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class QuestPage extends StatefulWidget {
   const QuestPage({super.key});
@@ -15,6 +18,8 @@ class _QuestPageState extends State<QuestPage>
     with SingleTickerProviderStateMixin {
   late TabController _tabController;
   int _selectedTabIndex = 0;
+  Position? _userPosition;
+  bool _isLocationPermissionChecked = false;
 
   final List<Quest> quests = [
     Quest(
@@ -54,7 +59,6 @@ class _QuestPageState extends State<QuestPage>
       progress: 1.0,
       status: QuestStatus.completed,
     ),
-    // Altre quest...
   ];
 
   @override
@@ -66,6 +70,67 @@ class _QuestPageState extends State<QuestPage>
           _selectedTabIndex = _tabController.index;
         });
       });
+    _checkLocationPermission();
+  }
+
+  Future<void> _checkLocationPermission() async {
+    if (_isLocationPermissionChecked) return;
+
+    final prefs = await SharedPreferences.getInstance();
+    final hasLocationPermission = prefs.getBool('location_permission') ?? false;
+
+    if (hasLocationPermission) {
+      _startLocationUpdates();
+      return;
+    }
+
+    bool serviceEnabled = await Geolocator.isLocationServiceEnabled();
+    if (!serviceEnabled) {
+      return;
+    }
+
+    LocationPermission permission = await Geolocator.checkPermission();
+    if (permission == LocationPermission.denied) {
+      permission = await Geolocator.requestPermission();
+      if (permission == LocationPermission.denied) {
+        return;
+      }
+    }
+
+    if (permission == LocationPermission.deniedForever) {
+      return;
+    }
+
+    await prefs.setBool('location_permission', true);
+    _startLocationUpdates();
+    setState(() => _isLocationPermissionChecked = true);
+  }
+
+  void _startLocationUpdates() {
+    Geolocator.getPositionStream().listen((Position position) {
+      setState(() => _userPosition = position);
+    });
+  }
+
+  List<Quest> _getSortedQuests(List<Quest> questList) {
+    if (_userPosition == null) return questList;
+
+    return List<Quest>.from(questList)
+      ..sort((a, b) {
+        final distanceA = Geolocator.distanceBetween(
+          _userPosition!.latitude,
+          _userPosition!.longitude,
+          a.latitude,
+          a.longitude,
+        );
+        final distanceB = Geolocator.distanceBetween(
+          _userPosition!.latitude,
+          _userPosition!.longitude,
+          b.latitude,
+          b.longitude,
+        );
+        return distanceA.compareTo(distanceB);
+      });
   }
 
   @override
@@ -76,48 +141,71 @@ class _QuestPageState extends State<QuestPage>
 
   @override
   Widget build(BuildContext context) {
-    final l10n = AppLocalizations.of(context)!;
-
-    return Column(
-      children: [
-        Container(
-          color: Theme.of(context).scaffoldBackgroundColor,
-          child: TabBar(
-            controller: _tabController,
-            labelColor: AppTheme.primaryColor,
-            unselectedLabelColor: AppTheme.neutralColor.withValues(alpha: 108),
-            labelStyle: Theme.of(context).textTheme.labelLarge,
-            unselectedLabelStyle: Theme.of(context).textTheme.labelLarge,
-            indicatorSize: TabBarIndicatorSize.label,
-            indicatorWeight: 3,
-            indicatorColor: AppTheme.primaryColor,
-            tabs: [
-              _buildTab(l10n.activeQuests, 0),
-              _buildTab(l10n.completedQuests, 1),
-              _buildTab(l10n.upcomingQuests, 2),
-            ],
+    return DefaultTabController(
+      length: 3,
+      child: Column(
+        children: [
+          Container(
+            margin: const EdgeInsets.only(bottom: 10),
+            decoration: BoxDecoration(
+              color: const Color.fromARGB(0, 255, 255, 255),
+            ),
+            child: TabBar(
+              controller: _tabController,
+              labelColor: AppTheme.secondaryColor,
+              unselectedLabelColor:
+                  const Color.fromRGBO(57, 67, 122, 1).withValues(alpha: 19),
+              indicatorColor: const Color.fromARGB(105, 255, 255, 255),
+              tabAlignment: TabAlignment.fill,
+              isScrollable: false,
+              tabs: [
+                SizedBox(
+                  height: 56,
+                  child:
+                      _buildTab(AppLocalizations.of(context)!.activeQuests, 0),
+                ),
+                SizedBox(
+                  height: 56,
+                  child: _buildTab(
+                      AppLocalizations.of(context)!.completedQuests, 1),
+                ),
+                const SizedBox(
+                  height: 56,
+                  child: Tab(icon: Icon(Icons.map_rounded)),
+                ),
+              ],
+            ),
           ),
-        ),
-        Expanded(
-          child: TabBarView(
-            controller: _tabController,
-            children: [
-              _QuestList(
-                status: QuestStatus.active,
-                quests: quests,
-              ),
-              _QuestList(
-                status: QuestStatus.completed,
-                quests: quests,
-              ),
-              _QuestList(
-                status: QuestStatus.upcoming,
-                quests: quests,
-              ),
-            ],
+          Expanded(
+            child: TabBarView(
+              controller: _tabController,
+              children: [
+                _QuestList(
+                  status: QuestStatus.active,
+                  quests: _getSortedQuests(quests),
+                ),
+                _QuestList(
+                  status: QuestStatus.completed,
+                  quests: _getSortedQuests(quests),
+                ),
+                MapScreen(
+                  latitude: _userPosition?.latitude ?? 41.8902,
+                  longitude: _userPosition?.longitude ?? 12.4922,
+                  showBackButton: false,
+                  markers: quests
+                      .map((quest) => QuestMarker(
+                            latitude: quest.latitude,
+                            longitude: quest.longitude,
+                            title: quest.title,
+                            isCompleted: quest.status == QuestStatus.completed,
+                          ))
+                      .toList(),
+                ),
+              ],
+            ),
           ),
-        ),
-      ],
+        ],
+      ),
     );
   }
 
@@ -131,7 +219,7 @@ class _QuestPageState extends State<QuestPage>
           fontWeight: isSelected ? FontWeight.w600 : FontWeight.w500,
           color: isSelected
               ? AppTheme.primaryColor
-              : AppTheme.neutralColor.withValues(alpha: 108),
+              : AppTheme.neutralColor.withValues(alpha: 68),
         ),
         child: Text(text),
       ),
@@ -231,6 +319,15 @@ class _QuestCardState extends State<_QuestCard>
     _controller.reverse();
   }
 
+  void _onQuestTap(BuildContext context, Quest quest) {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => QuestDetailScreen(quest: quest),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Padding(
@@ -246,16 +343,7 @@ class _QuestCardState extends State<_QuestCard>
           onTapUp: _onTapUp,
           onTapCancel: _onTapCancel,
           onTap: () {
-            Navigator.push(
-              context,
-              MaterialPageRoute(
-                builder: (context) => MapScreen(
-                  latitude: widget.quest.latitude,
-                  longitude: widget.quest.longitude,
-                  questTitle: widget.quest.title,
-                ),
-              ),
-            );
+            _onQuestTap(context, widget.quest);
           },
           child: Container(
             decoration: BoxDecoration(
@@ -352,10 +440,7 @@ class _QuestCardState extends State<_QuestCard>
   Widget _buildStatusBadge() {
     final statusConfig = {
       QuestStatus.active: (color: AppTheme.accentColor, label: 'Active'),
-      QuestStatus.completed: (
-        color: AppTheme.successColor,
-        label: 'Not available'
-      ),
+      QuestStatus.completed: (color: AppTheme.successColor, label: 'Completed'),
       QuestStatus.upcoming: (color: AppTheme.warningColor, label: 'Upcoming'),
     };
 

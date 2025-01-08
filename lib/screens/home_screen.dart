@@ -18,6 +18,7 @@ class HomeScreenState extends State<HomeScreen>
   int _selectedIndex = 0;
   User? currentUser;
   bool _isMenuVisible = false;
+  bool _isLoading = true;
   late AnimationController _controller;
   late Animation<double> _animation;
   late Animation<Offset> _slideAnimation;
@@ -28,7 +29,10 @@ class HomeScreenState extends State<HomeScreen>
             onNavigateToRewards: () => _onItemTapped(2)),
         const QuestPage(),
         const RewardScreen(),
-        UserPage(user: currentUser ?? User.empty()),
+        if (_isLoading)
+          const Center(child: CircularProgressIndicator())
+        else
+          UserPage(user: currentUser ?? User.empty()),
       ];
 
   @override
@@ -36,13 +40,14 @@ class HomeScreenState extends State<HomeScreen>
     super.initState();
     _checkIfLoggedIn();
     _controller = AnimationController(
-      duration: AppTheme.animationNormal,
+      duration: const Duration(milliseconds: 250),
       vsync: this,
     );
 
     _animation = CurvedAnimation(
       parent: _controller,
-      curve: Curves.easeInOut,
+      curve: Curves.easeOutCubic,
+      reverseCurve: Curves.easeInCubic,
     );
 
     _slideAnimation = Tween<Offset>(
@@ -67,6 +72,7 @@ class HomeScreenState extends State<HomeScreen>
     if (!mounted) return;
     setState(() {
       currentUser = user;
+      _isLoading = false;
     });
   }
 
@@ -118,7 +124,12 @@ class HomeScreenState extends State<HomeScreen>
           Column(
             children: [
               _buildAppBar(),
-              Expanded(child: _pages[_selectedIndex]),
+              if (_selectedIndex == 3 && _isLoading)
+                const Expanded(
+                  child: Center(child: CircularProgressIndicator()),
+                )
+              else
+                Expanded(child: _pages[_selectedIndex]),
             ],
           ),
           if (_isMenuVisible) _buildMenu(),

@@ -1,21 +1,31 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_map/flutter_map.dart';
-import 'package:latlong2/latlong.dart';
+import 'package:google_maps_flutter/google_maps_flutter.dart';
+import 'package:intelligearth_mobile/models/quest_model.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:geolocator/geolocator.dart';
+import 'dart:async';
+import 'dart:math';
+import 'package:http/http.dart' as http;
+import 'dart:convert';
 import '../theme/app_theme.dart';
+import '../config/app_config.dart';
 import 'camera_view_page.dart';
 
 class MapScreen extends StatefulWidget {
+  final double latitude;
+  final double longitude;
+  final String? questTitle;
+  final bool showBackButton;
+  final List<QuestMarker>? markers;
+
   const MapScreen({
     super.key,
     required this.latitude,
     required this.longitude,
-    required this.questTitle,
+    this.questTitle,
+    this.showBackButton = false,
+    this.markers,
   });
-
-  final double latitude;
-  final double longitude;
-  final String questTitle;
 
   @override
   State<MapScreen> createState() => _MapScreenState();
@@ -24,23 +34,18 @@ class MapScreen extends StatefulWidget {
 class _MapScreenState extends State<MapScreen>
     with SingleTickerProviderStateMixin {
   late final AnimationController _controller;
-  final MapController _mapController = MapController();
-  String currentLayer = 'OpenStreetMap DE';
+  GoogleMapController? _mapController;
+  MapType _currentMapType = MapType.normal;
   bool _isMarkerSelected = false;
+  bool _isFullScreen = false;
+  Position? _currentPosition;
+  StreamSubscription<Position>? _positionStreamSubscription;
+  Set<Marker> _markers = {};
+  final Set<Polyline> _polylines = {};
+  final Set<Circle> _circles = {};
 
-  final Map<String, TileLayer> mapLayers = {
-    'OpenStreetMap DE': TileLayer(
-      urlTemplate: 'https://tile.openstreetmap.de/{z}/{x}/{y}.png',
-      userAgentPackageName: 'com.example.app',
-      tileBuilder: (context, child, tile) => child,
-    ),
-    'Esri Satellite': TileLayer(
-      urlTemplate:
-          'https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}',
-      userAgentPackageName: 'com.example.app',
-      tileBuilder: (context, child, tile) => child,
-    ),
-  };
+  // Posizione di default (Roma - Colosseo)
+  static const LatLng _defaultLocation = LatLng(41.8902, 12.4922);
 
   @override
   void initState() {
@@ -49,11 +54,218 @@ class _MapScreenState extends State<MapScreen>
       duration: AppTheme.animationNormal,
       vsync: this,
     );
+    _checkLocationPermission();
+    _initializeMarkers();
+
+    // Add accuracy circle for current location
+    if (_currentPosition != null) {
+      _updateLocationCircle();
+    }
+  }
+
+  void _updateLocationCircle() {
+    if (_currentPosition != null) {
+      setState(() {
+        _circles.clear();
+        _circles.add(
+          Circle(
+            circleId: const CircleId('currentLocation'),
+            center:
+                LatLng(_currentPosition!.latitude, _currentPosition!.longitude),
+            radius: _currentPosition!.accuracy,
+            fillColor: AppTheme.accentColor.withValues(alpha: 106),
+            strokeColor: AppTheme.accentColor,
+            strokeWidth: 1,
+          ),
+        );
+      });
+    }
+  }
+
+  Future<void> _getDirections() async {
+    if (_currentPosition == null) return;
+
+    final String url = 'https://maps.googleapis.com/maps/api/directions/json?'
+        'origin=${_currentPosition!.latitude},${_currentPosition!.longitude}'
+        '&destination=${widget.latitude},${widget.longitude}'
+        '&mode=walking'
+        '&key=${AppConfig.mapsApiKey}';
+
+    try {
+      final response = await http.get(Uri.parse(url));
+
+      if (response.statusCode == 200) {
+        final data = json.decode(response.body);
+        if (data['status'] == 'OK') {
+          final points =
+              _decodePolyline(data['routes'][0]['overview_polyline']['points']);
+          final List<LatLng> polylineCoordinates =
+              points.map((point) => LatLng(point[0], point[1])).toList();
+
+          setState(() {
+            _polylines.clear();
+            _polylines.add(
+              Polyline(
+                polylineId: const PolylineId('route'),
+                color: AppTheme.accentColor,
+                points: polylineCoordinates,
+                width: 5,
+                patterns: [
+                  PatternItem.dash(20.0),
+                  PatternItem.gap(10.0),
+                ],
+              ),
+            );
+          });
+
+          // Zoom per mostrare l'intero percorso
+          final bounds = _getBounds(polylineCoordinates);
+          _mapController?.animateCamera(
+            CameraUpdate.newLatLngBounds(bounds, 50),
+          );
+        }
+      }
+    } catch (e) {
+      debugPrint('Error getting directions: $e');
+    }
+  }
+
+  List<List<double>> _decodePolyline(String encoded) {
+    List<List<double>> poly = [];
+    int index = 0, len = encoded.length;
+    int lat = 0, lng = 0;
+
+    while (index < len) {
+      int b, shift = 0, result = 0;
+      do {
+        b = encoded.codeUnitAt(index++) - 63;
+        result |= (b & 0x1f) << shift;
+        shift += 5;
+      } while (b >= 0x20);
+      int dlat = ((result & 1) != 0 ? ~(result >> 1) : (result >> 1));
+      lat += dlat;
+
+      shift = 0;
+      result = 0;
+      do {
+        b = encoded.codeUnitAt(index++) - 63;
+        result |= (b & 0x1f) << shift;
+        shift += 5;
+      } while (b >= 0x20);
+      int dlng = ((result & 1) != 0 ? ~(result >> 1) : (result >> 1));
+      lng += dlng;
+
+      poly.add([lat / 1E5, lng / 1E5]);
+    }
+
+    return poly;
+  }
+
+  LatLngBounds _getBounds(List<LatLng> points) {
+    double? minLat, maxLat, minLng, maxLng;
+
+    for (final point in points) {
+      minLat =
+          minLat == null ? point.latitude : min<double>(minLat, point.latitude);
+      maxLat =
+          maxLat == null ? point.latitude : max<double>(maxLat, point.latitude);
+      minLng = minLng == null
+          ? point.longitude
+          : min<double>(minLng, point.longitude);
+      maxLng = maxLng == null
+          ? point.longitude
+          : max<double>(maxLng, point.longitude);
+    }
+
+    return LatLngBounds(
+      southwest: LatLng(minLat!, minLng!),
+      northeast: LatLng(maxLat!, maxLng!),
+    );
+  }
+
+  void _initializeMarkers() {
+    _markers = {
+      if (widget.markers != null)
+        ...widget.markers!.map(
+          (marker) => Marker(
+            markerId: MarkerId(marker.title),
+            position: LatLng(marker.latitude, marker.longitude),
+            infoWindow: InfoWindow(title: marker.title),
+            icon: BitmapDescriptor.defaultMarkerWithHue(
+              marker.isCompleted
+                  ? BitmapDescriptor.hueGreen
+                  : BitmapDescriptor.hueViolet,
+            ),
+            onTap: () {
+              setState(() => _isMarkerSelected = true);
+              _mapController?.animateCamera(
+                CameraUpdate.newLatLngZoom(
+                  LatLng(marker.latitude, marker.longitude),
+                  17.0,
+                ),
+              );
+            },
+          ),
+        )
+      else
+        Marker(
+          markerId: const MarkerId('quest'),
+          position: LatLng(widget.latitude, widget.longitude),
+          infoWindow: InfoWindow(title: widget.questTitle ?? ''),
+          icon:
+              BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueViolet),
+        ),
+    };
+  }
+
+  Future<void> _checkLocationPermission() async {
+    bool serviceEnabled;
+    LocationPermission permission;
+
+    serviceEnabled = await Geolocator.isLocationServiceEnabled();
+    if (!serviceEnabled) {
+      return;
+    }
+
+    permission = await Geolocator.checkPermission();
+    if (permission == LocationPermission.denied) {
+      permission = await Geolocator.requestPermission();
+      if (permission == LocationPermission.denied) {
+        return;
+      }
+    }
+
+    if (permission == LocationPermission.deniedForever) {
+      return;
+    }
+
+    _startLocationUpdates();
+  }
+
+  void _startLocationUpdates() {
+    const LocationSettings locationSettings = LocationSettings(
+      accuracy: LocationAccuracy.high,
+      distanceFilter: 10, // Update every 10 meters
+    );
+
+    _positionStreamSubscription = Geolocator.getPositionStream(
+      locationSettings: locationSettings,
+    ).listen(
+      (Position position) {
+        if (mounted) {
+          setState(() {
+            _currentPosition = position;
+            _updateLocationCircle();
+          });
+        }
+      },
+    );
   }
 
   @override
   void dispose() {
     _controller.dispose();
+    _positionStreamSubscription?.cancel();
     super.dispose();
   }
 
@@ -73,7 +285,7 @@ class _MapScreenState extends State<MapScreen>
     } else {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text('Nessuna immagine selezionata.'),
+          content: const Text('Nessuna immagine selezionata.'),
           behavior: SnackBarBehavior.floating,
           backgroundColor: AppTheme.darkColor,
           shape: RoundedRectangleBorder(
@@ -86,80 +298,58 @@ class _MapScreenState extends State<MapScreen>
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      body: Stack(
-        children: [
-          _buildMap(),
-          _buildTopBar(),
-          _buildLayerSelector(),
-          _buildFloatingActionButtons(),
-          if (_isMarkerSelected) _buildMarkerInfoPanel(),
-        ],
-      ),
-    );
-  }
-
-  Widget _buildMap() {
-    return FlutterMap(
-      mapController: _mapController,
-      options: MapOptions(
-        initialCenter: LatLng(widget.latitude, widget.longitude),
-        initialZoom: 13.0,
-        minZoom: 3.0,
-        maxZoom: 17.0,
-        interactionOptions:
-            const InteractionOptions(flags: InteractiveFlag.all),
-        onTap: (_, __) {
-          if (_isMarkerSelected) {
-            setState(() => _isMarkerSelected = false);
-          }
-        },
-      ),
+    return Stack(
       children: [
-        mapLayers[currentLayer]!,
-        MarkerLayer(
-          markers: [
-            Marker(
-              point: LatLng(widget.latitude, widget.longitude),
-              width: 40,
-              height: 40,
-              child: GestureDetector(
-                onTap: () {
-                  setState(() => _isMarkerSelected = true);
-                  _mapController.move(
-                    LatLng(widget.latitude, widget.longitude),
-                    17.0,
-                  );
-                },
-                child: _buildCustomMarker(),
-              ),
-            ),
-          ],
+        AnimatedContainer(
+          duration: AppTheme.animationFast,
+          margin: EdgeInsets.only(
+            top: _isFullScreen ? 0 : MediaQuery.of(context).padding.top,
+          ),
+          child: _buildMap(),
         ),
+        if (widget.showBackButton && !_isFullScreen) _buildTopBar(),
+        _buildFloatingActionButtons(),
+        if (_isMarkerSelected && !_isFullScreen) _buildMarkerInfoPanel(),
       ],
     );
   }
 
-  Widget _buildCustomMarker() {
-    return TweenAnimationBuilder<double>(
-      tween: Tween(begin: 0.0, end: _isMarkerSelected ? 1.2 : 1.0),
-      duration: AppTheme.animationFast,
-      builder: (context, value, child) {
-        return Transform.scale(
-          scale: value,
-          child: Container(
-            decoration: BoxDecoration(
-              gradient: AppTheme.accentGradient,
-              shape: BoxShape.circle,
-              boxShadow: AppTheme.neumorphicShadow,
+  Widget _buildMap() {
+    return GoogleMap(
+      initialCameraPosition: CameraPosition(
+        target: _currentPosition != null
+            ? LatLng(_currentPosition!.latitude, _currentPosition!.longitude)
+            : _defaultLocation,
+        zoom: widget.markers != null ? 11.0 : 13.0,
+      ),
+      mapType: _currentMapType,
+      markers: {
+        ..._markers,
+        if (_currentPosition != null)
+          Marker(
+            markerId: const MarkerId('current_location'),
+            position: LatLng(
+              _currentPosition!.latitude,
+              _currentPosition!.longitude,
             ),
-            child: const Icon(
-              Icons.location_on,
-              color: Colors.white,
-              size: 26,
+            icon: BitmapDescriptor.defaultMarkerWithHue(
+              BitmapDescriptor.hueAzure,
             ),
+            infoWindow: const InfoWindow(title: 'La tua posizione'),
           ),
-        );
+      },
+      polylines: _polylines,
+      circles: _circles,
+      myLocationEnabled: true,
+      myLocationButtonEnabled: false,
+      zoomControlsEnabled: false,
+      onMapCreated: (GoogleMapController controller) {
+        _mapController = controller;
+      },
+      onTap: (_) {
+        if (_isMarkerSelected) {
+          setState(() => _isMarkerSelected = false);
+        }
       },
     );
   }
@@ -183,7 +373,7 @@ class _MapScreenState extends State<MapScreen>
             const SizedBox(width: AppTheme.spacingXSmall),
             Expanded(
               child: Text(
-                widget.questTitle,
+                widget.questTitle ?? '',
                 style: Theme.of(context).textTheme.titleLarge,
                 overflow: TextOverflow.ellipsis,
               ),
@@ -215,56 +405,6 @@ class _MapScreenState extends State<MapScreen>
     );
   }
 
-  Widget _buildLayerSelector() {
-    return Positioned(
-      top: 100,
-      right: AppTheme.spacingMedium,
-      child: Container(
-        decoration: BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.circular(AppTheme.borderRadiusLarge),
-          boxShadow: AppTheme.softShadow,
-        ),
-        child: Column(
-          children: mapLayers.keys.map((String layer) {
-            final isSelected = currentLayer == layer;
-            return Padding(
-              padding: const EdgeInsets.all(AppTheme.spacingSmall),
-              child: Material(
-                color: Colors.transparent,
-                child: InkWell(
-                  borderRadius:
-                      BorderRadius.circular(AppTheme.borderRadiusLarge),
-                  onTap: () => setState(() => currentLayer = layer),
-                  child: Container(
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: AppTheme.spacingMedium,
-                      vertical: AppTheme.spacingSmall,
-                    ),
-                    decoration: BoxDecoration(
-                      color: isSelected
-                          ? AppTheme.primaryColor
-                          : Colors.transparent,
-                      borderRadius:
-                          BorderRadius.circular(AppTheme.borderRadiusLarge),
-                    ),
-                    child: Text(
-                      layer,
-                      style: Theme.of(context).textTheme.labelLarge?.copyWith(
-                            color:
-                                isSelected ? Colors.white : AppTheme.darkColor,
-                          ),
-                    ),
-                  ),
-                ),
-              ),
-            );
-          }).toList(),
-        ),
-      ),
-    );
-  }
-
   Widget _buildFloatingActionButtons() {
     return Positioned(
       right: AppTheme.spacingMedium,
@@ -272,60 +412,117 @@ class _MapScreenState extends State<MapScreen>
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
-          _buildMapControlButton(
-            icon: Icons.add,
-            onPressed: () => _mapController.move(
-              _mapController.camera.center,
-              _mapController.camera.zoom + 1,
-            ),
-          ),
-          const SizedBox(height: AppTheme.spacingSmall),
-          _buildMapControlButton(
-            icon: Icons.remove,
-            onPressed: () => _mapController.move(
-              _mapController.camera.center,
-              _mapController.camera.zoom - 1,
-            ),
-          ),
-          const SizedBox(height: AppTheme.spacingSmall),
-          _buildMapControlButton(
-            icon: Icons.my_location,
-            onPressed: () => _mapController.move(
-              LatLng(widget.latitude, widget.longitude),
-              _mapController.camera.zoom,
-            ),
-          ),
-          const SizedBox(height: AppTheme.spacingLarge),
           FloatingActionButton(
+            heroTag: 'fullscreen',
+            onPressed: () {
+              setState(() => _isFullScreen = !_isFullScreen);
+            },
+            child:
+                Icon(_isFullScreen ? Icons.fullscreen_exit : Icons.fullscreen),
+          ),
+          const SizedBox(height: AppTheme.spacingSmall),
+          FloatingActionButton(
+            heroTag: 'zoom_in',
+            onPressed: () {
+              _mapController?.animateCamera(CameraUpdate.zoomIn());
+            },
+            child: const Icon(Icons.add),
+          ),
+          const SizedBox(height: AppTheme.spacingSmall),
+          FloatingActionButton(
+            heroTag: 'zoom_out',
+            onPressed: () {
+              _mapController?.animateCamera(CameraUpdate.zoomOut());
+            },
+            child: const Icon(Icons.remove),
+          ),
+          const SizedBox(height: AppTheme.spacingSmall),
+          FloatingActionButton(
+            heroTag: 'layer_selector',
+            onPressed: () {
+              showModalBottomSheet(
+                context: context,
+                builder: (context) => Container(
+                  padding: const EdgeInsets.all(AppTheme.spacingMedium),
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      ListTile(
+                        title: const Text('Normale'),
+                        leading: Radio<MapType>(
+                          value: MapType.normal,
+                          groupValue: _currentMapType,
+                          onChanged: (value) {
+                            setState(() => _currentMapType = value!);
+                            Navigator.pop(context);
+                          },
+                        ),
+                        onTap: () {
+                          setState(() => _currentMapType = MapType.normal);
+                          Navigator.pop(context);
+                        },
+                      ),
+                      ListTile(
+                        title: const Text('Satellite'),
+                        leading: Radio<MapType>(
+                          value: MapType.satellite,
+                          groupValue: _currentMapType,
+                          onChanged: (value) {
+                            setState(() => _currentMapType = value!);
+                            Navigator.pop(context);
+                          },
+                        ),
+                        onTap: () {
+                          setState(() => _currentMapType = MapType.satellite);
+                          Navigator.pop(context);
+                        },
+                      ),
+                      ListTile(
+                        title: const Text('Ibrida'),
+                        leading: Radio<MapType>(
+                          value: MapType.hybrid,
+                          groupValue: _currentMapType,
+                          onChanged: (value) {
+                            setState(() => _currentMapType = value!);
+                            Navigator.pop(context);
+                          },
+                        ),
+                        onTap: () {
+                          setState(() => _currentMapType = MapType.hybrid);
+                          Navigator.pop(context);
+                        },
+                      ),
+                    ],
+                  ),
+                ),
+              );
+            },
+            child: const Icon(Icons.layers),
+          ),
+          const SizedBox(height: AppTheme.spacingSmall),
+          FloatingActionButton(
+            heroTag: 'location',
+            onPressed: () {
+              if (_currentPosition != null) {
+                _mapController?.animateCamera(
+                  CameraUpdate.newLatLng(
+                    LatLng(
+                      _currentPosition!.latitude,
+                      _currentPosition!.longitude,
+                    ),
+                  ),
+                );
+              }
+            },
+            child: const Icon(Icons.my_location),
+          ),
+          const SizedBox(height: AppTheme.spacingSmall),
+          FloatingActionButton(
+            heroTag: 'camera',
             onPressed: () => _openCamera(context),
-            backgroundColor: AppTheme.accentColor.withValues(alpha: 106),
-            child: const Icon(Icons.camera_alt, color: Colors.white),
+            child: const Icon(Icons.camera_alt),
           ),
         ],
-      ),
-    );
-  }
-
-  Widget _buildMapControlButton({
-    required IconData icon,
-    required VoidCallback onPressed,
-  }) {
-    return Container(
-      decoration: BoxDecoration(
-        shape: BoxShape.circle,
-        boxShadow: AppTheme.softShadow,
-      ),
-      child: Material(
-        color: Colors.white,
-        shape: const CircleBorder(),
-        child: InkWell(
-          customBorder: const CircleBorder(),
-          onTap: onPressed,
-          child: Container(
-            padding: const EdgeInsets.all(AppTheme.spacingMedium),
-            child: Icon(icon, color: AppTheme.darkColor),
-          ),
-        ),
       ),
     );
   }
@@ -368,7 +565,7 @@ class _MapScreenState extends State<MapScreen>
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    widget.questTitle,
+                    widget.questTitle ?? '',
                     style: Theme.of(context).textTheme.titleMedium,
                   ),
                   const SizedBox(height: AppTheme.spacingSmall),
@@ -377,16 +574,35 @@ class _MapScreenState extends State<MapScreen>
                     style: Theme.of(context).textTheme.bodyMedium,
                   ),
                   const SizedBox(height: AppTheme.spacingMedium),
-                  ElevatedButton.icon(
-                    onPressed: () => _openCamera(context),
-                    icon: const Icon(Icons.camera_alt),
-                    label: const Text('Scatta una foto'),
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor:
-                          AppTheme.accentColor.withValues(alpha: 106),
-                      foregroundColor: Colors.white,
-                      minimumSize: const Size(double.infinity, 48),
-                    ),
+                  Row(
+                    children: [
+                      Expanded(
+                        child: ElevatedButton.icon(
+                          onPressed: _getDirections,
+                          icon: const Icon(Icons.directions_walk),
+                          label: const Text('Mostra Percorso'),
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: AppTheme.accentColor,
+                            foregroundColor: Colors.white,
+                            minimumSize: const Size(double.infinity, 48),
+                          ),
+                        ),
+                      ),
+                      const SizedBox(width: AppTheme.spacingMedium),
+                      Expanded(
+                        child: ElevatedButton.icon(
+                          onPressed: () => _openCamera(context),
+                          icon: const Icon(Icons.camera_alt),
+                          label: const Text('Scatta Foto'),
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor:
+                                AppTheme.accentColor.withValues(alpha: 106),
+                            foregroundColor: Colors.white,
+                            minimumSize: const Size(double.infinity, 48),
+                          ),
+                        ),
+                      ),
+                    ],
                   ),
                 ],
               ),

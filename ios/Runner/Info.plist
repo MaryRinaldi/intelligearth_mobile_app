@@ -51,5 +51,11 @@
 <string>Questa app necessita di accesso alla libreria fotografica per selezionare immagini.</string>
 <key>NSMicrophoneUsageDescription</key>
 <string>Questa app necessita di accesso al microfono per registrare video.</string>
+<key>NSLocationWhenInUseUsageDescription</key>
+<string>Questa app necessita di accesso alla tua posizione per mostrarti sulla mappa e calcolare i percorsi.</string>
+<key>NSLocationAlwaysUsageDescription</key>
+<string>Questa app necessita di accesso alla tua posizione per mostrarti sulla mappa e calcolare i percorsi anche in background.</string>
+<key>io.flutter.embedded_views_preview</key>
+<true/>
 </dict>
 </plist>

@@ -19,3 +19,17 @@ class Quest {
 }
 
 enum QuestStatus { active, completed, upcoming }
+
+class QuestMarker {
+  final double latitude;
+  final double longitude;
+  final String title;
+  final bool isCompleted;
+
+  const QuestMarker({
+    required this.latitude,
+    required this.longitude,
+    required this.title,
+    required this.isCompleted,
+  });
+}

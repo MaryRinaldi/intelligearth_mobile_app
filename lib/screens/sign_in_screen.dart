@@ -3,8 +3,8 @@ import 'dart:ui';
 import 'package:intelligearth_mobile/services/auth_service.dart';
 import '../theme/app_theme.dart';
 import 'sign_up_screen.dart';
-import 'package:shared_preferences/shared_preferences.dart';
-import 'dart:convert';
+import '../services/preferences_service.dart';
+import '../models/user_model.dart';
 
 class SignInScreen extends StatefulWidget {
   const SignInScreen({super.key});
@@ -16,6 +16,7 @@ class SignInScreen extends StatefulWidget {
 class SignInScreenState extends State<SignInScreen>
     with SingleTickerProviderStateMixin {
   final AuthService _authService = AuthService();
+  final PreferencesService _preferencesService = PreferencesService();
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
   final _formKey = GlobalKey<FormState>();
@@ -25,7 +26,7 @@ class SignInScreenState extends State<SignInScreen>
   String? errorMessage;
 
   late final AnimationController _controller;
-  late final Animation<double> _fadeInAnimation;
+  Animation<double>? _fadeInAnimation;
 
   @override
   void initState() {
@@ -41,6 +42,21 @@ class SignInScreenState extends State<SignInScreen>
     );
 
     _controller.forward();
+    _checkRememberMe();
+  }
+
+  Future<void> _checkRememberMe() async {
+    final rememberMe = await _preferencesService.getRememberMe();
+    if (!mounted) return;
+
+    setState(() => _rememberMe = rememberMe);
+
+    if (rememberMe) {
+      final user = await _preferencesService.getStoredUser();
+      if (user != null && mounted) {
+        Navigator.pushReplacementNamed(context, '/home');
+      }
+    }
   }
 
   @override
@@ -60,44 +76,32 @@ class SignInScreenState extends State<SignInScreen>
     });
 
     try {
-      final prefs = await SharedPreferences.getInstance();
-
       if (_emailController.text == 'mary' &&
           _passwordController.text == '1234') {
-        await Future.delayed(
-            const Duration(seconds: 1)); // Simula il caricamento
+        final user = User(
+          id: 'mary_id',
+          name: 'Mary',
+          email: 'mary@example.com',
+          role: 'user',
+          position: 'Explorer',
+        );
 
-        // Salva i dati dell'utente hardcoded come se fosse un utente normale
-        if (_rememberMe) {
-          await prefs.setString('jwt_token', 'fake_token_for_mary');
-          await prefs.setString(
-              'user_data',
-              json.encode({
-                'id': 'mary_id',
-                'name': 'Mary',
-                'email': 'mary@example.com',
-                'role': 'user',
-              }));
-        }
-
-        // Salva sempre la preferenza remember_me
-        await prefs.setBool('remember_me', _rememberMe);
-
+        await _authService.rememberUser(_rememberMe);
+        
         if (!mounted) return;
         Navigator.pushReplacementNamed(context, '/home');
         return;
       }
 
-      // Login normale con AuthService
       final user = await _authService.signIn(
         _emailController.text,
         _passwordController.text,
-        _rememberMe,
       );
 
       if (!mounted) return;
 
       if (user != null) {
+        await _authService.rememberUser(_rememberMe);
         Navigator.pushReplacementNamed(context, '/home');
       } else {
         setState(() {
@@ -106,6 +110,7 @@ class SignInScreenState extends State<SignInScreen>
         });
       }
     } catch (e) {
+      if (!mounted) return;
       setState(() {
         errorMessage = 'Si è verificato un errore. Riprova più tardi.';
         _isLoading = false;
@@ -114,6 +119,8 @@ class SignInScreenState extends State<SignInScreen>
   }
 
   Future<void> _showRecoveryDialog() async {
+    if (!mounted) return;
+
     final emailController = TextEditingController();
     bool isLoading = false;
 
@@ -230,7 +237,7 @@ class SignInScreenState extends State<SignInScreen>
           child: SingleChildScrollView(
             padding: const EdgeInsets.all(AppTheme.spacingLarge),
             child: FadeTransition(
-              opacity: _fadeInAnimation,
+              opacity: _fadeInAnimation!,
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
@@ -295,7 +302,7 @@ class SignInScreenState extends State<SignInScreen>
                           controller: _emailController,
                           keyboardType: TextInputType.emailAddress,
                           autofocus: true,
-                          style: Theme.of(context).textTheme.titleMedium,
+                          style: TextStyle(color: AppTheme.textOnPrimaryColor),
                           decoration: InputDecoration(
                             filled: false,
                             labelText: 'Email',
@@ -331,7 +338,7 @@ class SignInScreenState extends State<SignInScreen>
                         TextFormField(
                           controller: _passwordController,
                           obscureText: !_isPasswordVisible,
-                          style: Theme.of(context).textTheme.titleMedium,
+                          style: TextStyle(color: AppTheme.textOnPrimaryColor),
                           decoration: InputDecoration(
                             filled: false,
                             labelText: 'Password',
@@ -394,8 +401,7 @@ class SignInScreenState extends State<SignInScreen>
                                     if (states.contains(WidgetState.selected)) {
                                       return AppTheme.textOnPrimaryColor;
                                     }
-                                    return AppTheme.textOnPrimaryColor
-                                        .withValues(alpha: 51);
+                                    return Colors.transparent;
                                   },
                                 ),
                                 checkColor: AppTheme.primaryColor,
