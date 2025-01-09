@@ -4,12 +4,10 @@ import 'package:intelligearth_mobile/models/quest_model.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:geolocator/geolocator.dart';
 import 'dart:async';
-import 'dart:math';
-import 'package:http/http.dart' as http;
-import 'dart:convert';
 import '../theme/app_theme.dart';
-import '../config/app_config.dart';
 import 'camera_view_page.dart';
+import 'package:url_launcher/url_launcher.dart';
+import 'quest_detail_screen.dart';
 
 class MapScreen extends StatefulWidget {
   final double latitude;
@@ -17,6 +15,7 @@ class MapScreen extends StatefulWidget {
   final String? questTitle;
   final bool showBackButton;
   final List<QuestMarker>? markers;
+  final String? description;
 
   const MapScreen({
     super.key,
@@ -25,6 +24,7 @@ class MapScreen extends StatefulWidget {
     this.questTitle,
     this.showBackButton = false,
     this.markers,
+    this.description,
   });
 
   @override
@@ -41,7 +41,6 @@ class _MapScreenState extends State<MapScreen>
   Position? _currentPosition;
   StreamSubscription<Position>? _positionStreamSubscription;
   Set<Marker> _markers = {};
-  final Set<Polyline> _polylines = {};
   final Set<Circle> _circles = {};
 
   // Posizione di default (Roma - Colosseo)
@@ -80,107 +79,6 @@ class _MapScreenState extends State<MapScreen>
         );
       });
     }
-  }
-
-  Future<void> _getDirections() async {
-    if (_currentPosition == null) return;
-
-    final String url = 'https://maps.googleapis.com/maps/api/directions/json?'
-        'origin=${_currentPosition!.latitude},${_currentPosition!.longitude}'
-        '&destination=${widget.latitude},${widget.longitude}'
-        '&mode=walking'
-        '&key=${AppConfig.mapsApiKey}';
-
-    try {
-      final response = await http.get(Uri.parse(url));
-
-      if (response.statusCode == 200) {
-        final data = json.decode(response.body);
-        if (data['status'] == 'OK') {
-          final points =
-              _decodePolyline(data['routes'][0]['overview_polyline']['points']);
-          final List<LatLng> polylineCoordinates =
-              points.map((point) => LatLng(point[0], point[1])).toList();
-
-          setState(() {
-            _polylines.clear();
-            _polylines.add(
-              Polyline(
-                polylineId: const PolylineId('route'),
-                color: AppTheme.accentColor,
-                points: polylineCoordinates,
-                width: 5,
-                patterns: [
-                  PatternItem.dash(20.0),
-                  PatternItem.gap(10.0),
-                ],
-              ),
-            );
-          });
-
-          // Zoom per mostrare l'intero percorso
-          final bounds = _getBounds(polylineCoordinates);
-          _mapController?.animateCamera(
-            CameraUpdate.newLatLngBounds(bounds, 50),
-          );
-        }
-      }
-    } catch (e) {
-      debugPrint('Error getting directions: $e');
-    }
-  }
-
-  List<List<double>> _decodePolyline(String encoded) {
-    List<List<double>> poly = [];
-    int index = 0, len = encoded.length;
-    int lat = 0, lng = 0;
-
-    while (index < len) {
-      int b, shift = 0, result = 0;
-      do {
-        b = encoded.codeUnitAt(index++) - 63;
-        result |= (b & 0x1f) << shift;
-        shift += 5;
-      } while (b >= 0x20);
-      int dlat = ((result & 1) != 0 ? ~(result >> 1) : (result >> 1));
-      lat += dlat;
-
-      shift = 0;
-      result = 0;
-      do {
-        b = encoded.codeUnitAt(index++) - 63;
-        result |= (b & 0x1f) << shift;
-        shift += 5;
-      } while (b >= 0x20);
-      int dlng = ((result & 1) != 0 ? ~(result >> 1) : (result >> 1));
-      lng += dlng;
-
-      poly.add([lat / 1E5, lng / 1E5]);
-    }
-
-    return poly;
-  }
-
-  LatLngBounds _getBounds(List<LatLng> points) {
-    double? minLat, maxLat, minLng, maxLng;
-
-    for (final point in points) {
-      minLat =
-          minLat == null ? point.latitude : min<double>(minLat, point.latitude);
-      maxLat =
-          maxLat == null ? point.latitude : max<double>(maxLat, point.latitude);
-      minLng = minLng == null
-          ? point.longitude
-          : min<double>(minLng, point.longitude);
-      maxLng = maxLng == null
-          ? point.longitude
-          : max<double>(maxLng, point.longitude);
-    }
-
-    return LatLngBounds(
-      southwest: LatLng(minLat!, minLng!),
-      northeast: LatLng(maxLat!, maxLng!),
-    );
   }
 
   void _initializeMarkers() {
@@ -296,6 +194,34 @@ class _MapScreenState extends State<MapScreen>
     }
   }
 
+  Future<void> _openGoogleMapsDirections() async {
+    if (_currentPosition == null) return;
+
+    final url = Uri.parse(
+      'https://www.google.com/maps/dir/?api=1&origin=${_currentPosition!.latitude},${_currentPosition!.longitude}&destination=${widget.latitude},${widget.longitude}&travelmode=walking'
+    );
+
+    if (await canLaunchUrl(url)) {
+      await launchUrl(url);
+    }
+  }
+
+  double _calculateDistance() {
+    if (_currentPosition == null) return double.infinity;
+    
+    return Geolocator.distanceBetween(
+      _currentPosition!.latitude,
+      _currentPosition!.longitude,
+      widget.latitude,
+      widget.longitude,
+    );
+  }
+
+  bool _isWithinPhotoDistance() {
+    final distance = _calculateDistance();
+    return distance <= 50; // 50 meters
+  }
+
   @override
   Widget build(BuildContext context) {
     return Stack(
@@ -338,7 +264,6 @@ class _MapScreenState extends State<MapScreen>
             infoWindow: const InfoWindow(title: 'La tua posizione'),
           ),
       },
-      polylines: _polylines,
       circles: _circles,
       myLocationEnabled: true,
       myLocationButtonEnabled: false,
@@ -528,14 +453,17 @@ class _MapScreenState extends State<MapScreen>
   }
 
   Widget _buildMarkerInfoPanel() {
+    final distance = _calculateDistance();
+    final isWithinRange = _isWithinPhotoDistance();
+    
     return AnimatedPositioned(
       duration: AppTheme.animationNormal,
       curve: Curves.easeInOut,
       left: 0,
       right: 0,
-      bottom: _isMarkerSelected ? 0 : -200,
+      bottom: _isMarkerSelected ? 0 : -300,
       child: Container(
-        height: 200,
+        height: 300,
         decoration: BoxDecoration(
           color: Colors.white,
           borderRadius: const BorderRadius.vertical(
@@ -559,28 +487,69 @@ class _MapScreenState extends State<MapScreen>
               ),
             ),
             Padding(
-              padding:
-                  const EdgeInsets.symmetric(horizontal: AppTheme.spacingLarge),
+              padding: const EdgeInsets.symmetric(horizontal: AppTheme.spacingLarge),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
                     widget.questTitle ?? '',
-                    style: Theme.of(context).textTheme.titleMedium,
+                    style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                      fontWeight: FontWeight.bold,
+                    ),
                   ),
                   const SizedBox(height: AppTheme.spacingSmall),
                   Text(
-                    'Lat: ${widget.latitude.toStringAsFixed(6)}\nLong: ${widget.longitude.toStringAsFixed(6)}',
+                    'Distanza: ${(distance / 1000).toStringAsFixed(2)} km',
                     style: Theme.of(context).textTheme.bodyMedium,
                   ),
+                  const SizedBox(height: AppTheme.spacingMedium),
+                  if (widget.description != null) ...[
+                    Text(
+                      widget.description!,
+                      style: Theme.of(context).textTheme.bodyMedium,
+                      maxLines: 2,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                    TextButton(
+                      onPressed: () {
+                        // Navigate to quest details with proper data
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => QuestDetailScreen(
+                              quest: Quest(
+                                title: widget.questTitle ?? '',
+                                latitude: widget.latitude,
+                                longitude: widget.longitude,
+                                description: widget.description ?? '',
+                                imagePath: 'assets/images/quest_default.jpg', // You might want to add this as a parameter
+                              ),
+                            ),
+                          ),
+                        );
+                      },
+                      style: TextButton.styleFrom(
+                        padding: EdgeInsets.zero,
+                        minimumSize: const Size(0, 24),
+                        tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                      ),
+                      child: Text(
+                        'Read more...',
+                        style: TextStyle(
+                          color: AppTheme.accentColor,
+                          fontWeight: FontWeight.w500,
+                        ),
+                      ),
+                    ),
+                  ],
                   const SizedBox(height: AppTheme.spacingMedium),
                   Row(
                     children: [
                       Expanded(
                         child: ElevatedButton.icon(
-                          onPressed: _getDirections,
-                          icon: const Icon(Icons.directions_walk),
-                          label: const Text('Mostra Percorso'),
+                          onPressed: _openGoogleMapsDirections,
+                          icon: const Icon(Icons.directions),
+                          label: const Text('Indicazioni'),
                           style: ElevatedButton.styleFrom(
                             backgroundColor: AppTheme.accentColor,
                             foregroundColor: Colors.white,
@@ -591,12 +560,28 @@ class _MapScreenState extends State<MapScreen>
                       const SizedBox(width: AppTheme.spacingMedium),
                       Expanded(
                         child: ElevatedButton.icon(
-                          onPressed: () => _openCamera(context),
+                          onPressed: isWithinRange 
+                            ? () => _openCamera(context)
+                            : () {
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                  SnackBar(
+                                    content: const Text('Devi essere a meno di 50 metri dal punto per scattare una foto. Usa le indicazioni per raggiungerlo.'),
+                                    behavior: SnackBarBehavior.floating,
+                                    backgroundColor: AppTheme.darkColor,
+                                    action: SnackBarAction(
+                                      label: 'Indicazioni',
+                                      textColor: Colors.white,
+                                      onPressed: _openGoogleMapsDirections,
+                                    ),
+                                  ),
+                                );
+                              },
                           icon: const Icon(Icons.camera_alt),
                           label: const Text('Scatta Foto'),
                           style: ElevatedButton.styleFrom(
-                            backgroundColor:
-                                AppTheme.accentColor.withValues(alpha: 106),
+                            backgroundColor: isWithinRange
+                              ? AppTheme.accentColor
+                              : AppTheme.accentColor.withValues(alpha: 106),
                             foregroundColor: Colors.white,
                             minimumSize: const Size(double.infinity, 48),
                           ),

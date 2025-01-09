@@ -258,7 +258,7 @@ class CustomAppBar extends StatelessWidget implements PreferredSizeWidget {
     return Container(
       height: preferredSize.height,
       decoration: BoxDecoration(
-        gradient: AppTheme.accentGradient,
+        gradient: AppTheme.primaryGradient,
       ),
       child: AppBar(
         title: Text(

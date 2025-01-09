@@ -34,7 +34,7 @@ class AuthService {
   Future<User?> signIn(String email, String password) async {
     try {
       // Gestione utente hardcoded
-      if (email == "mary@example.com" && password == "password123") {
+      if (email == "mary" && password == "1234") {
         _currentUser = User(
           id: "1",
           name: "Mary",

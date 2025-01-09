@@ -4,7 +4,6 @@ import 'package:intelligearth_mobile/services/auth_service.dart';
 import '../theme/app_theme.dart';
 import 'sign_up_screen.dart';
 import '../services/preferences_service.dart';
-import '../models/user_model.dart';
 
 class SignInScreen extends StatefulWidget {
   const SignInScreen({super.key});
@@ -52,8 +51,8 @@ class SignInScreenState extends State<SignInScreen>
     setState(() => _rememberMe = rememberMe);
 
     if (rememberMe) {
-      final user = await _preferencesService.getStoredUser();
-      if (user != null && mounted) {
+      final storedUser = await _preferencesService.getStoredUser();
+      if (storedUser != null && mounted) {
         Navigator.pushReplacementNamed(context, '/home');
       }
     }
@@ -76,32 +75,16 @@ class SignInScreenState extends State<SignInScreen>
     });
 
     try {
-      if (_emailController.text == 'mary' &&
-          _passwordController.text == '1234') {
-        final user = User(
-          id: 'mary_id',
-          name: 'Mary',
-          email: 'mary@example.com',
-          role: 'user',
-          position: 'Explorer',
-        );
-
-        await _authService.rememberUser(_rememberMe);
-        
-        if (!mounted) return;
-        Navigator.pushReplacementNamed(context, '/home');
-        return;
-      }
-
-      final user = await _authService.signIn(
+      final signedInUser = await _authService.signIn(
         _emailController.text,
         _passwordController.text,
       );
 
       if (!mounted) return;
 
-      if (user != null) {
+      if (signedInUser != null) {
         await _authService.rememberUser(_rememberMe);
+        if (!mounted) return;
         Navigator.pushReplacementNamed(context, '/home');
       } else {
         setState(() {
@@ -115,6 +98,10 @@ class SignInScreenState extends State<SignInScreen>
         errorMessage = 'Si è verificato un errore. Riprova più tardi.';
         _isLoading = false;
       });
+    } finally {
+      if (mounted && _isLoading) {
+        setState(() => _isLoading = false);
+      }
     }
   }
 

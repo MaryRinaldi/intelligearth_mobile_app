@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 import '../providers/locale_provider.dart';
 import '../theme/app_theme.dart';
+import '../services/preferences_service.dart';
 
 class WelcomePage extends StatefulWidget {
   const WelcomePage({super.key});
@@ -104,21 +104,22 @@ class _WelcomePageState extends State<WelcomePage>
 
     _controller.forward();
 
-    final prefs = await SharedPreferences.getInstance();
-    final hasSeenOnboarding = prefs.getBool('has_seen_onboarding') ?? false;
+    final prefsService = PreferencesService();
+    final hasSeenOnboarding = await prefsService.getOnboardingComplete();
+    final hasSelectedLanguage = (await prefsService.getLanguage()).isNotEmpty;
 
     if (!mounted) return;
 
     if (hasSeenOnboarding) {
       Navigator.pushReplacementNamed(context, '/signin');
-    } else if (_showLanguagePopup) {
+    } else if (_showLanguagePopup && !hasSelectedLanguage) {
       _showLanguageSelector();
     }
   }
 
   Future<void> _finishOnboarding() async {
-    final prefs = await SharedPreferences.getInstance();
-    await prefs.setBool('has_seen_onboarding', true);
+    final prefsService = PreferencesService();
+    await prefsService.setOnboardingComplete(true);
 
     if (!mounted) return;
     Navigator.pushReplacementNamed(context, '/signin');
@@ -596,9 +597,15 @@ class _LanguageOption extends StatelessWidget {
     return Material(
       color: Colors.transparent,
       child: InkWell(
-        onTap: () {
+        onTap: () async {
           final provider = Provider.of<LocaleProvider>(context, listen: false);
           provider.setLocale(locale);
+          
+          // Save language preference
+          final prefsService = PreferencesService();
+          await prefsService.setLanguage(locale.languageCode);
+          
+          if (!context.mounted) return;
           Navigator.pop(context);
         },
         borderRadius: BorderRadius.circular(AppTheme.borderRadiusLarge),

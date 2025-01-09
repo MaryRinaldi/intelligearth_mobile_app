@@ -353,15 +353,7 @@ class HomeScreenState extends State<HomeScreen>
     ];
     return Container(
       decoration: BoxDecoration(
-        gradient: LinearGradient(
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-          colors: [
-            AppTheme.primaryColor.withValues(alpha: 86),
-            const Color(0xFF9918B9)
-                .withValues(alpha: 200), // darker version of accentColor
-          ],
-        ),
+        color: AppTheme.primaryColor,
         boxShadow: AppTheme.neumorphicShadow,
       ),
       child: SafeArea(

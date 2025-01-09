@@ -30,16 +30,16 @@
     "termsText": "Accedendo, accetti i nostri Termini di Servizio e la Privacy Policy",
     "questsTitle": "Missioni di Monitoraggio",
     "questsEmpty": "Nessuna missione disponibile al momento",
-    "questsCompleted": "Missioni Finite",
+    "questsCompleted": "Concluse",
     "@questsCompleted": {
         "description": "Label for completed missions tab"
     },
-    "questsAvailable": "Missioni Disponibili",
-    "activeQuests": "Missioni Attive",
+    "questsAvailable": "Disponibili",
+    "activeQuests": "Attive",
     "@activeQuests": {
         "description": "Label for active missions tab"
     },
-    "completedQuests": "Missioni Terminate",
+    "completedQuests": "Concluse",
     "@completedQuests": {
         "description": "Label for completed missions tab"
     },

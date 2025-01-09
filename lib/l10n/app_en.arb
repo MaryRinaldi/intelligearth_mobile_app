@@ -30,7 +30,7 @@
     "termsText": "By signing in, you agree to our Terms of Service and Privacy Policy",
     "questsTitle": "Monitoring Missions",
     "questsEmpty": "No missions available at the moment",
-    "questsCompleted": "Ended Missions",
+    "questsCompleted": "Closed",
     "@questsCompleted": {
         "description": "Label for finished missions tab"
     },
@@ -39,9 +39,9 @@
     "@activeQuests": {
         "description": "Label for active missions tab"
     },
-    "completedQuests": "Completed Missions",
+    "completedQuests": "Closed Missions",
     "@completedQuests": {
-        "description": "Label for completed missions tab"
+        "description": "Label for closed missions tab"
     },
     "upcomingQuests": "Upcoming Missions",
     "@upcomingQuests": {
