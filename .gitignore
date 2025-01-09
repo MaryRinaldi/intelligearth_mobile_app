@@ -3,6 +3,27 @@
 .env.local
 .env.*.local
 
+# Flutter/Dart specific
+.metadata
+pubspec.lock
+.dart_tool/
+.flutter-plugins
+.flutter-plugins-dependencies
+.packages
+build/
+
+# IDE specific
+.idea/
+.vscode/
+*.iml
+*.iws
+.DS_Store
+
+# Node.js specific (if not using Node.js, these can be removed)
+node_modules/
+package-lock.json
+package.json
+
 # Miscellaneous
 *.class
 *.log
@@ -15,30 +36,6 @@
 .svn/
 migrate_working_dir/
 
-# IntelliJ related
-*.iml
-*.ipr
-*.iws
-.idea/
-
-# Visual Studio Code related
-.classpath
-.project
-.settings/
-.vscode/
-
-# Flutter/Dart/Pub related
-**/doc/api/
-**/ios/Flutter/.last_build_id
-.dart_tool/
-.flutter-plugins
-.flutter-plugins-dependencies
-.packages
-.pub-cache/
-.pub/
-/build/
-.env
-
 # Android related
 **/android/**/gradle-wrapper.jar
 **/android/.gradle
@@ -49,7 +46,6 @@ migrate_working_dir/
 **/android/**/GeneratedPluginRegistrant.java
 **/android/key.properties
 **/android/app/release/
-**/android/app/src/main/res/values/strings.xml
 
 # iOS/XCode related
 **/ios/**/*.mode1v3
