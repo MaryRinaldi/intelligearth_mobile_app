@@ -204,7 +204,8 @@ La tua partecipazione contribuisce a:
                             builder: (context) => MapScreen(
                               latitude: quest.latitude,
                               longitude: quest.longitude,
-                              questTitle: quest.title,
+                              title: quest.title,
+                              description: quest.description,
                               showBackButton: true,
                             ),
                           ),

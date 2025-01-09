@@ -4,6 +4,7 @@ import 'package:intelligearth_mobile/services/auth_service.dart';
 import '../theme/app_theme.dart';
 import 'sign_up_screen.dart';
 import '../services/preferences_service.dart';
+import 'package:geolocator/geolocator.dart';
 
 class SignInScreen extends StatefulWidget {
   const SignInScreen({super.key});
@@ -23,6 +24,7 @@ class SignInScreenState extends State<SignInScreen>
   bool _isLoading = false;
   bool _rememberMe = false;
   String? errorMessage;
+  bool _isLocationPermissionChecked = false;
 
   late final AnimationController _controller;
   Animation<double>? _fadeInAnimation;
@@ -42,6 +44,7 @@ class SignInScreenState extends State<SignInScreen>
 
     _controller.forward();
     _checkRememberMe();
+    _checkLocationPermission();
   }
 
   Future<void> _checkRememberMe() async {
@@ -56,6 +59,77 @@ class SignInScreenState extends State<SignInScreen>
         Navigator.pushReplacementNamed(context, '/home');
       }
     }
+  }
+
+  Future<void> _checkLocationPermission() async {
+    if (_isLocationPermissionChecked) return;
+
+    final hasLocationPermission = await _preferencesService.getLocationPermission();
+
+    if (hasLocationPermission) {
+      setState(() => _isLocationPermissionChecked = true);
+      return;
+    }
+
+    bool serviceEnabled = await Geolocator.isLocationServiceEnabled();
+    if (!serviceEnabled) {
+      if (!mounted) return;
+      _showLocationDialog(
+        'Servizi di localizzazione disattivati',
+        'Per una migliore esperienza, attiva i servizi di localizzazione.',
+      );
+      return;
+    }
+
+    LocationPermission permission = await Geolocator.checkPermission();
+    if (permission == LocationPermission.denied) {
+      permission = await Geolocator.requestPermission();
+      if (permission == LocationPermission.denied) {
+        if (!mounted) return;
+        _showLocationDialog(
+          'Permesso negato',
+          'Per utilizzare tutte le funzionalità dell\'app, concedi l\'accesso alla posizione.',
+        );
+        return;
+      }
+    }
+
+    if (permission == LocationPermission.deniedForever) {
+      if (!mounted) return;
+      _showLocationDialog(
+        'Permesso negato permanentemente',
+        'Per utilizzare tutte le funzionalità dell\'app, concedi l\'accesso alla posizione dalle impostazioni del dispositivo.',
+        true,
+      );
+      return;
+    }
+
+    await _preferencesService.setLocationPermission(true);
+    setState(() => _isLocationPermissionChecked = true);
+  }
+
+  void _showLocationDialog(String title, String message, [bool openSettings = false]) {
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text(title),
+          content: Text(message),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop();
+                if (openSettings) {
+                  Geolocator.openLocationSettings();
+                }
+              },
+              child: Text(openSettings ? 'Apri Impostazioni' : 'Ho capito'),
+            ),
+          ],
+        );
+      },
+    );
   }
 
   @override

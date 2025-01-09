@@ -6,13 +6,14 @@ import 'package:geolocator/geolocator.dart';
 import 'dart:async';
 import '../theme/app_theme.dart';
 import 'camera_view_page.dart';
-import 'package:url_launcher/url_launcher.dart';
 import 'quest_detail_screen.dart';
+import '../services/map_service.dart';
+import 'package:logger/logger.dart';
 
 class MapScreen extends StatefulWidget {
   final double latitude;
   final double longitude;
-  final String? questTitle;
+  final String title;
   final bool showBackButton;
   final List<QuestMarker>? markers;
   final String? description;
@@ -21,8 +22,8 @@ class MapScreen extends StatefulWidget {
     super.key,
     required this.latitude,
     required this.longitude,
-    this.questTitle,
-    this.showBackButton = false,
+    required this.title,
+    this.showBackButton = true,
     this.markers,
     this.description,
   });
@@ -42,6 +43,11 @@ class _MapScreenState extends State<MapScreen>
   StreamSubscription<Position>? _positionStreamSubscription;
   Set<Marker> _markers = {};
   final Set<Circle> _circles = {};
+  final Set<Polyline> _polylines = {};
+  final MapService _mapService = MapService();
+  final logger = Logger();
+  String? _routeDistance;
+  String? _routeDuration;
 
   // Posizione di default (Roma - Colosseo)
   static const LatLng _defaultLocation = LatLng(41.8902, 12.4922);
@@ -53,7 +59,7 @@ class _MapScreenState extends State<MapScreen>
       duration: AppTheme.animationNormal,
       vsync: this,
     );
-    _checkLocationPermission();
+    _startLocationUpdates();
     _initializeMarkers();
 
     // Add accuracy circle for current location
@@ -109,35 +115,11 @@ class _MapScreenState extends State<MapScreen>
         Marker(
           markerId: const MarkerId('quest'),
           position: LatLng(widget.latitude, widget.longitude),
-          infoWindow: InfoWindow(title: widget.questTitle ?? ''),
+          infoWindow: InfoWindow(title: widget.title),
           icon:
               BitmapDescriptor.defaultMarkerWithHue(BitmapDescriptor.hueViolet),
         ),
     };
-  }
-
-  Future<void> _checkLocationPermission() async {
-    bool serviceEnabled;
-    LocationPermission permission;
-
-    serviceEnabled = await Geolocator.isLocationServiceEnabled();
-    if (!serviceEnabled) {
-      return;
-    }
-
-    permission = await Geolocator.checkPermission();
-    if (permission == LocationPermission.denied) {
-      permission = await Geolocator.requestPermission();
-      if (permission == LocationPermission.denied) {
-        return;
-      }
-    }
-
-    if (permission == LocationPermission.deniedForever) {
-      return;
-    }
-
-    _startLocationUpdates();
   }
 
   void _startLocationUpdates() {
@@ -194,15 +176,29 @@ class _MapScreenState extends State<MapScreen>
     }
   }
 
-  Future<void> _openGoogleMapsDirections() async {
+  Future<void> _getDirections() async {
     if (_currentPosition == null) return;
-
-    final url = Uri.parse(
-      'https://www.google.com/maps/dir/?api=1&origin=${_currentPosition!.latitude},${_currentPosition!.longitude}&destination=${widget.latitude},${widget.longitude}&travelmode=walking'
-    );
-
-    if (await canLaunchUrl(url)) {
-      await launchUrl(url);
+    
+    try {
+      final result = await _mapService.getDirections(
+        LatLng(_currentPosition!.latitude, _currentPosition!.longitude),
+        LatLng(widget.latitude, widget.longitude)
+      );
+      
+      setState(() {
+        _routeDistance = result['distance'];
+        _routeDuration = result['duration'];
+        _polylines.add(
+          Polyline(
+            polylineId: const PolylineId('route'),
+            points: result['points'],
+            color: Colors.blue,
+            width: 5,
+          ),
+        );
+      });
+    } catch (e) {
+      logger.e('Error getting directions: $e');
     }
   }
 
@@ -264,6 +260,7 @@ class _MapScreenState extends State<MapScreen>
             infoWindow: const InfoWindow(title: 'La tua posizione'),
           ),
       },
+      polylines: _polylines,
       circles: _circles,
       myLocationEnabled: true,
       myLocationButtonEnabled: false,
@@ -298,7 +295,7 @@ class _MapScreenState extends State<MapScreen>
             const SizedBox(width: AppTheme.spacingXSmall),
             Expanded(
               child: Text(
-                widget.questTitle ?? '',
+                widget.title,
                 style: Theme.of(context).textTheme.titleLarge,
                 overflow: TextOverflow.ellipsis,
               ),
@@ -492,12 +489,42 @@ class _MapScreenState extends State<MapScreen>
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    widget.questTitle ?? '',
+                    widget.title,
                     style: Theme.of(context).textTheme.titleMedium?.copyWith(
                       fontWeight: FontWeight.bold,
                     ),
                   ),
                   const SizedBox(height: AppTheme.spacingSmall),
+                  if (_routeDistance != null && _routeDuration != null) ...[
+                    Row(
+                      children: [
+                        Icon(Icons.directions_walk, 
+                          size: 16, 
+                          color: AppTheme.accentColor
+                        ),
+                        const SizedBox(width: AppTheme.spacingXSmall),
+                        Text(
+                          _routeDistance!,
+                          style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                            color: AppTheme.textOnLightColor.withValues(alpha: 179),
+                          ),
+                        ),
+                        const SizedBox(width: AppTheme.spacingMedium),
+                        Icon(Icons.access_time, 
+                          size: 16, 
+                          color: AppTheme.accentColor
+                        ),
+                        const SizedBox(width: AppTheme.spacingXSmall),
+                        Text(
+                          _routeDuration!,
+                          style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                            color: AppTheme.textOnLightColor.withValues(alpha: 179),
+                          ),
+                        ),
+                      ],
+                    ),
+                    const SizedBox(height: AppTheme.spacingSmall),
+                  ],
                   Text(
                     'Distanza: ${(distance / 1000).toStringAsFixed(2)} km',
                     style: Theme.of(context).textTheme.bodyMedium,
@@ -512,17 +539,16 @@ class _MapScreenState extends State<MapScreen>
                     ),
                     TextButton(
                       onPressed: () {
-                        // Navigate to quest details with proper data
                         Navigator.push(
                           context,
                           MaterialPageRoute(
                             builder: (context) => QuestDetailScreen(
                               quest: Quest(
-                                title: widget.questTitle ?? '',
+                                title: widget.title,
                                 latitude: widget.latitude,
                                 longitude: widget.longitude,
                                 description: widget.description ?? '',
-                                imagePath: 'assets/images/quest_default.jpg', // You might want to add this as a parameter
+                                imagePath: 'assets/images/quest_default.jpg',
                               ),
                             ),
                           ),
@@ -547,13 +573,16 @@ class _MapScreenState extends State<MapScreen>
                     children: [
                       Expanded(
                         child: ElevatedButton.icon(
-                          onPressed: _openGoogleMapsDirections,
+                          onPressed: _getDirections,
                           icon: const Icon(Icons.directions),
                           label: const Text('Indicazioni'),
                           style: ElevatedButton.styleFrom(
                             backgroundColor: AppTheme.accentColor,
                             foregroundColor: Colors.white,
                             minimumSize: const Size(double.infinity, 48),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(AppTheme.borderRadiusLarge),
+                            ),
                           ),
                         ),
                       ),
@@ -571,7 +600,10 @@ class _MapScreenState extends State<MapScreen>
                                     action: SnackBarAction(
                                       label: 'Indicazioni',
                                       textColor: Colors.white,
-                                      onPressed: _openGoogleMapsDirections,
+                                      onPressed: _getDirections,
+                                    ),
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(AppTheme.borderRadiusLarge),
                                     ),
                                   ),
                                 );
@@ -580,10 +612,13 @@ class _MapScreenState extends State<MapScreen>
                           label: const Text('Scatta Foto'),
                           style: ElevatedButton.styleFrom(
                             backgroundColor: isWithinRange
-                              ? AppTheme.accentColor
-                              : AppTheme.accentColor.withValues(alpha: 106),
+                              ? AppTheme.accentColor.withValues(alpha: 106)
+                              : AppTheme.accentColor.withValues(alpha: 77),
                             foregroundColor: Colors.white,
                             minimumSize: const Size(double.infinity, 48),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(AppTheme.borderRadiusLarge),
+                            ),
                           ),
                         ),
                       ),

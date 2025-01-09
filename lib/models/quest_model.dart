@@ -30,6 +30,6 @@ class QuestMarker {
     required this.latitude,
     required this.longitude,
     required this.title,
-    required this.isCompleted,
+    this.isCompleted = false,
   });
 }

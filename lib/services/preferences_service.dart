@@ -21,6 +21,7 @@ class PreferencesService {
   static const String keyLanguage = 'app_language';
   static const String keyThemeMode = 'theme_mode';
   static const String keyNotifications = 'notifications_enabled';
+  static const String keyLocationPermission = 'location_permission';
 
   static final PreferencesService _instance = PreferencesService._internal();
   factory PreferencesService() => _instance;
@@ -180,5 +181,16 @@ class PreferencesService {
   Future<void> resetAllData() async {
     final prefs = await SharedPreferences.getInstance();
     await prefs.clear(); // Rimuove tutte le preferenze
+  }
+
+  // Location Permission
+  Future<void> setLocationPermission(bool granted) async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setBool(keyLocationPermission, granted);
+  }
+
+  Future<bool> getLocationPermission() async {
+    final prefs = await SharedPreferences.getInstance();
+    return prefs.getBool(keyLocationPermission) ?? false;
   }
 }

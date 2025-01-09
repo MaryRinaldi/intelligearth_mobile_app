@@ -17,10 +17,12 @@ import 'theme/app_theme.dart';
 import 'package:intelligearth_mobile/config/app_config.dart';
 import 'services/preferences_service.dart';
 import 'services/auth_service.dart';
+import 'package:flutter_dotenv/flutter_dotenv.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await AppConfig.load();
+  await dotenv.load();
   runApp(
     ChangeNotifierProvider(
       create: (_) => LocaleProvider(),

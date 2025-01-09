@@ -191,6 +191,7 @@ class _QuestPageState extends State<QuestPage>
                 MapScreen(
                   latitude: _userPosition?.latitude ?? 41.8902,
                   longitude: _userPosition?.longitude ?? 12.4922,
+                  title: 'Mappa delle Quest',
                   showBackButton: false,
                   markers: quests
                       .map((quest) => QuestMarker(

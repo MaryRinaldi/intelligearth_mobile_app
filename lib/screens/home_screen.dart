@@ -353,7 +353,7 @@ class HomeScreenState extends State<HomeScreen>
     ];
     return Container(
       decoration: BoxDecoration(
-        color: AppTheme.primaryColor,
+        color: AppTheme.primaryColor.withValues(alpha: 160),
         boxShadow: AppTheme.neumorphicShadow,
       ),
       child: SafeArea(
