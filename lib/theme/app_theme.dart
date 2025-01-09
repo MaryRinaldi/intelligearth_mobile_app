@@ -5,7 +5,7 @@ class AppTheme {
   // Colors
   static const Color primaryColor = Color(0xFF668FE6); // Blu chiaro
   static const Color secondaryColor = Color(0xFF39437A); // Blu scuro
-  static const Color accentColor = Color(0xFFBF20EC); // Viola
+  static const Color accentColor = Color.fromARGB(255, 173, 28, 213); // Viola
   static const Color successColor = Color(0xFF4CAF50); // Verde
   static const Color warningColor = Color(0xFFFFC107); // Giallo
   static const Color errorColor = Color(0xFFE53935); // Rosso

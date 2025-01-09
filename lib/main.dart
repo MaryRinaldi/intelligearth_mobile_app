@@ -11,6 +11,7 @@ import 'screens/user_page.dart';
 import 'models/user_model.dart';
 import 'screens/settings_page.dart';
 import 'screens/help_page.dart';
+import 'screens/splash_screen.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'theme/app_theme.dart';
@@ -35,22 +36,32 @@ class MyApp extends StatelessWidget {
   const MyApp({super.key});
 
   Future<String> _getInitialRoute() async {
-    final prefsService = PreferencesService();
-    final authService = AuthService();
-    
-    // Check if onboarding is completed
-    final onboardingComplete = await prefsService.getOnboardingComplete();
-    if (!onboardingComplete) {
-      return '/';
+    try {
+      final prefsService = PreferencesService();
+      final authService = AuthService();
+      
+      // Load preferences and check auth state in parallel
+      final results = await Future.wait([
+        prefsService.getOnboardingComplete(),
+        authService.getCurrentUser(),
+      ]);
+      
+      final onboardingComplete = results[0] as bool;
+      final currentUser = results[1];
+      
+      if (!onboardingComplete) {
+        return '/';
+      }
+      
+      if (currentUser != null) {
+        return '/home';
+      }
+      
+      return '/signin';
+    } catch (e) {
+      // In caso di errore, mostra la schermata di login
+      return '/signin';
     }
-    
-    // Check if user is logged in
-    final currentUser = await authService.getCurrentUser();
-    if (currentUser != null) {
-      return '/home';
-    }
-    
-    return '/signin';
   }
 
   @override
@@ -75,11 +86,7 @@ class MyApp extends StatelessWidget {
             future: _getInitialRoute(),
             builder: (context, snapshot) {
               if (snapshot.connectionState == ConnectionState.waiting) {
-                return const Scaffold(
-                  body: Center(
-                    child: CircularProgressIndicator(),
-                  ),
-                );
+                return const SplashScreen();
               }
               
               switch (snapshot.data) {

@@ -17,10 +17,8 @@ class _WelcomePageState extends State<WelcomePage>
   late final AnimationController _controller;
   late final Animation<double> _fadeInAnimation;
   late final Animation<double> _slideAnimation;
-  late final Animation<double> _pulseAnimation;
   int _currentPage = 0;
   bool _showLanguagePopup = true;
-  bool _isLoading = true;
 
   final List<OnboardingItem> _onboardingItems = [
     OnboardingItem(
@@ -51,7 +49,7 @@ class _WelcomePageState extends State<WelcomePage>
     super.initState();
     _pageController = PageController();
     _controller = AnimationController(
-      duration: const Duration(seconds: 2),
+      duration: const Duration(seconds: 1),
       vsync: this,
     );
 
@@ -70,49 +68,18 @@ class _WelcomePageState extends State<WelcomePage>
       ),
     );
 
-    _pulseAnimation = TweenSequence<double>([
-      TweenSequenceItem(
-        tween: Tween<double>(begin: 1.0, end: 1.1)
-            .chain(CurveTween(curve: Curves.easeInOut)),
-        weight: 50,
-      ),
-      TweenSequenceItem(
-        tween: Tween<double>(begin: 1.1, end: 1.0)
-            .chain(CurveTween(curve: Curves.easeInOut)),
-        weight: 50,
-      ),
-    ]).animate(
-      CurvedAnimation(
-        parent: _controller,
-        curve: const Interval(0.0, 1.0),
-      ),
-    );
-
-    Future.delayed(const Duration(seconds: 3), () {
-      _initializeApp();
-    });
-
-    _controller.repeat();
+    _initializeWelcome();
   }
 
-  Future<void> _initializeApp() async {
-    // Simula il caricamento delle risorse
-    await Future.delayed(const Duration(seconds: 1));
-
-    if (!mounted) return;
-    setState(() => _isLoading = false);
-
-    _controller.forward();
-
+  Future<void> _initializeWelcome() async {
     final prefsService = PreferencesService();
-    final hasSeenOnboarding = await prefsService.getOnboardingComplete();
     final hasSelectedLanguage = (await prefsService.getLanguage()).isNotEmpty;
 
     if (!mounted) return;
 
-    if (hasSeenOnboarding) {
-      Navigator.pushReplacementNamed(context, '/signin');
-    } else if (_showLanguagePopup && !hasSelectedLanguage) {
+    _controller.forward();
+
+    if (_showLanguagePopup && !hasSelectedLanguage) {
       _showLanguageSelector();
     }
   }
@@ -159,93 +126,8 @@ class _WelcomePageState extends State<WelcomePage>
           ),
         ),
         child: SafeArea(
-          child: _isLoading ? _buildSplashScreen() : _buildOnboardingContent(),
+          child: _buildOnboardingContent(),
         ),
-      ),
-    );
-  }
-
-  Widget _buildSplashScreen() {
-    return Center(
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          ScaleTransition(
-            scale: _pulseAnimation,
-            child: Container(
-              padding: const EdgeInsets.all(AppTheme.spacingSmall),
-              decoration: BoxDecoration(
-                shape: BoxShape.circle,
-                border: Border.all(
-                  color: AppTheme.textOnPrimaryColor,
-                  width: 1,
-                ),
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.black.withValues(alpha: 51),
-                    blurRadius: 10,
-                    offset: const Offset(0, 4),
-                  ),
-                  BoxShadow(
-                    color: Colors.white.withValues(alpha: 26),
-                    blurRadius: 8,
-                    offset: const Offset(0, -2),
-                  ),
-                ],
-              ),
-              child: Image.asset(
-                'assets/images/intelligearth_logo.png',
-                height: 120,
-                width: 120,
-                fit: BoxFit.contain,
-                filterQuality: FilterQuality.high,
-              ),
-            ),
-          ),
-          const SizedBox(height: AppTheme.spacingLarge),
-          FadeTransition(
-            opacity: _fadeInAnimation,
-            child: SlideTransition(
-              position: Tween<Offset>(
-                begin: const Offset(0, 0.5),
-                end: Offset.zero,
-              ).animate(_fadeInAnimation),
-              child: Column(
-                children: [
-                  Text(
-                    'IntelligEarth',
-                    style: Theme.of(context).textTheme.displaySmall?.copyWith(
-                          color: AppTheme.textOnPrimaryColor,
-                          fontWeight: FontWeight.bold,
-                        ),
-                  ),
-                  const SizedBox(height: AppTheme.spacingMedium),
-                  Text(
-                    'Documenta. Monitora. Preserva.',
-                    style: Theme.of(context).textTheme.headlineSmall?.copyWith(
-                          color: AppTheme.textOnPrimaryColor
-                              .withValues(alpha: 179),
-                        ),
-                  ),
-                ],
-              ),
-            ),
-          ),
-          const SizedBox(height: AppTheme.spacingXLarge),
-          RotationTransition(
-            turns: _controller,
-            child: SizedBox(
-              width: 36,
-              height: 36,
-              child: CircularProgressIndicator(
-                valueColor: AlwaysStoppedAnimation<Color>(
-                  AppTheme.textOnPrimaryColor.withValues(alpha: 179),
-                ),
-                strokeWidth: 2,
-              ),
-            ),
-          ),
-        ],
       ),
     );
   }

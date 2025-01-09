@@ -4,6 +4,7 @@ import 'package:intelligearth_mobile/models/user_model.dart';
 import 'package:intelligearth_mobile/screens/quest_page.dart';
 import 'package:intelligearth_mobile/screens/reward_screen.dart';
 import 'package:intelligearth_mobile/services/auth_service.dart';
+import 'package:intelligearth_mobile/screens/settings_page.dart';
 import '../theme/app_theme.dart';
 
 class HomeScreen extends StatefulWidget {
@@ -109,8 +110,7 @@ class HomeScreenState extends State<HomeScreen>
         return 'Quests';
       case 2:
         return 'Rewards';
-      case 3:
-        return 'Profile';
+
       default:
         return '';
     }
@@ -183,11 +183,15 @@ class HomeScreenState extends State<HomeScreen>
       child: FadeTransition(
         opacity: _animation,
         child: Container(
-          width: MediaQuery.of(context).size.width * 0.75,
+          width: MediaQuery.of(context).size.width * 0.65,
           height: MediaQuery.of(context).size.height,
           decoration: BoxDecoration(
-            color: AppTheme.darkColor.withValues(alpha: 3),
+            color: AppTheme.lightColor.withValues(alpha: 15),
             boxShadow: AppTheme.softShadow,
+            border: Border.all(
+              color: AppTheme.accentColor.withValues(alpha: 155),
+              width: 1,
+            ),
           ),
           child: SafeArea(
             child: Column(
@@ -266,18 +270,30 @@ class HomeScreenState extends State<HomeScreen>
                         label: 'Rewards',
                         route: '/rewards',
                       ),
-                      _buildMenuItem(
-                        icon: Icons.person_rounded,
-                        label: 'Profile',
-                        route: '/user',
-                      ),
                       const Divider(
                           indent: AppTheme.spacingLarge,
                           endIndent: AppTheme.spacingLarge),
                       _buildMenuItem(
                         icon: Icons.settings_rounded,
                         label: 'Settings',
-                        route: '/settings',
+                        onTap: () {
+                          Navigator.of(context).push(
+                            PageRouteBuilder(
+                              opaque: false,
+                              pageBuilder: (context, animation, secondaryAnimation) => const SettingsPage(),
+                              transitionsBuilder: (context, animation, secondaryAnimation, child) {
+                                const begin = Offset(1.0, 0.0);
+                                const end = Offset.zero;
+                                const curve = Curves.easeInOut;
+                                var tween = Tween(begin: begin, end: end).chain(CurveTween(curve: curve));
+                                return SlideTransition(
+                                  position: animation.drive(tween),
+                                  child: child,
+                                );
+                              },
+                            ),
+                          );
+                        },
                       ),
                       _buildMenuItem(
                         icon: Icons.help_rounded,
@@ -327,14 +343,14 @@ class HomeScreenState extends State<HomeScreen>
               Icon(
                 icon,
                 color: color ?? AppTheme.accentColor,
-                size: 24,
+                size: 25,
               ),
               const SizedBox(width: AppTheme.spacingMedium),
               Text(
                 label,
                 style: Theme.of(context).textTheme.titleMedium?.copyWith(
                       color: color ?? AppTheme.textOnLightColor,
-                      fontWeight: FontWeight.w600,
+                      fontWeight: FontWeight.w700,
                     ),
               ),
             ],

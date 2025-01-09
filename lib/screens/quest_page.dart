@@ -216,7 +216,7 @@ class _QuestPageState extends State<QuestPage>
       child: AnimatedDefaultTextStyle(
         duration: AppTheme.animationFast,
         style: TextStyle(
-          fontSize: isSelected ? 16 : 14,
+          fontSize: isSelected ? 20 : 17,
           fontWeight: isSelected ? FontWeight.w600 : FontWeight.w500,
           color: isSelected
               ? AppTheme.primaryColor

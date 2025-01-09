@@ -22,6 +22,11 @@ class PreferencesService {
   static const String keyThemeMode = 'theme_mode';
   static const String keyNotifications = 'notifications_enabled';
   static const String keyLocationPermission = 'location_permission';
+  static const String keyTutorialEnabled = 'tutorial_enabled';
+  static const String keyQuestsEnabled = 'quests_enabled';
+  static const String keyPhotosEnabled = 'photos_enabled';
+  static const String keyAchievementsEnabled = 'achievements_enabled';
+  static const String keyUserDataEnabled = 'user_data_enabled';
 
   static final PreferencesService _instance = PreferencesService._internal();
   factory PreferencesService() => _instance;
@@ -193,4 +198,46 @@ class PreferencesService {
     final prefs = await SharedPreferences.getInstance();
     return prefs.getBool(keyLocationPermission) ?? false;
   }
+
+  Future<PreferencesData> getPreferences() async {
+    final prefs = await SharedPreferences.getInstance();
+    return PreferencesData(
+      tutorialEnabled: prefs.getBool(keyTutorialEnabled) ?? true,
+      questsEnabled: prefs.getBool(keyQuestsEnabled) ?? true,
+      photosEnabled: prefs.getBool(keyPhotosEnabled) ?? true,
+      achievementsEnabled: prefs.getBool(keyAchievementsEnabled) ?? true,
+      userDataEnabled: prefs.getBool(keyUserDataEnabled) ?? true,
+    );
+  }
+
+  Future<void> updatePreferences({
+    required bool tutorialEnabled,
+    required bool questsEnabled,
+    required bool photosEnabled,
+    required bool achievementsEnabled,
+    required bool userDataEnabled,
+  }) async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setBool(keyTutorialEnabled, tutorialEnabled);
+    await prefs.setBool(keyQuestsEnabled, questsEnabled);
+    await prefs.setBool(keyPhotosEnabled, photosEnabled);
+    await prefs.setBool(keyAchievementsEnabled, achievementsEnabled);
+    await prefs.setBool(keyUserDataEnabled, userDataEnabled);
+  }
+}
+
+class PreferencesData {
+  final bool tutorialEnabled;
+  final bool questsEnabled;
+  final bool photosEnabled;
+  final bool achievementsEnabled;
+  final bool userDataEnabled;
+
+  PreferencesData({
+    required this.tutorialEnabled,
+    required this.questsEnabled,
+    required this.photosEnabled,
+    required this.achievementsEnabled,
+    required this.userDataEnabled,
+  });
 }

@@ -44,7 +44,6 @@ class SignInScreenState extends State<SignInScreen>
 
     _controller.forward();
     _checkRememberMe();
-    _checkLocationPermission();
   }
 
   Future<void> _checkRememberMe() async {
@@ -55,57 +54,75 @@ class SignInScreenState extends State<SignInScreen>
 
     if (rememberMe) {
       final storedUser = await _preferencesService.getStoredUser();
-      if (storedUser != null && mounted) {
-        Navigator.pushReplacementNamed(context, '/home');
+      if (!mounted) return;
+
+      if (storedUser != null) {
+        // Check if we already have location permission
+        final hasLocationPermission = await _preferencesService.getLocationPermission();
+        if (!mounted) return;
+
+        if (hasLocationPermission) {
+          // Se abbiamo già sia il login che i permessi, andiamo direttamente alla home
+          Navigator.pushReplacementNamed(context, '/home');
+        } else {
+          // Se abbiamo il login ma non i permessi, chiediamoli prima di andare alla home
+          final permissionGranted = await _checkLocationPermission();
+          if (!mounted) return;
+
+          if (permissionGranted) {
+            Navigator.pushReplacementNamed(context, '/home');
+          }
+        }
       }
     }
   }
 
-  Future<void> _checkLocationPermission() async {
-    if (_isLocationPermissionChecked) return;
+  Future<bool> _checkLocationPermission() async {
+    if (_isLocationPermissionChecked) return true;
 
     final hasLocationPermission = await _preferencesService.getLocationPermission();
 
     if (hasLocationPermission) {
       setState(() => _isLocationPermissionChecked = true);
-      return;
+      return true;
     }
 
     bool serviceEnabled = await Geolocator.isLocationServiceEnabled();
     if (!serviceEnabled) {
-      if (!mounted) return;
+      if (!mounted) return false;
       _showLocationDialog(
         'Servizi di localizzazione disattivati',
         'Per una migliore esperienza, attiva i servizi di localizzazione.',
       );
-      return;
+      return false;
     }
 
     LocationPermission permission = await Geolocator.checkPermission();
     if (permission == LocationPermission.denied) {
       permission = await Geolocator.requestPermission();
       if (permission == LocationPermission.denied) {
-        if (!mounted) return;
+        if (!mounted) return false;
         _showLocationDialog(
           'Permesso negato',
           'Per utilizzare tutte le funzionalità dell\'app, concedi l\'accesso alla posizione.',
         );
-        return;
+        return false;
       }
     }
 
     if (permission == LocationPermission.deniedForever) {
-      if (!mounted) return;
+      if (!mounted) return false;
       _showLocationDialog(
         'Permesso negato permanentemente',
         'Per utilizzare tutte le funzionalità dell\'app, concedi l\'accesso alla posizione dalle impostazioni del dispositivo.',
         true,
       );
-      return;
+      return false;
     }
 
     await _preferencesService.setLocationPermission(true);
     setState(() => _isLocationPermissionChecked = true);
+    return true;
   }
 
   void _showLocationDialog(String title, String message, [bool openSettings = false]) {
@@ -159,7 +176,15 @@ class SignInScreenState extends State<SignInScreen>
       if (signedInUser != null) {
         await _authService.rememberUser(_rememberMe);
         if (!mounted) return;
-        Navigator.pushReplacementNamed(context, '/home');
+        
+        // Check location permission after successful login
+        final hasPermission = await _checkLocationPermission();
+        if (!mounted) return;
+
+        // Proceed to home only if we have location permission
+        if (hasPermission) {
+          Navigator.pushReplacementNamed(context, '/home');
+        }
       } else {
         setState(() {
           errorMessage = 'Credenziali non valide. Riprova.';

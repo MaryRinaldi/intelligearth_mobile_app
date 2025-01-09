@@ -5,6 +5,7 @@ import 'package:image_picker/image_picker.dart';
 import 'package:geolocator/geolocator.dart';
 import 'dart:async';
 import '../theme/app_theme.dart';
+import '../config/map_style.dart';
 import 'camera_view_page.dart';
 import 'quest_detail_screen.dart';
 import '../services/map_service.dart';
@@ -38,7 +39,6 @@ class _MapScreenState extends State<MapScreen>
   GoogleMapController? _mapController;
   MapType _currentMapType = MapType.normal;
   bool _isMarkerSelected = false;
-  bool _isFullScreen = false;
   Position? _currentPosition;
   StreamSubscription<Position>? _positionStreamSubscription;
   Set<Marker> _markers = {};
@@ -78,8 +78,8 @@ class _MapScreenState extends State<MapScreen>
             center:
                 LatLng(_currentPosition!.latitude, _currentPosition!.longitude),
             radius: _currentPosition!.accuracy,
-            fillColor: AppTheme.accentColor.withValues(alpha: 106),
-            strokeColor: AppTheme.accentColor,
+            fillColor: Colors.red.withValues(alpha: 106),
+            strokeColor: Colors.redAccent,
             strokeWidth: 1,
           ),
         );
@@ -125,7 +125,8 @@ class _MapScreenState extends State<MapScreen>
   void _startLocationUpdates() {
     const LocationSettings locationSettings = LocationSettings(
       accuracy: LocationAccuracy.high,
-      distanceFilter: 10, // Update every 10 meters
+      distanceFilter: 10,
+      timeLimit: Duration(seconds: 30),
     );
 
     _positionStreamSubscription = Geolocator.getPositionStream(
@@ -133,10 +134,20 @@ class _MapScreenState extends State<MapScreen>
     ).listen(
       (Position position) {
         if (mounted) {
-          setState(() {
-            _currentPosition = position;
-            _updateLocationCircle();
-          });
+          final distance = _currentPosition == null ? double.infinity :
+            Geolocator.distanceBetween(
+              _currentPosition!.latitude,
+              _currentPosition!.longitude,
+              position.latitude,
+              position.longitude,
+            );
+          
+          if (distance > 10) {
+            setState(() {
+              _currentPosition = position;
+              _updateLocationCircle();
+            });
+          }
         }
       },
     );
@@ -225,13 +236,13 @@ class _MapScreenState extends State<MapScreen>
         AnimatedContainer(
           duration: AppTheme.animationFast,
           margin: EdgeInsets.only(
-            top: _isFullScreen ? 0 : MediaQuery.of(context).padding.top,
+            top: MediaQuery.of(context).padding.top,
           ),
           child: _buildMap(),
         ),
-        if (widget.showBackButton && !_isFullScreen) _buildTopBar(),
+        if (widget.showBackButton) _buildTopBar(),
         _buildFloatingActionButtons(),
-        if (_isMarkerSelected && !_isFullScreen) _buildMarkerInfoPanel(),
+        if (_isMarkerSelected) _buildMarkerInfoPanel(),
       ],
     );
   }
@@ -245,30 +256,24 @@ class _MapScreenState extends State<MapScreen>
         zoom: widget.markers != null ? 11.0 : 13.0,
       ),
       mapType: _currentMapType,
-      markers: {
-        ..._markers,
-        if (_currentPosition != null)
-          Marker(
-            markerId: const MarkerId('current_location'),
-            position: LatLng(
-              _currentPosition!.latitude,
-              _currentPosition!.longitude,
-            ),
-            icon: BitmapDescriptor.defaultMarkerWithHue(
-              BitmapDescriptor.hueAzure,
-            ),
-            infoWindow: const InfoWindow(title: 'La tua posizione'),
-          ),
-      },
-      polylines: _polylines,
+      markers: _markers,
       circles: _circles,
+      polylines: _polylines,
       myLocationEnabled: true,
-      myLocationButtonEnabled: false,
+      myLocationButtonEnabled: true,
+      compassEnabled: true,
       zoomControlsEnabled: false,
+      mapToolbarEnabled: false,
+      tiltGesturesEnabled: false,
+      rotateGesturesEnabled: false,
+      zoomGesturesEnabled: true,
+      scrollGesturesEnabled: true,
+      liteModeEnabled: false,
+      style: MapStyle.mapStyle,
       onMapCreated: (GoogleMapController controller) {
         _mapController = controller;
       },
-      onTap: (_) {
+      onCameraMove: (_) {
         if (_isMarkerSelected) {
           setState(() => _isMarkerSelected = false);
         }
@@ -334,115 +339,120 @@ class _MapScreenState extends State<MapScreen>
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
-          FloatingActionButton(
-            heroTag: 'fullscreen',
-            onPressed: () {
-              setState(() => _isFullScreen = !_isFullScreen);
-            },
-            child:
-                Icon(_isFullScreen ? Icons.fullscreen_exit : Icons.fullscreen),
+          SizedBox(
+            width: 40.0,
+            height: 40.0,
+            child: FloatingActionButton(
+              heroTag: 'zoom_in',
+              mini: true,
+              onPressed: () {
+                _mapController?.animateCamera(CameraUpdate.zoomIn());
+              },
+              child: const Icon(Icons.add, size: 20),
+            ),
           ),
           const SizedBox(height: AppTheme.spacingSmall),
-          FloatingActionButton(
-            heroTag: 'zoom_in',
-            onPressed: () {
-              _mapController?.animateCamera(CameraUpdate.zoomIn());
-            },
-            child: const Icon(Icons.add),
+          SizedBox(
+            width: 40.0,
+            height: 40.0,
+            child: FloatingActionButton(
+              heroTag: 'zoom_out',
+              mini: true,
+              onPressed: () {
+                _mapController?.animateCamera(CameraUpdate.zoomOut());
+              },
+              child: const Icon(Icons.remove, size: 20),
+            ),
           ),
           const SizedBox(height: AppTheme.spacingSmall),
-          FloatingActionButton(
-            heroTag: 'zoom_out',
-            onPressed: () {
-              _mapController?.animateCamera(CameraUpdate.zoomOut());
-            },
-            child: const Icon(Icons.remove),
-          ),
-          const SizedBox(height: AppTheme.spacingSmall),
-          FloatingActionButton(
-            heroTag: 'layer_selector',
-            onPressed: () {
-              showModalBottomSheet(
-                context: context,
-                builder: (context) => Container(
-                  padding: const EdgeInsets.all(AppTheme.spacingMedium),
-                  child: Column(
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      ListTile(
-                        title: const Text('Normale'),
-                        leading: Radio<MapType>(
-                          value: MapType.normal,
-                          groupValue: _currentMapType,
-                          onChanged: (value) {
-                            setState(() => _currentMapType = value!);
+          SizedBox(
+            width: 40.0,
+            height: 40.0,
+            child: FloatingActionButton(
+              heroTag: 'layer_selector',
+              mini: true,
+              onPressed: () {
+                showModalBottomSheet(
+                  context: context,
+                  builder: (context) => Container(
+                    padding: const EdgeInsets.all(AppTheme.spacingXSmall),
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        ListTile(
+                          title: const Text('Normale'),
+                          leading: Radio<MapType>(
+                            value: MapType.normal,
+                            groupValue: _currentMapType,
+                            onChanged: (value) {
+                              setState(() => _currentMapType = value!);
+                              Navigator.pop(context);
+                            },
+                          ),
+                          onTap: () {
+                            setState(() => _currentMapType = MapType.normal);
                             Navigator.pop(context);
                           },
                         ),
-                        onTap: () {
-                          setState(() => _currentMapType = MapType.normal);
-                          Navigator.pop(context);
-                        },
-                      ),
-                      ListTile(
-                        title: const Text('Satellite'),
-                        leading: Radio<MapType>(
-                          value: MapType.satellite,
-                          groupValue: _currentMapType,
-                          onChanged: (value) {
-                            setState(() => _currentMapType = value!);
+                        ListTile(
+                          title: const Text('Satellite'),
+                          leading: Radio<MapType>(
+                            value: MapType.satellite,
+                            groupValue: _currentMapType,
+                            onChanged: (value) {
+                              setState(() => _currentMapType = value!);
+                              Navigator.pop(context);
+                            },
+                          ),
+                          onTap: () {
+                            setState(() => _currentMapType = MapType.satellite);
                             Navigator.pop(context);
                           },
                         ),
-                        onTap: () {
-                          setState(() => _currentMapType = MapType.satellite);
-                          Navigator.pop(context);
-                        },
-                      ),
-                      ListTile(
-                        title: const Text('Ibrida'),
-                        leading: Radio<MapType>(
-                          value: MapType.hybrid,
-                          groupValue: _currentMapType,
-                          onChanged: (value) {
-                            setState(() => _currentMapType = value!);
+                        ListTile(
+                          title: const Text('Ibrida'),
+                          leading: Radio<MapType>(
+                            value: MapType.hybrid,
+                            groupValue: _currentMapType,
+                            onChanged: (value) {
+                              setState(() => _currentMapType = value!);
+                              Navigator.pop(context);
+                            },
+                          ),
+                          onTap: () {
+                            setState(() => _currentMapType = MapType.hybrid);
                             Navigator.pop(context);
                           },
                         ),
-                        onTap: () {
-                          setState(() => _currentMapType = MapType.hybrid);
-                          Navigator.pop(context);
-                        },
-                      ),
-                    ],
-                  ),
-                ),
-              );
-            },
-            child: const Icon(Icons.layers),
-          ),
-          const SizedBox(height: AppTheme.spacingSmall),
-          FloatingActionButton(
-            heroTag: 'location',
-            onPressed: () {
-              if (_currentPosition != null) {
-                _mapController?.animateCamera(
-                  CameraUpdate.newLatLng(
-                    LatLng(
-                      _currentPosition!.latitude,
-                      _currentPosition!.longitude,
+                      ],
                     ),
                   ),
                 );
-              }
-            },
-            child: const Icon(Icons.my_location),
+              },
+              child: const Icon(Icons.layers, size: 20),
+            ),
           ),
           const SizedBox(height: AppTheme.spacingSmall),
-          FloatingActionButton(
-            heroTag: 'camera',
-            onPressed: () => _openCamera(context),
-            child: const Icon(Icons.camera_alt),
+          SizedBox(
+            width: 40.0,
+            height: 40.0,
+            child: FloatingActionButton(
+              heroTag: 'location',
+              mini: true,
+              onPressed: () {
+                if (_currentPosition != null) {
+                  _mapController?.animateCamera(
+                    CameraUpdate.newLatLng(
+                      LatLng(
+                        _currentPosition!.latitude,
+                        _currentPosition!.longitude,
+                      ),
+                    ),
+                  );
+                }
+              },
+              child: const Icon(Icons.my_location, size: 20),
+            ),
           ),
         ],
       ),
