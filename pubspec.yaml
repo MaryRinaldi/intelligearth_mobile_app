@@ -48,6 +48,7 @@ dependencies:
   google_fonts: ^6.1.0  # Modern typography with Google Fonts
   flutter_dotenv: ^5.1.0
   logger: ^2.0.2+1
+  permission_handler: ^10.2.0
 
 dev_dependencies:
   flutter_test:
@@ -74,6 +75,7 @@ flutter:
     - assets/images/
     - assets/icons/
     - .env
+    - assets/images/intelligearth_logo.png
   
   # To add assets to your application, add an assets section, like this:
   # assets:
@@ -106,4 +108,4 @@ flutter:
   # For details regarding fonts from package dependencies,
   # see https://flutter.dev/to/font-from-package
 
-  generate: true  # Abilita la generazione dei file l10n 
+  generate: true  # Abilita la generazione dei file l10n

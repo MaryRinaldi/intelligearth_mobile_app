@@ -11,7 +11,7 @@ import 'screens/user_page.dart';
 import 'models/user_model.dart';
 import 'screens/settings_page.dart';
 import 'screens/help_page.dart';
-import 'screens/splash_screen.dart';
+import 'screens/splash_screen.dart'; 
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 import 'theme/app_theme.dart';
@@ -40,7 +40,6 @@ class MyApp extends StatelessWidget {
       final prefsService = PreferencesService();
       final authService = AuthService();
       
-      // Load preferences and check auth state in parallel
       final results = await Future.wait([
         prefsService.getOnboardingComplete(),
         authService.getCurrentUser(),
@@ -50,17 +49,16 @@ class MyApp extends StatelessWidget {
       final currentUser = results[1];
       
       if (!onboardingComplete) {
-        return '/';
+        return '/welcome';  
       }
       
       if (currentUser != null) {
-        return '/home';
+        return '/home';  // Percorso per la home page
       }
       
-      return '/signin';
+      return '/signin';  // Percorso per la pagina di login
     } catch (e) {
-      // In caso di errore, mostra la schermata di login
-      return '/signin';
+      return '/signin';  // In caso di errore, vai direttamente alla pagina di login
     }
   }
 
@@ -86,11 +84,11 @@ class MyApp extends StatelessWidget {
             future: _getInitialRoute(),
             builder: (context, snapshot) {
               if (snapshot.connectionState == ConnectionState.waiting) {
-                return const SplashScreen();
+                return const SplashScreen();  // Mostra la splash screen durante il caricamento
               }
-              
+
               switch (snapshot.data) {
-                case '/':
+                case '/welcome':
                   return const WelcomePage();
                 case '/home':
                   return const HomeScreen();
@@ -111,6 +109,7 @@ class MyApp extends StatelessWidget {
             },
             '/help': (context) => const HelpPage(),
             '/settings': (context) => const SettingsPage(),
+            '/welcome': (context) => const WelcomePage(),
           },
         );
       },
