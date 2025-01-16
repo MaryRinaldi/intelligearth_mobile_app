@@ -255,8 +255,10 @@ class SignInScreenState extends State<SignInScreen>
                       if (emailController.text.isEmpty) {
                         ScaffoldMessenger.of(context).showSnackBar(
                           const SnackBar(
-                            content:
-                                Text('Inserisci un indirizzo email valido'),
+                            content: Text(
+                              'Inserisci un indirizzo email valido',
+                              style: TextStyle(color: Colors.white),
+                            ),
                             backgroundColor: Colors.red,
                           ),
                         );

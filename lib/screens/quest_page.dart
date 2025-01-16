@@ -143,69 +143,72 @@ class _QuestPageState extends State<QuestPage>
   Widget build(BuildContext context) {
     return DefaultTabController(
       length: 3,
-      child: Column(
-        children: [
-          Container(
-            margin: const EdgeInsets.only(bottom: 10),
-            decoration: BoxDecoration(
-              color: const Color.fromARGB(0, 255, 255, 255),
+      child: SingleChildScrollView(
+        child: Column(
+          children: [
+            Container(
+              margin: const EdgeInsets.only(bottom: 10),
+              decoration: BoxDecoration(
+                color: const Color.fromARGB(0, 255, 255, 255),
+              ),
+              child: TabBar(
+                controller: _tabController,
+                labelColor: AppTheme.secondaryColor,
+                unselectedLabelColor:
+                    const Color.fromRGBO(57, 67, 122, 1).withValues(alpha: 19),
+                indicatorColor: const Color.fromARGB(105, 255, 255, 255),
+                tabAlignment: TabAlignment.fill,
+                isScrollable: false,
+                tabs: [
+                  SizedBox(
+                    height: 56,
+                    child:
+                        _buildTab(AppLocalizations.of(context)!.activeQuests, 0),
+                  ),
+                  SizedBox(
+                    height: 56,
+                    child: _buildTab(
+                        AppLocalizations.of(context)!.completedQuests, 1),
+                  ),
+                  const SizedBox(
+                    height: 56,
+                    child: Tab(icon: Icon(Icons.map_rounded)),
+                  ),
+                ],
+              ),
             ),
-            child: TabBar(
-              controller: _tabController,
-              labelColor: AppTheme.secondaryColor,
-              unselectedLabelColor:
-                  const Color.fromRGBO(57, 67, 122, 1).withValues(alpha: 19),
-              indicatorColor: const Color.fromARGB(105, 255, 255, 255),
-              tabAlignment: TabAlignment.fill,
-              isScrollable: false,
-              tabs: [
-                SizedBox(
-                  height: 56,
-                  child:
-                      _buildTab(AppLocalizations.of(context)!.activeQuests, 0),
-                ),
-                SizedBox(
-                  height: 56,
-                  child: _buildTab(
-                      AppLocalizations.of(context)!.completedQuests, 1),
-                ),
-                const SizedBox(
-                  height: 56,
-                  child: Tab(icon: Icon(Icons.map_rounded)),
-                ),
-              ],
+            SizedBox(
+              height: MediaQuery.of(context).size.height * 0.6,
+              child: TabBarView(
+                controller: _tabController,
+                children: [
+                  _QuestList(
+                    status: QuestStatus.active,
+                    quests: _getSortedQuests(quests),
+                  ),
+                  _QuestList(
+                    status: QuestStatus.completed,
+                    quests: _getSortedQuests(quests),
+                  ),
+                  MapScreen(
+                    latitude: _userPosition?.latitude ?? 41.8902,
+                    longitude: _userPosition?.longitude ?? 12.4922,
+                    title: 'Mappa delle Quest',
+                    showBackButton: false,
+                    markers: quests
+                        .map((quest) => QuestMarker(
+                              latitude: quest.latitude,
+                              longitude: quest.longitude,
+                              title: quest.title,
+                              isCompleted: quest.status == QuestStatus.completed,
+                            ))
+                        .toList(),
+                  ),
+                ],
+              ),
             ),
-          ),
-          Expanded(
-            child: TabBarView(
-              controller: _tabController,
-              children: [
-                _QuestList(
-                  status: QuestStatus.active,
-                  quests: _getSortedQuests(quests),
-                ),
-                _QuestList(
-                  status: QuestStatus.completed,
-                  quests: _getSortedQuests(quests),
-                ),
-                MapScreen(
-                  latitude: _userPosition?.latitude ?? 41.8902,
-                  longitude: _userPosition?.longitude ?? 12.4922,
-                  title: 'Mappa delle Quest',
-                  showBackButton: false,
-                  markers: quests
-                      .map((quest) => QuestMarker(
-                            latitude: quest.latitude,
-                            longitude: quest.longitude,
-                            title: quest.title,
-                            isCompleted: quest.status == QuestStatus.completed,
-                          ))
-                      .toList(),
-                ),
-              ],
-            ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }

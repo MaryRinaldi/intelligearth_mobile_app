@@ -328,11 +328,12 @@ class HomeScreenState extends State<HomeScreen>
     return Material(
       color: Colors.transparent,
       child: InkWell(
-        onTap: onTap ??
-            () {
-              _toggleMenu();
-              Navigator.pushNamed(context, route!);
-            },
+        onTap: onTap ?? () {
+          _toggleMenu();
+          if (route != null) {
+            Navigator.pushNamed(context, route);
+          }
+        },
         child: Padding(
           padding: const EdgeInsets.symmetric(
             horizontal: AppTheme.spacingLarge,
