@@ -16,6 +16,7 @@ class AppTheme {
       Colors.white; // Testo su sfondo primario
   static const Color textOnLightColor =
       Color.fromARGB(255, 44, 53, 103); // Testo su sfondo chiaro
+  static const Color backgroundColor = Colors.white;  // o il colore che preferisci
 
   // Gradients
   static const LinearGradient primaryGradient = LinearGradient(

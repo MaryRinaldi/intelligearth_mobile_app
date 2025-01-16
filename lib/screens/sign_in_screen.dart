@@ -5,6 +5,7 @@ import '../theme/app_theme.dart';
 import 'sign_up_screen.dart';
 import '../services/preferences_service.dart';
 import 'package:geolocator/geolocator.dart';
+import '../utils/location_service.dart';
 
 class SignInScreen extends StatefulWidget {
   const SignInScreen({super.key});
@@ -166,6 +167,16 @@ class SignInScreenState extends State<SignInScreen>
     });
 
     try {
+      // Ottieni la posizione prima del sign in
+      final position = await LocationService.getCurrentPosition();
+      if (position == null) {
+        setState(() {
+          errorMessage = 'Impossibile ottenere la posizione. Verifica i permessi di localizzazione.';
+          _isLoading = false;
+        });
+        return;
+      }
+
       final signedInUser = await _authService.signIn(
         _emailController.text,
         _passwordController.text,
@@ -177,14 +188,7 @@ class SignInScreenState extends State<SignInScreen>
         await _authService.rememberUser(_rememberMe);
         if (!mounted) return;
         
-        // Check location permission after successful login
-        final hasPermission = await _checkLocationPermission();
-        if (!mounted) return;
-
-        // Proceed to home only if we have location permission
-        if (hasPermission) {
-          Navigator.pushReplacementNamed(context, '/home');
-        }
+        Navigator.pushReplacementNamed(context, '/home');
       } else {
         setState(() {
           errorMessage = 'Credenziali non valide. Riprova.';
@@ -197,10 +201,6 @@ class SignInScreenState extends State<SignInScreen>
         errorMessage = 'Si è verificato un errore. Riprova più tardi.';
         _isLoading = false;
       });
-    } finally {
-      if (mounted && _isLoading) {
-        setState(() => _isLoading = false);
-      }
     }
   }
 

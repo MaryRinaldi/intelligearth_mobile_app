@@ -272,34 +272,38 @@ class _WelcomePageState extends State<WelcomePage>
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             const Spacer(),
-            Hero(
-              tag: 'app_logo',
-              child: Container(
-                padding: const EdgeInsets.all(AppTheme.spacingMedium),
-                decoration: BoxDecoration(
-                  shape: BoxShape.circle,
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.black.withValues(alpha: 51),
-                      blurRadius: 10,
-                      offset: const Offset(0, 4),
+             Hero(
+                    tag: 'app_logo',
+                    child: Container(
+                      padding: const EdgeInsets.all(AppTheme.spacingSmall),
+                      decoration: BoxDecoration(
+                        shape: BoxShape.circle,
+                        border: Border.all(
+                          color: AppTheme.textOnPrimaryColor,
+                          width: 1,
+                        ),
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.black.withValues(alpha: 51),
+                            blurRadius: 10,
+                            offset: const Offset(0, 4),
+                          ),
+                          BoxShadow(
+                            color: Colors.white.withValues(alpha: 26),
+                            blurRadius: 8,
+                            offset: const Offset(0, -2),
+                          ),
+                        ],
+                      ),
+                      child: Image.asset(
+                        'assets/images/intelligearth_logo.png',
+                        height: 100,
+                        width: 100,
+                        fit: BoxFit.contain,
+                        filterQuality: FilterQuality.high,
+                      ),
                     ),
-                    BoxShadow(
-                      color: Colors.white.withValues(alpha: 26),
-                      blurRadius: 8,
-                      offset: const Offset(0, -2),
-                    ),
-                  ],
-                ),
-                child: Image.asset(
-                  'assets/images/intelligearth_logo.png',
-                  height: 100,
-                  width: 100,
-                  fit: BoxFit.contain,
-                  filterQuality: FilterQuality.high,
-                ),
-              ),
-            ),
+                  ),
             const SizedBox(height: AppTheme.spacingLarge),
             SlideTransition(
               position: Tween<Offset>(
