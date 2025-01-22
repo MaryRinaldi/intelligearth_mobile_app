@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
-import '../theme/app_theme.dart';
+import 'dart:developer' as developer;
+import '../services/preferences_service.dart';
 
 class SplashScreen extends StatefulWidget {
   const SplashScreen({super.key});
@@ -8,83 +9,53 @@ class SplashScreen extends StatefulWidget {
   State<SplashScreen> createState() => _SplashScreenState();
 }
 
-class _SplashScreenState extends State<SplashScreen>
-    with SingleTickerProviderStateMixin {
-  late AnimationController _controller;
-
+class _SplashScreenState extends State<SplashScreen> {
   @override
   void initState() {
     super.initState();
-    _controller = AnimationController(
-      duration: const Duration(milliseconds: 2000),
-      vsync: this,
-    );
-
+    developer.log('SplashScreen initialized');
+    _checkInitialRoute();
   }
 
-  @override
-  void dispose() {
-    _controller.dispose();
-    super.dispose();
+  Future<void> _checkInitialRoute() async {
+    try {
+      developer.log('Checking initial route...');
+      // Aggiungi un piccolo delay per assicurarti che lo splash screen sia visibile
+      await Future.delayed(const Duration(seconds: 2));
+      
+      if (!mounted) return;
+
+      final prefs = PreferencesService();
+      final initialRoute = await prefs.checkInitialRoute();
+      developer.log('Initial route determined: $initialRoute');
+
+      if (!mounted) return;
+      
+      Navigator.of(context).pushReplacementNamed(initialRoute);
+    } catch (e) {
+      developer.log('Error in _checkInitialRoute: $e');
+      // In caso di errore, vai alla schermata di login come fallback
+      if (!mounted) return;
+      Navigator.of(context).pushReplacementNamed('/login');
+    }
   }
 
   @override
   Widget build(BuildContext context) {
+    developer.log('Building SplashScreen');
     return Scaffold(
-      body: Container(
-        decoration: BoxDecoration(
-          gradient: LinearGradient(
-            begin: Alignment.topLeft,
-            end: Alignment.bottomRight,
-            colors: [
-              AppTheme.primaryColor,
-              AppTheme.secondaryColor,
-            ],
-          ),
-        ),
-        child: Center(
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              ShaderMask(
-                shaderCallback: (bounds) => LinearGradient(
-                  colors: [
-                    AppTheme.accentGradient.colors[0],
-                    AppTheme.accentGradient.colors[1],
-                  ],
-                  tileMode: TileMode.clamp,
-                ).createShader(bounds),
-                child: Text(
-                  'IntelligEarth',
-                  style: Theme.of(context).textTheme.displaySmall?.copyWith(
-                    fontWeight: FontWeight.bold,
-                    color: Colors.white,
-                    shadows: [
-                      Shadow(
-                        color: Colors.black.withValues(alpha: 21),
-                        offset: const Offset(0, 2),
-                        blurRadius: 8,
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-              const SizedBox(height: AppTheme.spacingMedium),
-              Text(
-                'Documenta. Monitora. Preserva.',
-                style: Theme.of(context).textTheme.headlineSmall?.copyWith(
-                  color: AppTheme.textOnPrimaryColor,
-                  shadows: [
-                    Shadow(
-                      color: Colors.black.withValues(alpha: 21),
-                      offset: const Offset(0, 1),
-                      blurRadius: 2,
-                    ),
-                  ],
-                ),
-              ),
-            ],
-          ),
+      body: Center(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Image.asset(
+              'assets/images/intelligearth_logo.png',
+              width: 200,
+              height: 200,
+            ),
+            const SizedBox(height: 20),
+            const CircularProgressIndicator(),
+          ],
         ),
       ),
     );

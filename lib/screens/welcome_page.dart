@@ -485,7 +485,7 @@ class _LanguageOption extends StatelessWidget {
       child: InkWell(
         onTap: () async {
           final provider = Provider.of<LocaleProvider>(context, listen: false);
-          provider.setLocale(locale);
+          provider.setLocale(locale.languageCode);
           
           // Save language preference
           final prefsService = PreferencesService();

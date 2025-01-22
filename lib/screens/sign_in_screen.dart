@@ -376,7 +376,7 @@ class SignInScreenState extends State<SignInScreen>
                     'Accedi per continuare la tua missione',
                     style: Theme.of(context).textTheme.titleMedium?.copyWith(
                           color: AppTheme.textOnPrimaryColor
-                              .withValues(alpha: 179),
+                              .withValues(alpha: 159),
                         ),
                     textAlign: TextAlign.center,
                   ),

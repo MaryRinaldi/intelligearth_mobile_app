@@ -63,27 +63,31 @@ class SignUpScreenState extends State<SignUpScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      
+      backgroundColor: Colors.transparent,
       body: SafeArea(
         child: Container(
-          margin:
-              const EdgeInsets.symmetric(horizontal: AppTheme.spacingMedium),
+           margin: const EdgeInsets.only(
+            left: AppTheme.spacingXLarge,
+            right: AppTheme.spacingXLarge,
+            top: AppTheme.spacingXLarge * 2,
+          ),
           decoration: BoxDecoration(
-            color: const Color.fromARGB(255, 56, 79, 156).withValues(alpha: 90),
+            color: AppTheme.secondaryColor.withValues(alpha: 90),
             borderRadius: BorderRadius.circular(AppTheme.borderRadiusLarge),
             boxShadow: [
               BoxShadow(
-                color: Colors.black.withValues(alpha: 12),
-                blurRadius: 10,
+                color: Colors.black.withValues(alpha: 52),
                 offset: const Offset(0, 4),
               ),
             ],
           ),
           child: SingleChildScrollView(
-            padding: const EdgeInsets.all(AppTheme.spacingLarge),
+            padding: const EdgeInsets.all(AppTheme.spacingMedium),
             child: Column(
               mainAxisSize: MainAxisSize.min,
               children: [
-                const SizedBox(height: AppTheme.spacingXLarge),
+                const SizedBox(height: AppTheme.spacingXSmall),
                 Text(
                   'Crea Account',
                   style: Theme.of(context).textTheme.headlineMedium?.copyWith(
@@ -91,7 +95,7 @@ class SignUpScreenState extends State<SignUpScreen> {
                         color: AppTheme.textOnPrimaryColor,
                       ),
                 ),
-                const SizedBox(height: AppTheme.spacingMedium),
+                const SizedBox(height: AppTheme.spacingSmall),
                 Text(
                   'Unisciti alla community di IntelligEarth',
                   style: Theme.of(context).textTheme.titleMedium?.copyWith(

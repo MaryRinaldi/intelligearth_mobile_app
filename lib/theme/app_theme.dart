@@ -81,6 +81,37 @@ class AppTheme {
   static const Duration animationNormal = Duration(milliseconds: 300);
   static const Duration animationSlow = Duration(milliseconds: 500);
 
+  // Text Styles
+  static const TextStyle settingsTitleStyle = TextStyle(
+    fontSize: 16.0,
+    fontWeight: FontWeight.w600,
+    color: Colors.black87,
+  );
+
+  static const TextStyle settingsSubtitleStyle = TextStyle(
+    fontSize: 14.0,
+    color: Colors.black54,
+  );
+
+  static const TextStyle settingsDescriptionStyle = TextStyle(
+    fontSize: 12.0,
+    color: Colors.black45,
+    fontStyle: FontStyle.italic,
+  );
+
+  static const TextStyle sectionHeaderStyle = TextStyle(
+    fontSize: 20.0,
+    fontWeight: FontWeight.w600,
+    color: primaryColor,
+  );
+
+  // Layout Constants
+  static const double settingsItemVerticalPadding = spacingSmall;
+  static const double settingsItemHorizontalPadding = spacingMedium;
+  static const double settingsIconSize = 22.0;
+  static const double settingsDividerIndent = 56.0;
+  static const double settingsContainerRadius = borderRadiusMedium;
+
   // Theme Data
   static ThemeData get lightTheme {
     return ThemeData(
