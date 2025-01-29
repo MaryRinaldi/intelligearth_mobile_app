@@ -1,38 +1,50 @@
 import 'package:geolocator/geolocator.dart';
-import 'package:logger/logger.dart';
 
 class LocationService {
-  static final Logger _logger = Logger();
+  static final LocationService _instance = LocationService._internal();
+  factory LocationService() => _instance;
+  LocationService._internal();
 
-  static Future<bool> checkPermissions() async {
-    bool serviceEnabled = await Geolocator.isLocationServiceEnabled();
-    if (!serviceEnabled) {
-      return false;
-    }
+  bool _isInitialized = false;
 
-    LocationPermission permission = await Geolocator.checkPermission();
-    if (permission == LocationPermission.denied) {
-      permission = await Geolocator.requestPermission();
-      if (permission == LocationPermission.denied) {
+  Future<bool> initializeLocationService() async {
+    if (_isInitialized) return true;
+
+    try {
+      bool serviceEnabled = await Geolocator.isLocationServiceEnabled();
+      if (!serviceEnabled) {
         return false;
       }
-    }
 
-    if (permission == LocationPermission.deniedForever) {
+      LocationPermission permission = await Geolocator.checkPermission();
+      
+      if (permission == LocationPermission.denied) {
+        permission = await Geolocator.requestPermission();
+        if (permission == LocationPermission.denied) {
+          return false;
+        }
+      }
+      
+      if (permission == LocationPermission.deniedForever) {
+        return false;
+      }
+
+      _isInitialized = true;
+      return true;
+    } catch (e) {
       return false;
     }
-
-    return true;
   }
 
-  static Future<Position?> getCurrentPosition() async {
+  Future<Position?> getCurrentPosition() async {
+    if (!_isInitialized) {
+      final initialized = await initializeLocationService();
+      if (!initialized) return null;
+    }
+    
     try {
-      if (!await checkPermissions()) {
-        return null;
-      }
       return await Geolocator.getCurrentPosition();
     } catch (e) {
-      _logger.e('Errore nel recupero della posizione: $e');
       return null;
     }
   }

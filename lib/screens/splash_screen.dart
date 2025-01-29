@@ -34,9 +34,8 @@ class _SplashScreenState extends State<SplashScreen> {
       Navigator.of(context).pushReplacementNamed(initialRoute);
     } catch (e) {
       developer.log('Error in _checkInitialRoute: $e');
-      // In caso di errore, vai alla schermata di login come fallback
       if (!mounted) return;
-      Navigator.of(context).pushReplacementNamed('/login');
+      Navigator.of(context).pushReplacementNamed('/signin');
     }
   }
 

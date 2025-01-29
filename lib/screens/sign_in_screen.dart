@@ -5,7 +5,7 @@ import '../theme/app_theme.dart';
 import 'sign_up_screen.dart';
 import '../services/preferences_service.dart';
 import 'package:geolocator/geolocator.dart';
-import '../utils/location_service.dart';
+
 
 class SignInScreen extends StatefulWidget {
   const SignInScreen({super.key});
@@ -167,16 +167,6 @@ class SignInScreenState extends State<SignInScreen>
     });
 
     try {
-      // Ottieni la posizione prima del sign in
-      final position = await LocationService.getCurrentPosition();
-      if (position == null) {
-        setState(() {
-          errorMessage = 'Impossibile ottenere la posizione. Verifica i permessi di localizzazione.';
-          _isLoading = false;
-        });
-        return;
-      }
-
       final signedInUser = await _authService.signIn(
         _emailController.text,
         _passwordController.text,

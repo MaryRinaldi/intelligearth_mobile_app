@@ -25,7 +25,7 @@ class _SettingsPageState extends State<SettingsPage> {
   String _selectedLanguage = 'it';
   bool _highContrastMode = false;
   double _textSize = 16.0; // Default text size
-  String _themeMode = 'system'; // Aggiungiamo questa variabile
+  String _themeMode = 'light'; 
   bool _systemNotifications = true;
   bool _questNotifications = true;
   bool _messageNotifications = true;
@@ -34,6 +34,7 @@ class _SettingsPageState extends State<SettingsPage> {
   @override
   void initState() {
     super.initState();
+    _themeMode = 'light';
     WidgetsBinding.instance.addPostFrameCallback((_) {
       _loadPreferences();
     });

@@ -25,8 +25,11 @@ void main() async {
   await AppConfig.load();
   await dotenv.load();
   runApp(
-    ChangeNotifierProvider(
-      create: (_) => LocaleProvider(),
+    MultiProvider(
+      providers: [
+        ChangeNotifierProvider(create: (_) => LocaleProvider()),
+        // altri provider...
+      ],
       child: const MyApp(),
     ),
   );
@@ -68,18 +71,17 @@ class MyApp extends StatelessWidget {
       builder: (context, localeProvider, child) {
         return MaterialApp(
           locale: localeProvider.locale,
-          localizationsDelegates: [
+          localizationsDelegates: const [
             AppLocalizations.delegate,
             GlobalMaterialLocalizations.delegate,
             GlobalWidgetsLocalizations.delegate,
             GlobalCupertinoLocalizations.delegate,
           ],
-          supportedLocales: const [
-            Locale('en'), // English
-            Locale('it'), // Italian
-          ],
+          supportedLocales: LocaleProvider.supportedLocales,
           title: 'IntelligEarth App',
           theme: AppTheme.lightTheme,
+          darkTheme: AppTheme.darkTheme,
+          themeMode: ThemeMode.light,
           home: FutureBuilder<String>(
             future: _getInitialRoute(),
             builder: (context, snapshot) {

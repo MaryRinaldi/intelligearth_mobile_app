@@ -37,7 +37,7 @@ class PreferencesService {
   static const String keyDoNotDisturbEnabled = 'do_not_disturb_enabled';
   static const String keyDoNotDisturbStart = 'do_not_disturb_start';
   static const String keyDoNotDisturbEnd = 'do_not_disturb_end';
-  static const String keyThemeSync = 'theme_sync_with_system';
+  static const String keyThemeSync = 'theme_sync_with_light';
   static const String keyFontScale = 'font_scale';
   static const String keyLastBackup = 'last_backup_date';
   static const String keyAccessibilityFeatures = 'accessibility_features';
@@ -67,7 +67,7 @@ class PreferencesService {
 
   Future<String> getThemeMode() async {
     final prefs = await SharedPreferences.getInstance();
-    return prefs.getString(keyThemeMode) ?? 'system';
+    return prefs.getString(keyThemeMode) ?? 'light';
   }
 
   // Notifiche
@@ -223,7 +223,7 @@ class PreferencesService {
       photosEnabled: prefs.getBool(keyPhotosEnabled) ?? true,
       achievementsEnabled: prefs.getBool(keyAchievementsEnabled) ?? true,
       userDataEnabled: prefs.getBool(keyUserDataEnabled) ?? true,
-      themeMode: prefs.getString(keyThemeMode) ?? 'system',
+      themeMode: prefs.getString(keyThemeMode) ?? 'light',
       promotionalNotifications: prefs.getBool(keyPromotionalNotifications) ?? true,
       language: prefs.getString(keyLanguage) ?? 'it',
       dataConsent: prefs.getBool(keyDataConsent) ?? false,
@@ -459,7 +459,7 @@ class PreferencesService {
   Future<ThemePreferences> getThemePreferences() async {
     final prefs = await SharedPreferences.getInstance();
     return ThemePreferences(
-      mode: prefs.getString(keyThemeMode) ?? 'system',
+      mode: prefs.getString(keyThemeMode) ?? 'light',
       syncWithSystem: prefs.getBool(keyThemeSync) ?? true,
     );
   }
