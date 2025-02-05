@@ -247,5 +247,9 @@ gradle-wrapper.properties
 .yarn/install-state.gz
 .pnp.*
 
+# Non escludere questi file se necessari per la build
+# local.defaults.properties
+# secrets.properties
+
 
 

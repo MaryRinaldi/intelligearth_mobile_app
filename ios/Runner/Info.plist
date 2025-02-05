@@ -57,5 +57,7 @@
 <string>Questa app necessita di accesso alla tua posizione per mostrarti sulla mappa e calcolare i percorsi anche in background.</string>
 <key>io.flutter.embedded_views_preview</key>
 <true/>
+<key>GMSApiKey</key>
+<string>map_chiave_api</string>
 </dict>
 </plist>

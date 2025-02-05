@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'package:flutter/material.dart';
 import '../theme/app_theme.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
@@ -20,6 +21,7 @@ class _QuestPageState extends State<QuestPage>
   int _selectedTabIndex = 0;
   Position? _userPosition;
   bool _isLocationPermissionChecked = false;
+  StreamSubscription<Position>? _positionStreamSubscription;
 
   final List<Quest> quests = [
     Quest(
@@ -102,14 +104,36 @@ class _QuestPageState extends State<QuestPage>
     }
 
     await prefs.setBool('location_permission', true);
-    _startLocationUpdates();
+    if (permission == LocationPermission.always || permission == LocationPermission.whileInUse) {
+      _startLocationUpdates();
+    }
     setState(() => _isLocationPermissionChecked = true);
   }
 
   void _startLocationUpdates() {
-    Geolocator.getPositionStream().listen((Position position) {
-      setState(() => _userPosition = position);
-    });
+    if (_positionStreamSubscription != null) return;
+
+    const LocationSettings locationSettings = LocationSettings(
+      accuracy: LocationAccuracy.high,
+      distanceFilter: 10,
+      timeLimit: Duration(seconds: 30),
+    );
+
+    _positionStreamSubscription = Geolocator.getPositionStream(
+      locationSettings: locationSettings,
+    ).listen(
+      (Position position) {
+        if (mounted) {
+          setState(() {
+            _userPosition = position;
+            debugPrint("Posizione aggiornata: $_userPosition");
+          });
+        }
+      },
+      onError: (error) {
+        debugPrint("Errore nel flusso della posizione: $error");
+      },
+    );
   }
 
   List<Quest> _getSortedQuests(List<Quest> questList) {
@@ -136,6 +160,7 @@ class _QuestPageState extends State<QuestPage>
   @override
   void dispose() {
     _tabController.dispose();
+    _positionStreamSubscription?.cancel();
     super.dispose();
   }
 

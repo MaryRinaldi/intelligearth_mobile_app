@@ -18,12 +18,11 @@ import 'theme/app_theme.dart';
 import 'package:intelligearth_mobile/config/app_config.dart';
 import 'services/preferences_service.dart';
 import 'services/auth_service.dart';
-import 'package:flutter_dotenv/flutter_dotenv.dart';
+
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await AppConfig.load();
-  await dotenv.load();
   runApp(
     MultiProvider(
       providers: [
@@ -60,8 +59,8 @@ class MyApp extends StatelessWidget {
       }
       
       return '/signin';  // Percorso per la pagina di login
-    } catch (e) {
-      return '/signin';  // In caso di errore, vai direttamente alla pagina di login
+    } catch (e) { 
+      return '/welcome';  // In caso di errore, vai direttamente alla pagina di login
     }
   }
 

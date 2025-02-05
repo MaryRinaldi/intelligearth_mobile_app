@@ -27,11 +27,12 @@ class MapService {
       _directionsCache.remove(oldestKey);
     }
 
+    final String apiKey = AppConfig.googleMapsApiKey;
     final String url = 'https://maps.googleapis.com/maps/api/directions/json?'
         'origin=${origin.latitude},${origin.longitude}'
         '&destination=${destination.latitude},${destination.longitude}'
         '&mode=walking'
-        '&key=${AppConfig.googleMapsApiKey}';
+        '&key=$apiKey';
 
     try {
       final response = await http.get(Uri.parse(url));

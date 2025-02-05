@@ -1,12 +1,51 @@
 buildscript {
+    ext {
+        kotlin_version = '1.9.0'
+    }
     repositories {
         google()
         mavenCentral()
     }
+
     dependencies {
-        classpath "com.android.tools.build:gradle:8.2.1"
-        classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:1.8.22"
+        classpath "com.android.tools.build:gradle:8.3.0"
+        classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
+        classpath "com.google.android.libraries.mapsplatform.secrets-gradle-plugin:secrets-gradle-plugin:2.0.1"
     }
+}
+
+apply plugin: 'com.google.android.libraries.mapsplatform.secrets-gradle-plugin'
+
+secrets {
+    def projectRoot = project.rootProject.rootDir
+    def parentDir = projectRoot.parentFile
+    
+    // Prova prima nella directory android
+    def secretsFile = new File(projectRoot, 'secrets.properties')
+    def defaultsFile = new File(projectRoot, 'local.defaults.properties')
+    
+    // Se non trovati, cerca nella directory principale
+    if (!secretsFile.exists()) {
+        secretsFile = new File(parentDir, 'secrets.properties')
+    }
+    if (!defaultsFile.exists()) {
+        defaultsFile = new File(parentDir, 'local.defaults.properties')
+    }
+    
+    println "Checking secrets.properties in android dir: ${new File(projectRoot, 'secrets.properties').exists()}"
+    println "Checking secrets.properties in parent dir: ${new File(parentDir, 'secrets.properties').exists()}"
+    println "Final secrets.properties path: ${secretsFile.absolutePath}"
+    println "Final local.defaults.properties path: ${defaultsFile.absolutePath}"
+    
+    if (!secretsFile.exists()) {
+        throw new GradleException("secrets.properties not found in either ${projectRoot} or ${parentDir}")
+    }
+    if (!defaultsFile.exists()) {
+        throw new GradleException("local.defaults.properties not found in either ${projectRoot} or ${parentDir}")
+    }
+    
+    propertiesFileName = secretsFile.absolutePath
+    defaultPropertiesFileName = defaultsFile.absolutePath
 }
 
 allprojects {
@@ -26,4 +65,6 @@ subprojects {
 tasks.register("clean", Delete) {
     delete rootProject.buildDir
 }
+
+
 

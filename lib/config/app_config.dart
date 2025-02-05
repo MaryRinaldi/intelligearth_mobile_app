@@ -8,9 +8,9 @@ class AppConfig {
   static bool get isProduction => kReleaseMode;
 
   static String get googleMapsApiKey {
-    final key = dotenv.env['GOOGLE_MAPS_API_KEY'] ?? '';
+    final key = const String.fromEnvironment('GOOGLE_MAPS_API_KEY', defaultValue: '');
     if (key.isEmpty) {
-      debugPrint('Warning: Google Maps API key is not set in .env file');
+      debugPrint('Warning: Google Maps API key is not set');
     }
     return key;
   }

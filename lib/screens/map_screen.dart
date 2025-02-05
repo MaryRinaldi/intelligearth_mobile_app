@@ -10,6 +10,7 @@ import 'camera_view_page.dart';
 import 'quest_detail_screen.dart';
 import '../services/map_service.dart';
 import 'package:logger/logger.dart';
+import '../config/app_config.dart';
 
 class MapScreen extends StatefulWidget {
   final double latitude;
@@ -48,6 +49,8 @@ class _MapScreenState extends State<MapScreen>
   final logger = Logger();
   String? _routeDistance;
   String? _routeDuration;
+  QuestMarker? _selectedMarker;
+  final apiKey = AppConfig.googleMapsApiKey;
 
   // Posizione di default (Roma - Colosseo)
   static const LatLng _defaultLocation = LatLng(41.8902, 12.4922);
@@ -108,6 +111,7 @@ class _MapScreenState extends State<MapScreen>
                   17.0,
                 ),
               );
+              _selectedMarker = marker;
             },
           ),
         )
@@ -134,20 +138,10 @@ class _MapScreenState extends State<MapScreen>
     ).listen(
       (Position position) {
         if (mounted) {
-          final distance = _currentPosition == null ? double.infinity :
-            Geolocator.distanceBetween(
-              _currentPosition!.latitude,
-              _currentPosition!.longitude,
-              position.latitude,
-              position.longitude,
-            );
-          
-          if (distance > 10) {
             setState(() {
               _currentPosition = position;
               _updateLocationCircle();
             });
-          }
         }
       },
     );
@@ -160,7 +154,42 @@ class _MapScreenState extends State<MapScreen>
     super.dispose();
   }
 
+  double _calculateDistance() {
+    if (_currentPosition == null) return double.infinity;
+    
+    return Geolocator.distanceBetween(
+      _currentPosition!.latitude,
+      _currentPosition!.longitude,
+      widget.latitude,
+      widget.longitude,
+    );
+  }
+
+  bool _isWithinPhotoDistance() {
+    final distance = _calculateDistance();
+    return distance <= 50; // 50 meters
+  }
+
   Future<void> _openCamera(BuildContext context) async {
+    if (!_isWithinPhotoDistance()) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: const Text('Devi essere a meno di 50 metri dal punto per scattare una foto.'),
+          behavior: SnackBarBehavior.floating,
+          backgroundColor: AppTheme.darkColor,
+          action: SnackBarAction(
+            label: 'Indicazioni',
+            textColor: Colors.white,
+            onPressed: _getDirections,
+          ),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(AppTheme.borderRadiusLarge),
+          ),
+        ),
+      );
+      return;
+    }
+
     final picker = ImagePicker();
     final pickedFile = await picker.pickImage(source: ImageSource.camera);
 
@@ -190,10 +219,13 @@ class _MapScreenState extends State<MapScreen>
   Future<void> _getDirections() async {
     if (_currentPosition == null) return;
     
+    final targetLatitude = _selectedMarker?.latitude ?? widget.latitude;
+    final targetLongitude = _selectedMarker?.longitude ?? widget.longitude;
+    
     try {
       final result = await _mapService.getDirections(
         LatLng(_currentPosition!.latitude, _currentPosition!.longitude),
-        LatLng(widget.latitude, widget.longitude)
+        LatLng(targetLatitude, targetLongitude)
       );
       
       setState(() {
@@ -211,22 +243,6 @@ class _MapScreenState extends State<MapScreen>
     } catch (e) {
       logger.e('Error getting directions: $e');
     }
-  }
-
-  double _calculateDistance() {
-    if (_currentPosition == null) return double.infinity;
-    
-    return Geolocator.distanceBetween(
-      _currentPosition!.latitude,
-      _currentPosition!.longitude,
-      widget.latitude,
-      widget.longitude,
-    );
-  }
-
-  bool _isWithinPhotoDistance() {
-    final distance = _calculateDistance();
-    return distance <= 50; // 50 meters
   }
 
   @override
@@ -460,8 +476,19 @@ class _MapScreenState extends State<MapScreen>
   }
 
   Widget _buildMarkerInfoPanel() {
-    final distance = _calculateDistance();
-    final isWithinRange = _isWithinPhotoDistance();
+    // Usa le coordinate del marker selezionato se disponibile, altrimenti usa quelle del widget
+    final targetLatitude = _selectedMarker?.latitude ?? widget.latitude;
+    final targetLongitude = _selectedMarker?.longitude ?? widget.longitude;
+    
+    final distance = _currentPosition == null ? double.infinity : 
+      Geolocator.distanceBetween(
+        _currentPosition!.latitude,
+        _currentPosition!.longitude,
+        targetLatitude,
+        targetLongitude,
+      );
+    
+    final isWithinRange = distance <= 50; // 50 meters
     
     return AnimatedPositioned(
       duration: AppTheme.animationNormal,
@@ -499,7 +526,7 @@ class _MapScreenState extends State<MapScreen>
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    widget.title,
+                    _selectedMarker?.title ?? widget.title,
                     style: Theme.of(context).textTheme.titleMedium?.copyWith(
                       fontWeight: FontWeight.bold,
                     ),
@@ -554,9 +581,9 @@ class _MapScreenState extends State<MapScreen>
                           MaterialPageRoute(
                             builder: (context) => QuestDetailScreen(
                               quest: Quest(
-                                title: widget.title,
-                                latitude: widget.latitude,
-                                longitude: widget.longitude,
+                                title: _selectedMarker?.title ?? widget.title,
+                                latitude: targetLatitude,
+                                longitude: targetLongitude,
                                 description: widget.description ?? '',
                                 imagePath: 'assets/images/quest_default.jpg',
                               ),
@@ -599,30 +626,12 @@ class _MapScreenState extends State<MapScreen>
                       const SizedBox(width: AppTheme.spacingMedium),
                       Expanded(
                         child: ElevatedButton.icon(
-                          onPressed: isWithinRange 
-                            ? () => _openCamera(context)
-                            : () {
-                                ScaffoldMessenger.of(context).showSnackBar(
-                                  SnackBar(
-                                    content: const Text('Devi essere a meno di 50 metri dal punto per scattare una foto. Usa le indicazioni per raggiungerlo.'),
-                                    behavior: SnackBarBehavior.floating,
-                                    backgroundColor: AppTheme.darkColor,
-                                    action: SnackBarAction(
-                                      label: 'Indicazioni',
-                                      textColor: Colors.white,
-                                      onPressed: _getDirections,
-                                    ),
-                                    shape: RoundedRectangleBorder(
-                                      borderRadius: BorderRadius.circular(AppTheme.borderRadiusLarge),
-                                    ),
-                                  ),
-                                );
-                              },
+                          onPressed: isWithinRange ? () => _openCamera(context) : null,
                           icon: const Icon(Icons.camera_alt),
                           label: const Text('Scatta Foto'),
                           style: ElevatedButton.styleFrom(
                             backgroundColor: isWithinRange
-                              ? AppTheme.accentColor.withValues(alpha: 106)
+                              ? AppTheme.accentColor
                               : AppTheme.accentColor.withValues(alpha: 77),
                             foregroundColor: Colors.white,
                             minimumSize: const Size(double.infinity, 48),
@@ -633,6 +642,35 @@ class _MapScreenState extends State<MapScreen>
                         ),
                       ),
                     ],
+                  ),
+                  const SizedBox(height: AppTheme.spacingMedium),
+                  ElevatedButton.icon(
+                    onPressed: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => QuestDetailScreen(
+                            quest: Quest(
+                              title: _selectedMarker?.title ?? widget.title,
+                              latitude: targetLatitude,
+                              longitude: targetLongitude,
+                              description: widget.description ?? '',
+                              imagePath: 'assets/images/quest_default.jpg',
+                            ),
+                          ),
+                        ),
+                      );
+                    },
+                    icon: const Icon(Icons.info_outline),
+                    label: const Text('Dettagli Quest'),
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Colors.white,
+                      foregroundColor: AppTheme.primaryColor,
+                      minimumSize: const Size(double.infinity, 48),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(AppTheme.borderRadiusLarge),
+                      ),
+                    ),
                   ),
                 ],
               ),

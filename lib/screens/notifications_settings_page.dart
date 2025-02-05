@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import '../../theme/app_theme.dart';
-import '../../services/preferences_service.dart';
+import '../theme/app_theme.dart';
+import '../services/preferences_service.dart';
 
 class NotificationsSettingsPage extends StatefulWidget {
   final bool notificationsEnabled;
