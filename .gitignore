@@ -233,7 +233,6 @@ gradle-wrapper.properties
 # Atom configuration
 .atom/
 
-
 # Flutter build files
 /build/
 .flutter-plugins
@@ -247,9 +246,65 @@ gradle-wrapper.properties
 .yarn/install-state.gz
 .pnp.*
 
+# CMake and native build files
+android/app/.cxx/
+
 # Non escludere questi file se necessari per la build
 # local.defaults.properties
 # secrets.properties
 
+android/app/.cxx/Debug/2i4w5z47/x86_64/CMakeFiles/3.22.1-g37088a8-dirty/CMakeSystem.cmake
+android/app/.cxx/Debug/2i4w5z47/x86_64/CMakeFiles/3.22.1-g37088a8-dirty/CompilerIdC/CMakeCCompilerId.c
+android/app/.cxx/Debug/2i4w5z47/arm64-v8a/build_file_index.txt
+android/app/.cxx/Debug/2i4w5z47/armeabi-v7a/android_gradle_build.json
+android/app/.cxx/Debug/2i4w5z47/arm64-v8a/android_gradle_build_mini.json
+android/app/.cxx/Debug/2i4w5z47/arm64-v8a/metadata_generation_command.txt
 
+# Android
+*.iml
+.gradle
+/local.properties
+/.idea/caches
+/.idea/libraries
+/.idea/modules.xml
+/.idea/workspace.xml
+.DS_Store
+/build
+/captures
+.externalNativeBuild
 
+# Flutter
+.flutter-plugins
+.flutter-plugins-dependencies
+.packages
+.pub-cache
+.pub
+android/app/.cxx/Debug/2i4w5z47/hash_key.txt
+android/app/.cxx/Debug/2i4w5z47/arm64-v8a/additional_project_files.txt
+android/app/.cxx/Debug/2i4w5z47/arm64-v8a/android_gradle_build.json
+android/app/.cxx/Debug/2i4w5z47/arm64-v8a/build.ninja
+android/app/.cxx/Debug/2i4w5z47/arm64-v8a/cmake_install.cmake
+android/app/.cxx/Debug/2i4w5z47/arm64-v8a/CMakeCache.txt
+android/app/.cxx/Debug/2i4w5z47/arm64-v8a/configure_fingerprint.bin
+android/app/.cxx/Debug/2i4w5z47/arm64-v8a/prefab_config.json
+android/app/.cxx/Debug/2i4w5z47/arm64-v8a/symbol_folder_index.txt
+android/app/.cxx/Debug/2i4w5z47/arm64-v8a/.cmake/api/v1/query/client-agp/cache-v2
+android/app/.cxx/Debug/2i4w5z47/arm64-v8a/.cmake/api/v1/query/client-agp/cmakeFiles-v1
+android/app/.cxx/Debug/2i4w5z47/arm64-v8a/.cmake/api/v1/query/client-agp/codemodel-v2
+android/app/.cxx/Debug/2i4w5z47/arm64-v8a/.cmake/api/v1/reply/cache-v2-a1c7daec35c99db97a99.json
+android/app/.cxx/Debug/2i4w5z47/arm64-v8a/.cmake/api/v1/reply/cmakeFiles-v1-ae9c5edaae5a3c9c3b78.json
+android/app/.cxx/Debug/2i4w5z47/arm64-v8a/.cmake/api/v1/reply/codemodel-v2-0cc24d35533bef314790.json
+android/app/.cxx/Debug/2i4w5z47/arm64-v8a/.cmake/api/v1/reply/directory-.-Debug-d0094a50bb2071803777.json
+android/app/.cxx/Debug/2i4w5z47/arm64-v8a/.cmake/api/v1/reply/index-2025-02-13T14-59-09-0982.json
+android/app/.cxx/Debug/2i4w5z47/arm64-v8a/CMakeFiles/cmake.check_cache
+android/app/.cxx/Debug/2i4w5z47/arm64-v8a/CMakeFiles/rules.ninja
+android/app/.cxx/Debug/2i4w5z47/arm64-v8a/CMakeFiles/TargetDirectories.txt
+android/app/.cxx/Debug/2i4w5z47/arm64-v8a/CMakeFiles/3.22.1-g37088a8-dirty/CMakeCCompiler.cmake
+android/app/.cxx/Debug/2i4w5z47/arm64-v8a/CMakeFiles/3.22.1-g37088a8-dirty/CMakeCXXCompiler.cmake
+android/app/.cxx/Debug/2i4w5z47/arm64-v8a/CMakeFiles/3.22.1-g37088a8-dirty/CMakeDetermineCompilerABI_C.bin
+android/app/.cxx/Debug/2i4w5z47/arm64-v8a/CMakeFiles/3.22.1-g37088a8-dirty/CMakeDetermineCompilerABI_CXX.bin
+android/app/.cxx/Debug/2i4w5z47/arm64-v8a/CMakeFiles/3.22.1-g37088a8-dirty/CMakeSystem.cmake
+android/app/.cxx/Debug/2i4w5z47/arm64-v8a/CMakeFiles/3.22.1-g37088a8-dirty/CompilerIdC/CMakeCCompilerId.c
+android/app/.cxx/Debug/2i4w5z47/arm64-v8a/CMakeFiles/3.22.1-g37088a8-dirty/CompilerIdC/CMakeCCompilerId.o
+android/app/.cxx/Debug/2i4w5z47/arm64-v8a/CMakeFiles/3.22.1-g37088a8-dirty/CompilerIdCXX/CMakeCXXCompilerId.cpp
+android/app/.cxx/Debug/2i4w5z47/arm64-v8a/CMakeFiles/3.22.1-g37088a8-dirty/CompilerIdCXX/CMakeCXXCompilerId.o
